@@ -1,11 +1,11 @@
-import { type AppType } from "next/app";
+import type { AppProps } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import type { SIWESession } from "connectkit";
 import { optimismGoerli } from "wagmi/chains";
-import { siweClient } from "~/utils/siweClient";
+import type { Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 const chains = [optimismGoerli];
 
 const config = createConfig(
@@ -17,6 +17,7 @@ const config = createConfig(
 
     // Required
     appName: "Your App Name",
+    autoConnect: true,
 
     // Optional
     appDescription: "Your App Description",
@@ -25,21 +26,14 @@ const config = createConfig(
   })
 );
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
   return (
     <WagmiConfig config={config}>
-      <siweClient.Provider
-        onSignIn={(data?: SIWESession) => {
-          console.log("onSignIn Provider", data);
-        }}
-        onSignOut={() => {
-          console.log("onSignOut Provider");
-        }}
-      >
+      <SessionProvider session={pageProps.session} refetchInterval={0}>
         <ConnectKitProvider>
           <Component {...pageProps} />
         </ConnectKitProvider>
-      </siweClient.Provider>
+      </SessionProvider>
     </WagmiConfig>
   );
 };
