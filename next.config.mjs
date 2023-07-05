@@ -7,9 +7,9 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-  future: {
-    webpack5: true,
-  },
+  // future: {
+  //   webpack5: true,
+  // },
   webpack(config) {
     config.resolve.fallback = {
       ...config.resolve.fallback,

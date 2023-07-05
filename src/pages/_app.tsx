@@ -3,7 +3,9 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import type { SIWESession } from "connectkit";
 import { optimismGoerli } from "wagmi/chains";
+import { siweClient } from "~/utils/siweClient";
 const chains = [optimismGoerli];
 
 const config = createConfig(
@@ -26,9 +28,18 @@ const config = createConfig(
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <WagmiConfig config={config}>
-      <ConnectKitProvider>
-        <Component {...pageProps} />
-      </ConnectKitProvider>
+      <siweClient.Provider
+        onSignIn={(data?: SIWESession) => {
+          console.log("onSignIn Provider", data);
+        }}
+        onSignOut={() => {
+          console.log("onSignOut Provider");
+        }}
+      >
+        <ConnectKitProvider>
+          <Component {...pageProps} />
+        </ConnectKitProvider>
+      </siweClient.Provider>
     </WagmiConfig>
   );
 };
