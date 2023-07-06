@@ -18,6 +18,7 @@
     "@trpc/next": "^10.26.0",
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
+    "class-variance-authority": "^0.6.1",
     "connectkit": "^1.4.0",
     "connectkit-next-siwe": "^0.2.0",
     "ethers": "^6.6.2",

@@ -1,84 +1,22 @@
-import { ConnectKitButton } from "connectkit";
-import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
-import { useEffect } from "react";
-import { SiweMessage } from "siwe";
-import { useAccount, useNetwork, useSignMessage, useDisconnect } from "wagmi";
+import Image from "next/image";
+import Logo from "public/images/Logo";
+import { useNetwork } from "wagmi";
 
-// The approach used in this component shows how to build a sign in and sign out
-// component that works on pages which support both client and server side
-// rendering, and avoids any flash incorrect content on initial page load.
 export default function Header() {
-  // Hooks
-  const { data: sessionData } = useSession();
-  // Wagmi Hooks
-  const { signMessageAsync } = useSignMessage();
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
 
-  const { chain } = useNetwork();
+  const {chain} = useNetwork()
+  
+  console.log(chain)
 
-  // Functions
-  /**
-   * Attempts SIWE and establish session
-   */
-  const onClickSignIn = async () => {
-    try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in with Ethereum to the app.",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        // nonce is used from CSRF token
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      void signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-      });
-    } catch (error) {
-      window.alert(error);
-    }
-  };
-
-  /**
-   * Sign user out
-   */
-  const onClickSignOut = async () => {
-    await signOut();
-  };
-
-  useEffect(() => {
-    if (isConnected && !sessionData) {
-      void onClickSignIn();
-    } else if (!isConnected && sessionData) {
-      void onClickSignOut();
-    }
-  }, [isConnected]);
-
-  // Render
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <ConnectKitButton />
-      {sessionData && isConnected ? (
-        <>
-          <div>You are signed in!</div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              void onClickSignOut();
-              disconnect();
-            }}
-          >
-            Sign Out
-          </button>
-        </>
-      ) : null}
+    <div className="flex items-center justify-between gap-4 absolute top-0 w-full px-10 py-8 z-50">
+ <Logo/> 
+      {chain &&      (<div className="bg-brand flex items-center bg-brand-gray-light px-8 py-2 rounded-md">
+        <span className="mr-2">Network:</span>
+        <Image src={`/images/networks/${chain.name.toLowerCase()}.svg`} alt={chain.name} width={24} height={24} className="mr-1 w-6 h-6 object-contain" />
+        <span>{chain.name}</span>
+      </div>)}
+
     </div>
   );
 }

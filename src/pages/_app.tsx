@@ -30,7 +30,15 @@ const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
   return (
     <WagmiConfig config={config}>
       <SessionProvider session={pageProps.session} refetchInterval={0}>
-        <ConnectKitProvider>
+        <ConnectKitProvider customTheme={{
+          '--fhOscard-font-family': '"FH Oscar", sans-serif',
+          '--ck-connectbutton-border-radius': '100vw',
+          '--ck-connectbutton-background': "19181D",
+          '--ck-connectbutton-color': "F9FBFA",
+          '--ck-connectbutton-hover-background': "C8FD6A",
+          '--ck-connectbutton-hover-color': "19181D",
+
+        }}>
           <Component {...pageProps} />
         </ConnectKitProvider>
       </SessionProvider>

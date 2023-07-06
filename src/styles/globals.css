@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: 'PolySans';
+    src: local(''), url('/fonts/PolySans-Median.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'FH Oscar';
+    src: local(''), url('/fonts/fhoscar-medium.woff2') format('woff2');
+  }
+
+  body {
+    background-color: #F9FBFA;
+    color: #19181D;
+  }
+  
+  h1,
+  h2 {
+    @apply font-polysans;
+    letter-spacing: -0.01em;
+  }
+
+  p, span, div, a, li, input, textarea, button{
+    @apply font-fhoscar;
+    letter-spacing: 0.01em;
+  }
