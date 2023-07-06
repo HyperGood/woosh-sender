@@ -3,10 +3,10 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import { optimismGoerli } from "wagmi/chains";
+import { hardhat, optimismGoerli } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-const chains = [optimismGoerli];
+const chains = [hardhat];
 
 const config = createConfig(
   getDefaultConfig({
@@ -16,7 +16,7 @@ const config = createConfig(
     walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || "",
 
     // Required
-    appName: "Your App Name",
+    appName: "Woosh Sender",
     autoConnect: false,
 
     // Optional

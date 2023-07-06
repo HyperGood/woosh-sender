@@ -1,9 +1,20 @@
 import type { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useReducer } from "react";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useContractEvent,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
+import { abi } from "../../contract-abi";
+import { parseEther } from "ethers";
+import useDebounce from "~/hooks/useDebounce";
+
+const despositValutAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 interface TransactionForm {
   amount: number;
@@ -23,29 +34,79 @@ const Send = () => {
     }),
     {
       amount: 0,
-      token: "",
+      token: "ETH",
       phone: "",
     }
   );
-
-  const ctx = api.useContext();
-
-  const { mutate, isLoading: isSending } = api.transaction.add.useMutation({
+  const debouncedAmount = useDebounce(transaction.amount, 500);
+  const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
     onSuccess: () => {
-      console.log("Sent!");
+      console.log("Saved!");
       void ctx.transaction.getTransactions.invalidate();
+    },
+    onError: (error) => {
+      console.log(error);
     },
   });
 
+  const { config: contractWriteConfig } = usePrepareContractWrite({
+    address: despositValutAddress,
+    abi,
+    functionName: "deposit",
+    value: parseEther(debouncedAmount.toString()),
+    enabled: Boolean(debouncedAmount),
+  });
+
+  const {
+    data: depositData,
+    write: deposit,
+    isLoading: isDepositLoading,
+    error: depositError,
+  } = useContractWrite(contractWriteConfig);
+
+  const {
+    isLoading: isDepositing,
+    isSuccess: txSuccess,
+    error: txError,
+  } = useWaitForTransaction({
+    hash: depositData?.hash,
+    onSuccess(txData) {
+      console.log("txData: ", txData);
+      saveTransaction({ txId: txData.transactionHash });
+    },
+  });
+
+  useContractEvent({
+    address: despositValutAddress,
+    abi,
+    eventName: "DepositMade",
+    listener(log) {
+      console.log("Event: ", log);
+    },
+  });
+
+  const ctx = api.useContext();
+
   const sendFunction = () => {
-    if (transaction.amount !== 0 && transaction.phone !== "") {
+    if (transaction.phone === "") {
+      alert("Please enter a phone number");
+    } else if (transaction.amount === 0) {
+      alert("Please enter an amount greater than 0");
+    } else {
+      deposit?.();
+    }
+  };
+
+  const saveTransaction = ({ txId }: { txId: string }) => {
+    if (transaction.amount !== 0 && transaction.phone !== "" && txId) {
       const amountInUSD = transaction.amount * 2000;
-      const txId = "0x1234";
       mutate({
         ...transaction,
         amountInUSD: amountInUSD,
         txId: txId,
       });
+    } else {
+      console.log("Error saving transaction");
     }
   };
 
@@ -63,7 +124,6 @@ const Send = () => {
       <input
         type="text"
         value={transaction.token}
-        onChange={(e) => setFields({ token: e.target.value })}
         className="border-2 border-gray-300 p-2"
         placeholder="ETH"
         required
@@ -85,11 +145,20 @@ const Send = () => {
       />
       <button
         onClick={() => void sendFunction()}
-        disabled={isSending}
+        disabled={isSaving || isDepositLoading || isDepositing}
         className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Send
       </button>
+      {isDepositLoading && <span>Waiting for approval</span>}
+      {isDepositing && <span>Sending funds...</span>}
+
+      {depositError && (
+        <span className="text-red font-bold">{depositError.message}</span>
+      )}
+      {txError && <span className="text-red font-bold">{txError.message}</span>}
+
+      {txSuccess && <span className="text-green font-bold">Sent!</span>}
     </div>
   );
 };
