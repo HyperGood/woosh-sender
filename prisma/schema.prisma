@@ -69,12 +69,14 @@ model Transaction {
   userId      String
   amount      Int
   token       String
+  recipient   String?
   amountInUSD Int
   claimed     Boolean  @default(false)
   createdAt   DateTime @default(now())
   txId        String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 
 model Contact {
   id      String  @id @default(cuid())
