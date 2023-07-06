@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@next-auth/prisma-adapter':
+    specifier: ^1.0.5
+    version: 1.0.7(@prisma/client@4.14.0)(next-auth@4.22.1)
   '@prisma/client':
     specifier: ^4.14.0
     version: 4.14.0(prisma@4.14.0)
@@ -28,7 +31,7 @@ dependencies:
     version: 10.26.0
   connectkit:
     specifier: ^1.4.0
-    version: 1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.5)
+    version: 1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.7)
   connectkit-next-siwe:
     specifier: ^0.2.0
     version: 0.2.0(connectkit@1.4.0)(next@13.4.2)(react-dom@18.2.0)(react@18.2.0)(siwe@2.1.4)
@@ -57,8 +60,8 @@ dependencies:
     specifier: ^1.2.9
     version: 1.2.9(typescript@5.0.4)(zod@3.21.4)
   wagmi:
-    specifier: ^1.3.5
-    version: 1.3.5(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
+    specifier: ^1.3.7
+    version: 1.3.7(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -603,6 +606,16 @@ packages:
     dependencies:
       '@motionone/dom': 10.16.2
       tslib: 2.6.0
+    dev: false
+
+  /@next-auth/prisma-adapter@1.0.7(@prisma/client@4.14.0)(next-auth@4.22.1):
+    resolution: {integrity: sha512-Cdko4KfcmKjsyHFrWwZ//lfLUbcLqlyFqjd/nYE2m3aZ7tjMNUjpks47iw7NTCnXf+5UWz5Ypyt1dSs1EP5QJw==}
+    peerDependencies:
+      '@prisma/client': '>=2.26.0 || >=3'
+      next-auth: ^4
+    dependencies:
+      '@prisma/client': 4.14.0(prisma@4.14.0)
+      next-auth: 4.22.1(next@13.4.2)(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /@next/env@13.4.2:
@@ -1499,8 +1512,8 @@ packages:
       typescript: 5.0.4
     dev: false
 
-  /@wagmi/connectors@2.6.3(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
-    resolution: {integrity: sha512-tloHzZq/7OCoOnveNdouhwv0pB1H0lB8+wqurColJsQdMKBTKn5xodl0pCkHjcKHZdELyIcuTINoq9aDzt30sA==}
+  /@wagmi/connectors@2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
+    resolution: {integrity: sha512-klF31togMDd0qQqEcLl5cCGxjMbL0RRXQ8I1vxmEa3KdGzw6Z3ICVzX7/bDfnNEZcOW7BKyAnZDq7rCt5jTOiw==}
     peerDependencies:
       '@wagmi/chains': '>=1.3.0'
       typescript: '>=5.0.4'
@@ -1519,6 +1532,7 @@ packages:
       '@walletconnect/ethereum-provider': 2.8.6(@walletconnect/modal@2.5.9)
       '@walletconnect/legacy-provider': 2.0.0
       '@walletconnect/modal': 2.5.9(react@18.2.0)
+      '@walletconnect/utils': 2.8.6
       abitype: 0.8.7(typescript@5.0.4)(zod@3.21.4)
       eventemitter3: 4.0.7
       typescript: 5.0.4
@@ -1534,8 +1548,8 @@ packages:
       - zod
     dev: false
 
-  /@wagmi/core@1.3.4(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
-    resolution: {integrity: sha512-2p6DVtKMRjkFljaQVIBtbH/oHpgoHQ1l9lSG8RmH6Z+Gm8IO67KdUbO0HuxceO/3sfBPrbNY6abbyMEaz0Rx1g==}
+  /@wagmi/core@1.3.6(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
+    resolution: {integrity: sha512-TXv9ZlRR5aySfERFuWMuo+lKXC/CoqtxVJZVHPqhK1jY+nldMx3AvrWzzF4CccRaMYcVdvPFepvmxzq2A2VvWg==}
     peerDependencies:
       typescript: '>=5.0.4'
       viem: '>=0.3.35'
@@ -1544,7 +1558,7 @@ packages:
         optional: true
     dependencies:
       '@wagmi/chains': 1.4.0(typescript@5.0.4)
-      '@wagmi/connectors': 2.6.3(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
+      '@wagmi/connectors': 2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
       abitype: 0.8.7(typescript@5.0.4)(zod@3.21.4)
       eventemitter3: 4.0.7
       typescript: 5.0.4
@@ -2421,7 +2435,7 @@ packages:
       react-dom: 17.x || 18.x
       siwe: '>=2'
     dependencies:
-      connectkit: 1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.5)
+      connectkit: 1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.7)
       iron-session: 6.3.1(next@13.4.2)
       next: 13.4.2(@babel/core@7.22.5)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
@@ -2432,7 +2446,7 @@ packages:
       - koa
     dev: false
 
-  /connectkit@1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.5):
+  /connectkit@1.4.0(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)(viem@1.2.9)(wagmi@1.3.7):
     resolution: {integrity: sha512-gRfcb/7BDX4uKc3qghjVlV5rd3jfkivqSsUG5vywZYy4nSHE4q4NeHsgJTTC8WnNTWxfOz02oP8J2dCaeCHLNw==}
     engines: {node: '>=12.4'}
     peerDependencies:
@@ -2452,7 +2466,7 @@ packages:
       resize-observer-polyfill: 1.5.1
       styled-components: 5.3.11(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)
       viem: 1.2.9(typescript@5.0.4)(zod@3.21.4)
-      wagmi: 1.3.5(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
+      wagmi: 1.3.7(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
     transitivePeerDependencies:
       - '@babel/core'
       - react-is
@@ -5506,8 +5520,8 @@ packages:
       - zod
     dev: false
 
-  /wagmi@1.3.5(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
-    resolution: {integrity: sha512-RDFjGg2MYX6CQcrppLY+KBZSDi/iYwA5zWOWQU7/qNeb/R6mBjUdhqE+aGV02K/nZw7AL8HqEoye6vNwaTQNJA==}
+  /wagmi@1.3.7(react-dom@18.2.0)(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4):
+    resolution: {integrity: sha512-n4Qwby0QB8/JSGjc0gGn4MWZ0BT229agEg6saPGS6VswmPjJLdkLq9qxKn1JptXxPREmb/ZvwHxU++3Z+gQJVA==}
     peerDependencies:
       react: '>=17.0.0'
       typescript: '>=5.0.4'
@@ -5519,7 +5533,7 @@ packages:
       '@tanstack/query-sync-storage-persister': 4.29.19
       '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query-persist-client': 4.29.19(@tanstack/react-query@4.29.7)
-      '@wagmi/core': 1.3.4(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
+      '@wagmi/core': 1.3.6(react@18.2.0)(typescript@5.0.4)(viem@1.2.9)(zod@3.21.4)
       abitype: 0.8.7(typescript@5.0.4)(zod@3.21.4)
       react: 18.2.0
       typescript: 5.0.4

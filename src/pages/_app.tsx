@@ -17,7 +17,7 @@ const config = createConfig(
 
     // Required
     appName: "Your App Name",
-    autoConnect: true,
+    autoConnect: false,
 
     // Optional
     appDescription: "Your App Description",
