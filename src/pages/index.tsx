@@ -37,7 +37,7 @@ const Send = () => {
     },
   });
 
-  const sendFunction = async () => {
+  const sendFunction = () => {
     if (transaction.amount !== 0 && transaction.phone !== "") {
       const amountInUSD = transaction.amount * 2000;
       const txId = "0x1234";
