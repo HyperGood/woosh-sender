@@ -224,7 +224,7 @@ const SignIn = () => {
     }, [isConnected]);
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center">
+    <div className="w-full h-screen flex flex-col items-center justify-center px-6 lg:px-0">
       <div>
       <Logo/>
       <h1 className="text-4xl max-w-[10ch] mt-4 mb-16">Send crypto to any phone number</h1>
@@ -332,11 +332,11 @@ return (
 const Main = () => {
 
   return (
-    <div>
+    <div className="px-4 lg:px-0 mt-[8rem] lg:mt-0">
       <span className="font-polysans block text-lg">welcome</span>
       <span className="font-polysans block text-2xl">roysandoval.eth</span>
       <Balances/>
-      <div className="mt-14 flex flex-col gap-8">
+      <div className="my-12 lg:mb-0 lg:mt-14 flex flex-col gap-8">
       <Button fullWidth>Send To A Phone Number</Button>
       <Button fullWidth>Send To An ETH Address</Button>
       </div>
@@ -348,7 +348,7 @@ const Contacts = () => {
 
   const Contact = ({name, phone, photo}: {name: string; phone: string; photo: number}) => {
     return (
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-1 ">
         <Image src={`/images/avatars/${photo}.png`} width={48} height={48} alt={name} className="w-12 h-12 object-cover rounded-full"/>
         <span className="uppercase">{name}</span>
     
@@ -411,9 +411,9 @@ const Contacts = () => {
 
 return (
   <div>
-    <p className="text-lg font-polysans mb-8">contacts</p>
-    <div className="grid grid-cols-5 gap-8">
-{contactsArr.map((contact, index) => (<div key={index}><Contact name={contact.Name} phone={contact.Phone} photo={contact.Photo}/></div>))}
+    <p className="text-lg font-polysans mb-8">contacts ({contactsArr.length})</p>
+    <div className="flex overflow-scroll md:overflow-auto md:grid md:grid-cols-5 gap-8">
+{contactsArr.map((contact, index) => (<div className="shrink-0" key={index}><Contact name={contact.Name} phone={contact.Phone} photo={contact.Photo}/></div>))}
     </div>
   </div>
 )
@@ -474,7 +474,6 @@ const PreviousSends = () => {
 
 export default function Home({coinsData}: {coinsData: CryptoPrices}) {
   const { setCryptoPrices} = useContext(CryptoPricesContext)
-
   const { isConnected } = useAccount();
   const { data: session } = useSession();
   const {disconnect} = useDisconnect()
@@ -490,17 +489,17 @@ export default function Home({coinsData}: {coinsData: CryptoPrices}) {
   return (
     <Layout>
       {isConnected && session ? (
-        <div className="h-screen w-full grid grid-cols-[1fr_37%] items-center relative">
-          <div className="pl-[10rem] pr-[15rem]">
+        <div className="h-full min-h-screen lg:h-screen w-full lg:grid lg:grid-cols-[1fr_37%] items-center relative">
+          <div className="lg:pl-[10rem] lg:pr-[15rem]">
           <Main/>
           <button
         onClick={() => void onClickSignOut()}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 mt-20 absolute"
+        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 lg:mt-20 absolute"
       >
         Sign Out
       </button>
           </div>
-          <div className="w-full bg-brand-black text-brand-white h-full px-8 pt-[10rem] flex flex-col gap-20">
+          <div className="w-full bg-brand-black text-brand-white h-full px-4 lg:px-8 pb-20 lg:pb-0 pt-20 lg:pt-40 flex flex-col gap-20">
             <Contacts/>
             <PreviousSends/>
           </div>

@@ -9,7 +9,7 @@ export default function Header() {
   console.log(chain)
 
   return (
-    <div className="flex items-center justify-between gap-4 absolute top-0 w-full px-10 py-8 z-50">
+    <div className="flex items-center justify-between gap-4 absolute top-0 w-full px-4 lg:px-10 py-4 lg:py-8 z-50">
  <Logo/> 
       {chain &&      (<div className="bg-brand flex items-center bg-brand-gray-light px-8 py-2 rounded-md">
         <span className="mr-2">Network:</span>
