@@ -9,6 +9,7 @@ export default {
       "2xl": [ 'clamp(2rem, 1.8rem + 0.73vw, 2.5rem)', { lineHeight: '1.2' } ],
       "xl": [ '2rem', { lineHeight: '1.2' } ],
       "lg": [ 'clamp(1rem, 0.9rem + 0.36vw, 1.25rem)', { lineHeight: '1.2' } ],
+      "sm": '0.875rem',
     },
     extend: {
       borderRadius: {

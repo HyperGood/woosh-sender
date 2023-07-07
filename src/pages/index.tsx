@@ -1,244 +1,21 @@
 import type { Transaction } from "@prisma/client";
-import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
-import { useContext, useEffect, useReducer } from "react";
+import {  signOut, useSession } from "next-auth/react";
+import { useContext } from "react";
 import {
   useAccount,
   useBalance,
-  useContractEvent,
-  useContractWrite,
   useDisconnect,
-  useNetwork,
-  usePrepareContractWrite,
-  useSignMessage,
-  useWaitForTransaction,
 } from "wagmi";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
-import { abi } from "../lib/contract-abi";
-import { parseEther } from "ethers";
-import useDebounce from "~/hooks/useDebounce";
-import { SiweMessage } from "siwe";
-import Logo from "public/images/Logo";
-import { WooshConnectButton } from "~/components/WooshConnectButton";
+import SignIn from "~/components/SignIn";
 import Button from "~/components/Button";
 import Image from "next/image";
 import type { GetServerSideProps } from "next";
 import { type CryptoPrices, CryptoPricesContext } from "~/context/TokenPricesContext";
-
-
-const despositValutAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-
-
-interface TransactionForm {
-  amount: number;
-  token: string;
-  phone: string;
-  recipient?: string;
-}
-
-const Send = () => {
-  const [transaction, setFields] = useReducer(
-    (
-      current: TransactionForm,
-      update: Partial<TransactionForm>
-    ): TransactionForm => ({
-      ...current,
-      ...update,
-    }),
-    {
-      amount: 0,
-      token: "ETH",
-      phone: "",
-    }
-  );
-  const debouncedAmount = useDebounce(transaction.amount, 500);
-  const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
-    onSuccess: () => {
-      console.log("Saved!");
-      void ctx.transaction.getTransactions.invalidate();
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  const { config: contractWriteConfig } = usePrepareContractWrite({
-    address: despositValutAddress,
-    abi,
-    functionName: "deposit",
-    value: parseEther(debouncedAmount.toString()),
-    enabled: Boolean(debouncedAmount),
-  });
-
-  const {
-    data: depositData,
-    write: deposit,
-    isLoading: isDepositLoading,
-    error: depositError,
-  } = useContractWrite(contractWriteConfig);
-
-  const {
-    isLoading: isDepositing,
-    isSuccess: txSuccess,
-    error: txError,
-  } = useWaitForTransaction({
-    hash: depositData?.hash,
-    onSuccess(txData) {
-      console.log("txData: ", txData);
-      saveTransaction({ txId: txData.transactionHash });
-    },
-  });
-
-  useContractEvent({
-    address: despositValutAddress,
-    abi,
-    eventName: "DepositMade",
-    listener(log) {
-      console.log("Event: ", log);
-    },
-  });
-
-  const ctx = api.useContext();
-
-  const sendFunction = () => {
-    if (transaction.phone === "") {
-      alert("Please enter a phone number");
-    } else if (transaction.amount === 0) {
-      alert("Please enter an amount greater than 0");
-    } else {
-      deposit?.();
-    }
-  };
-
-  const saveTransaction = ({ txId }: { txId: string }) => {
-    if (transaction.amount !== 0 && transaction.phone !== "" && txId) {
-      const amountInUSD = transaction.amount * 2000;
-      mutate({
-        ...transaction,
-        amountInUSD: amountInUSD,
-        txId: txId,
-      });
-    } else {
-      console.log("Error saving transaction");
-    }
-  };
-
-  return (
-    <div className="flex gap-8">
-      <input
-        type="number"
-        value={transaction.amount}
-        onChange={(e) => setFields({ amount: parseInt(e.target.value) })}
-        className="border-2 border-gray-300 p-2"
-        placeholder="Amount"
-        min={0}
-        required
-      />
-      <input
-        type="text"
-        value={transaction.token}
-        className="border-2 border-gray-300 p-2"
-        placeholder="ETH"
-        required
-      />
-      <input
-        type="text"
-        value={transaction.phone}
-        onChange={(e) => setFields({ phone: e.target.value })}
-        className="border-2 border-gray-300 p-2"
-        placeholder="Phone number"
-        required
-      />
-      <input
-        type="text"
-        value={transaction.recipient}
-        onChange={(e) => setFields({ recipient: e.target.value })}
-        className="border-2 border-gray-300 p-2"
-        placeholder="Recipient Name"
-      />
-      <button
-        onClick={() => void sendFunction()}
-        disabled={isSaving || isDepositLoading || isDepositing}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Send
-      </button>
-      {isDepositLoading && <span>Waiting for approval</span>}
-      {isDepositing && <span>Sending funds...</span>}
-
-      {depositError && (
-        <span className="text-red font-bold">{depositError.message}</span>
-      )}
-      {txError && <span className="text-red font-bold">{txError.message}</span>}
-
-      {txSuccess && <span className="text-green font-bold">Sent!</span>}
-    </div>
-  );
-};
-
-const SignIn = () => {
-
-    // Hooks
-    const { data: sessionData } = useSession();
-    // Wagmi Hooks
-    const { signMessageAsync } = useSignMessage();
-    const { address, isConnected } = useAccount();
-  
-    const { chain } = useNetwork();
-  
-    // Functions
-    /**
-     * Attempts SIWE and establish session
-     */
-    const onClickSignIn = async () => {
-      try {
-        const message = new SiweMessage({
-          domain: window.location.host,
-          address: address,
-          statement: "Sign in with Ethereum to the app.",
-          uri: window.location.origin,
-          version: "1",
-          chainId: chain?.id,
-          // nonce is used from CSRF token
-          nonce: await getCsrfToken(),
-        });
-        const signature = await signMessageAsync({
-          message: message.prepareMessage(),
-        });
-        void signIn("credentials", {
-          message: JSON.stringify(message),
-          redirect: false,
-          signature,
-        });
-      } catch (error) {
-        window.alert(error);
-      }
-    };
-  
-
-  
-    useEffect(() => {
-      if (isConnected && !sessionData) {
-        void onClickSignIn();
-      } 
-    }, [isConnected]);
-
-  return (
-    <div className="w-full h-screen flex flex-col items-center justify-center px-6 lg:px-0">
-      <div>
-      <Logo/>
-      <h1 className="text-4xl max-w-[10ch] mt-4 mb-16">Send crypto to any phone number</h1>
-      <WooshConnectButton/>
-      </div>
-    </div>
-  )
-
-}
-
-const Divider = () => (
-  <div className="h-[1px] w-full bg-brand-black/10 my-2"></div>
-)
-
+import Send from "~/components/Send/Send";
+import Divider from "~/components/Divider";
+import Contacts from "~/components/Contacts";
 
 const Balances = () => {
   const { cryptoPrices} = useContext(CryptoPricesContext)
@@ -337,86 +114,11 @@ const Main = () => {
       <span className="font-polysans block text-2xl">roysandoval.eth</span>
       <Balances/>
       <div className="my-12 lg:mb-0 lg:mt-14 flex flex-col gap-8">
-      <Button fullWidth>Send To A Phone Number</Button>
+      <Send/>
       <Button fullWidth>Send To An ETH Address</Button>
       </div>
     </div>
   )
-}
-
-const Contacts = () => {
-
-  const Contact = ({name, phone, photo}: {name: string; phone: string; photo: number}) => {
-    return (
-      <div className="flex flex-col items-center gap-1 ">
-        <Image src={`/images/avatars/${photo}.png`} width={48} height={48} alt={name} className="w-12 h-12 object-cover rounded-full"/>
-        <span className="uppercase">{name}</span>
-    
-      </div>
-    )
-  }
-
-  const contactsArr = [
-    {
-      Name: "Ali",
-      Phone: "+1 (123) 456-7890",
-      Photo: 1
-    },
-    {
-      Name: "Henry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 2
-    },
-    {
-      Name: "Harry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 3
-    },
-    {
-      Name: "Fred",
-      Phone: "+1 (123) 456-7890",
-      Photo: 4
-    },
-    {
-      Name: "Jacqueline",
-      Phone: "+1 (123) 456-7890",
-      Photo: 5
-    },
-    {
-      Name: "Ali",
-      Phone: "+1 (123) 456-7890",
-      Photo: 1
-    },
-    {
-      Name: "Henry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 2
-    },
-    {
-      Name: "Harry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 3
-    },
-    {
-      Name: "Fred",
-      Phone: "+1 (123) 456-7890",
-      Photo: 4
-    },
-    {
-      Name: "Jacqueline",
-      Phone: "+1 (123) 456-7890",
-      Photo: 5
-    },
-  ]
-
-return (
-  <div>
-    <p className="text-lg font-polysans mb-8">contacts ({contactsArr.length})</p>
-    <div className="flex overflow-scroll md:overflow-hidden md:grid md:grid-cols-5 justify-items-start gap-8">
-{contactsArr.map((contact, index) => (<div className="shrink-0" key={index}><Contact name={contact.Name} phone={contact.Phone} photo={contact.Photo}/></div>))}
-    </div>
-  </div>
-)
 }
 
 const TransactionCard = ({ transaction }: { transaction: Transaction }) => {

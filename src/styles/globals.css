@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-accent: #C8FD6A;
+  --brand-black: #19181D;
+  --brand-white: #F9FBFA;
+  --brand-gray-light: #F1F3F2;
+}
+
 @font-face {
     font-family: 'PolySans';
     src: local(''), url('/fonts/PolySans-Median.woff2') format('woff2');

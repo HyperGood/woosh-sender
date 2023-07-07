@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
 
 export const buttonStyles = cva(
-  'flex items-center justify-center px-8 py-5 rounded-full focus:outline-none transition-colors',
+  'flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-colors',
   {
     variants: {
       intent: {
