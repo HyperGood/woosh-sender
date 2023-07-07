@@ -1,6 +1,6 @@
-export interface Country {
-  id: number | string;
-  displayValue: string;
+import type { Data } from "~/components/ComboboxSelect";
+
+export interface Country extends Data {
   additionalProperties: {
     name: string;
     abbr: string;

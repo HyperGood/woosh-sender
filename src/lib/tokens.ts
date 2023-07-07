@@ -4,6 +4,7 @@ export const TOKENS = [
     displayValue: "ETH",
     additionalProperties: {
       address: "0x123",
+      tokenName: "ethereum",
     },
   },
   {
@@ -11,6 +12,7 @@ export const TOKENS = [
     displayValue: "USDc",
     additionalProperties: {
       address: "0x123",
+      tokenName: "usd-coin",
     },
   },
   {
@@ -18,6 +20,7 @@ export const TOKENS = [
     displayValue: "DAI",
     additionalProperties: {
       address: "0x123",
+      tokenName: "dai",
     },
   },
   {
@@ -25,6 +28,7 @@ export const TOKENS = [
     displayValue: "lUSD",
     additionalProperties: {
       address: "0x123",
+      tokenName: "dai",
     },
   },
   {
@@ -32,27 +36,15 @@ export const TOKENS = [
     displayValue: "USDt",
     additionalProperties: {
       address: "0x123",
+      tokenName: "dai",
     },
   },
   {
     id: 6,
-    displayValue: "GHO",
-    additionalProperties: {
-      address: "0x123",
-    },
-  },
-  {
-    id: 7,
     displayValue: "RAI",
     additionalProperties: {
       address: "0x123",
-    },
-  },
-  {
-    id: 8,
-    displayValue: "HAI",
-    additionalProperties: {
-      address: "0x123",
+      tokenName: "dai",
     },
   },
 ];

@@ -5,7 +5,7 @@ import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 export interface Data {
   id: string | number;
   displayValue: string;
-  additionalProperties?: object;
+  additionalProperties?: unknown;
 }
 
 export interface ComboboxProps {
@@ -26,16 +26,17 @@ const ComboboxSelect = ({
   return (
     <Combobox value={selectedItem} onChange={setSelectedItem}>
       <div className="relative h-full w-full">
-        <Combobox.Button as="div" className="relative h-full  flex items-center">
+        <Combobox.Button
+          as="div"
+          className="relative flex  h-full items-center"
+        >
           <Combobox.Input
             displayValue={(item: Data) => item.displayValue}
             onChange={inputOnChange}
-            className="w-full bg-brand-gray-light rounded-l-[0.5rem] px-2 h-full focus:outline-none"
+            className="h-full w-full rounded-l-[0.5rem] bg-brand-gray-light px-2 focus:outline-none"
           />
-          <div className="absolute flex -mt-1 right-1 items-center justify-center w-8 h-8">
-         
+          <div className="absolute right-1 -mt-1 flex h-8 w-8 items-center justify-center">
             <ChevronDownIcon />
-         
           </div>
         </Combobox.Button>
         <Combobox.Options className="absolute z-50 flex max-h-[9rem] w-full flex-col gap-4 overflow-scroll rounded-b-[0.5rem] border bg-white p-2">
@@ -44,7 +45,7 @@ const ComboboxSelect = ({
               key={item.id}
               value={item}
               className={({ active }) =>
-                `relative cursor-default select-none rounded-[.25rem] p-2 ${
+                `relative cursor-pointer select-none rounded-[.25rem] p-2 ${
                   active ? "bg-brand-accent" : "bg-white"
                 }`
               }
