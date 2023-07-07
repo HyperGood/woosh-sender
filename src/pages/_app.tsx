@@ -6,6 +6,7 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { hardhat, optimismGoerli } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { CryptoPricesProvider } from "~/context/TokenPricesContext";
 const chains = [hardhat];
 
 const config = createConfig(
@@ -39,7 +40,9 @@ const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
           '--ck-connectbutton-hover-color': "19181D",
 
         }}>
-          <Component {...pageProps} />
+          <CryptoPricesProvider>          
+            <Component {...pageProps} />
+          </CryptoPricesProvider>
         </ConnectKitProvider>
       </SessionProvider>
     </WagmiConfig>

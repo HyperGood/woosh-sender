@@ -1,8 +1,9 @@
 import type { Transaction } from "@prisma/client";
 import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
-import { useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import {
   useAccount,
+  useBalance,
   useContractEvent,
   useContractWrite,
   useDisconnect,
@@ -13,7 +14,7 @@ import {
 } from "wagmi";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
-import { abi } from "../../contract-abi";
+import { abi } from "../lib/contract-abi";
 import { parseEther } from "ethers";
 import useDebounce from "~/hooks/useDebounce";
 import { SiweMessage } from "siwe";
@@ -21,8 +22,12 @@ import Logo from "public/images/Logo";
 import { WooshConnectButton } from "~/components/WooshConnectButton";
 import Button from "~/components/Button";
 import Image from "next/image";
+import type { GetServerSideProps } from "next";
+import { type CryptoPrices, CryptoPricesContext } from "~/context/TokenPricesContext";
+
 
 const despositValutAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
 
 interface TransactionForm {
   amount: number;
@@ -234,11 +239,63 @@ const Divider = () => (
   <div className="h-[1px] w-full bg-brand-black/10 my-2"></div>
 )
 
+
 const Balances = () => {
+  const { cryptoPrices} = useContext(CryptoPricesContext)
+  const {address} = useAccount()
+  const {data: ethBalance, isError: ethBalanceError, isLoading: ethBalanceLoading} = useBalance({
+    address: address
+  })
 
-  const totalBalance = 2000
+  interface UserBalance {
+    token: string,
+    tokenName: 'ethereum' | 'dai' | 'usd-coin',
+    balance: number
+  }
 
-  const Balance = ({token, balance}: {token: string; balance: number}) => {
+  const userBalances: UserBalance[] = [
+    {
+      token: 'ETH',
+      tokenName: 'ethereum',
+      balance: Number(ethBalance?.formatted) || 0
+    },
+    {
+      token: 'DAI',
+      tokenName: 'dai',
+      balance: 200
+    },
+    {
+      token: 'USDC',
+      tokenName: 'usd-coin',
+      balance: 800
+    },
+  ]
+
+  console.log(userBalances)
+
+
+
+  if(ethBalanceLoading) return <p>Loading...</p>
+  if(ethBalanceError) {
+    console.log("balanceError: ", ethBalanceError)
+  }
+
+  let totalBalance = 0
+
+  if(ethBalance && cryptoPrices){
+    for(const userBalance of userBalances) {
+      if(cryptoPrices[userBalance.tokenName]?.usd){
+        totalBalance += userBalance.balance * cryptoPrices[userBalance.tokenName]?.usd
+      }
+    }
+}
+
+  const Balance = ({token, balance, tokenName}: {token: string; balance: number; tokenName: 'ethereum' | 'usd-coin' | 'dai'}) => {
+    const { cryptoPrices} = useContext(CryptoPricesContext)
+    let balanceInUSD = 0
+    if(cryptoPrices?.[tokenName]?.usd){
+      balanceInUSD = balance * cryptoPrices?.[tokenName]?.usd
+    }
     return (
       <div className="flex justify-between items-center px-4">
         <div className="flex gap-1 items-center">
@@ -247,9 +304,11 @@ const Balances = () => {
 
       <span>{token}</span>
       </div>
-      <span>{balance.toLocaleString('en-us', {
+      <span>{balanceInUSD.toLocaleString('en-us', {
         style: 'currency',
         currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })}</span>
     </div>
     )
@@ -261,11 +320,11 @@ return (
         style: 'currency',
         currency: 'USD',
       })}</p>
-    <Balance token="ETH" balance={0.5}/>
+    <Balance token="ETH" tokenName="ethereum" balance={Number(ethBalance?.formatted) || 0}/>
     <Divider/>
-    <Balance token="USDC" balance={800}/>
+    <Balance token="USDC" tokenName="usd-coin" balance={800}/>
     <Divider/>
-    <Balance token="DAI" balance={200}/>
+    <Balance token="DAI" tokenName="dai" balance={200}/>
   </div>
 )
 }
@@ -413,7 +472,9 @@ const PreviousSends = () => {
   );
 };
 
-export default function Home() {
+export default function Home({coinsData}: {coinsData: CryptoPrices}) {
+  const { setCryptoPrices} = useContext(CryptoPricesContext)
+
   const { isConnected } = useAccount();
   const { data: session } = useSession();
   const {disconnect} = useDisconnect()
@@ -421,6 +482,10 @@ export default function Home() {
     await signOut();
     disconnect();
   };
+
+  if(coinsData){
+    setCryptoPrices(coinsData)
+  }
 
   return (
     <Layout>
@@ -445,4 +510,18 @@ export default function Home() {
       )}
     </Layout>
   );
+}
+
+
+export const getServerSideProps: GetServerSideProps<{coinsData: CryptoPrices}> = async () => {
+
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cdai%2Cusd-coin&vs_currencies=mxn%2Cusd")
+  const coinsData = await res.json() as CryptoPrices;
+
+  return {
+    props: {
+      coinsData
+    }
+  }
+
 }
