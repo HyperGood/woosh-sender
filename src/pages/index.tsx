@@ -412,7 +412,7 @@ const Contacts = () => {
 return (
   <div>
     <p className="text-lg font-polysans mb-8">contacts ({contactsArr.length})</p>
-    <div className="flex overflow-scroll md:overflow-auto md:grid md:grid-cols-5 gap-8">
+    <div className="flex overflow-scroll md:overflow-hidden md:grid md:grid-cols-5 justify-items-start gap-8">
 {contactsArr.map((contact, index) => (<div className="shrink-0" key={index}><Contact name={contact.Name} phone={contact.Phone} photo={contact.Photo}/></div>))}
     </div>
   </div>
@@ -489,8 +489,8 @@ export default function Home({coinsData}: {coinsData: CryptoPrices}) {
   return (
     <Layout>
       {isConnected && session ? (
-        <div className="h-full min-h-screen lg:h-screen w-full lg:grid lg:grid-cols-[1fr_37%] items-center relative">
-          <div className="lg:pl-[10rem] lg:pr-[15rem]">
+        <div className="h-full min-h-screen lg:h-screen w-full lg:grid lg:grid-cols-[1fr_44%] items-center relative">
+          <div className="mx-auto">
           <Main/>
           <button
         onClick={() => void onClickSignOut()}
