@@ -9,6 +9,7 @@ import ConfirmTransaction from "./ConfirmTransaction";
 import ShareTransaction from "./ShareTransaction";
 import SignDepositButton from "./SignDepositButton";
 import CloseIcon from "public/images/icons/CloseIcon";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 
 export interface TransactionForm {
   amount: number;
@@ -38,12 +39,14 @@ export const Send = () => {
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
   const [secret, setSecret] = useState<string>("");
   const [nonce, setNonce] = useState<bigint>(BigInt(0));
+  const [saveContact, setSaveContact] = useState<CheckedState>(false);
 
   useEffect(() => {
     if (depositSigned) {
       setStep(4);
     }
   }, [depositSigned]);
+
   return (
     <>
       <Dialog.Root>
@@ -88,7 +91,12 @@ export const Send = () => {
               </div>
               <div>
                 {step === 1 ? (
-                  <EnterPhone transaction={transaction} setFields={setFields} />
+                  <EnterPhone
+                    transaction={transaction}
+                    setFields={setFields}
+                    saveContact={saveContact}
+                    setSaveContact={setSaveContact}
+                  />
                 ) : step === 2 ? (
                   <EnterAmount
                     transaction={transaction}
@@ -115,6 +123,7 @@ export const Send = () => {
                     setFundsSent={setFundsSent}
                     setNonce={setNonce}
                     nonce={nonce}
+                    saveContact={saveContact}
                   />
                 )
               ) : (
@@ -123,7 +132,6 @@ export const Send = () => {
                   fullWidth
                   onClick={() => {
                     setStep(step > 4 ? step : step + 1);
-                    console.log(transaction);
                   }}
                   // disabled={isValid || step > 2 ? false : true}
                 >

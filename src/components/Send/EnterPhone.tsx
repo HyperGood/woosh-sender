@@ -1,24 +1,28 @@
 import { PatternFormat } from "react-number-format";
 import { COUNTRIES } from "~/lib/countries";
-import { useState, type Dispatch, useEffect } from "react";
+import { useState, type Dispatch, useEffect, type SetStateAction } from "react";
 import type { TransactionForm } from "./Send";
 import type { Data } from "../ComboboxSelect";
 import ComboInput from "../ComboInput";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { motion, useAnimate } from "framer-motion";
+import { useAnimate } from "framer-motion";
 
 export const EnterPhone = ({
   transaction,
   setFields,
+  saveContact,
+  setSaveContact,
 }: {
   transaction: TransactionForm;
   setFields: Dispatch<Partial<TransactionForm>>;
+  saveContact: Checkbox.CheckedState;
+  setSaveContact: Dispatch<SetStateAction<Checkbox.CheckedState>>;
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
   );
   const [countryQuery, setCountryQuery] = useState("");
-  const [saveContact, setSaveContact] = useState<Checkbox.CheckedState>(false);
+
   // const [isValid, setIsValid] = useState<boolean>(false);
 
   const filteredCountries =

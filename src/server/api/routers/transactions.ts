@@ -4,7 +4,6 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 export const transactionsRouter = createTRPCRouter({
   //Get all transactions that belong to the logged in user
   getTransactions: protectedProcedure.query(async ({ ctx }) => {
-    console.log(ctx.session.user.id);
     const transactions = await ctx.prisma.transaction.findMany({
       where: {
         userId: ctx.session.user.id,
@@ -12,7 +11,7 @@ export const transactionsRouter = createTRPCRouter({
     });
     return transactions;
   }),
-  // //Add a new transaction
+  //Add a new transaction
   add: protectedProcedure
     .input(
       z.object({
@@ -41,5 +40,15 @@ export const transactionsRouter = createTRPCRouter({
       });
       return transaction;
     }),
-  //When working with contacts figure out a way to save recent recipients and optionally add them as contacts
+  //Remove a transaction
+  remove: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const transaction = await ctx.prisma.transaction.delete({
+        where: {
+          id: input.id,
+        },
+      });
+      return transaction;
+    }),
 });

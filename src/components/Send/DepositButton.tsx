@@ -14,22 +14,35 @@ import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { useContext, type Dispatch, type SetStateAction } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 
 export const DepositButton = ({
   transaction,
   setFundsSent,
   setNonce,
   nonce,
+  saveContact,
 }: {
   transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
   setNonce: Dispatch<SetStateAction<bigint>>;
   nonce: bigint;
+  saveContact: CheckedState;
 }) => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
+  const ctx = api.useContext();
 
+  const { mutate: mutateContact } = api.contact.add.useMutation({
+    onSuccess: () => {
+      console.log("Successfully added contact");
+      void ctx.contact.getContacts.invalidate();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
   const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
     onSuccess: () => {
       console.log("Saved!");
@@ -88,7 +101,16 @@ export const DepositButton = ({
     },
   });
 
-  const ctx = api.useContext();
+  function saveContactFunction() {
+    if (transaction.recipient && transaction.phone) {
+      mutateContact({
+        name: transaction.recipient,
+        phone: transaction.phone,
+      });
+    } else {
+      console.log("Error saving contact");
+    }
+  }
 
   const sendFunction = () => {
     if (transaction.phone === "") {
@@ -96,6 +118,9 @@ export const DepositButton = ({
     } else if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {
+      if (saveContact) {
+        saveContactFunction();
+      }
       deposit?.();
     }
   };
