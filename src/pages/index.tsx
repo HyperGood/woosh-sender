@@ -12,10 +12,11 @@ import {
   type CryptoPrices,
   CryptoPricesContext,
 } from "~/context/TokenPricesContext";
-import Send from "~/components/Send/Send";
+import SendToPhone from "~/components/Send/Phone/SendToPhone";
 import Divider from "~/components/Divider";
 import Contacts from "~/components/Contacts";
-import CancelDepositButton from "~/components/Send/CancelDepositButton";
+import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
+import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -138,8 +139,8 @@ const Main = () => {
       <span className="block font-polysans text-2xl">roysandoval.eth</span>
       <Balances />
       <div className="my-12 flex flex-col gap-8 lg:mb-0 lg:mt-14">
-        <Send />
-        <Button fullWidth>Send To An ETH Address</Button>
+        <SendToPhone />
+        <SendToWallet />
       </div>
     </div>
   );
@@ -147,18 +148,22 @@ const Main = () => {
 
 const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const [clicked, setClicked] = useState(false);
+  console.log(transaction);
   return (
     <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           {transaction.recipient ? (
             <>
-              {" "}
               <span className="font-polysans">{transaction.recipient}</span>
-              <span className="opacity-60">{transaction.phone}</span>
+              <span className="opacity-60">
+                {transaction.phone ? transaction.phone : transaction.address}
+              </span>
             </>
           ) : (
-            <span className="font-polysans">{transaction.phone}</span>
+            <span className="font-polysans">
+              {transaction.phone ? transaction.phone : transaction.address}
+            </span>
           )}
         </div>
         <span className="opacity-60">
@@ -175,13 +180,15 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
             currency: "USD",
           })}
         </span>
-        <div
-          onClick={() => {
-            setClicked(!clicked);
-          }}
-        >
-          <CancelDepositButton transaction={transaction} clicked={clicked} />
-        </div>
+        {transaction.claimed || transaction.type === "wallet" ? null : (
+          <div
+            onClick={() => {
+              setClicked(!clicked);
+            }}
+          >
+            <CancelDepositButton transaction={transaction} clicked={clicked} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -35,8 +35,8 @@ export const CancelDepositButton = ({
     address: despositValutAddressHH,
     abi,
     functionName: "withdrawDeposit",
-    args: [BigInt(transaction.nonce)],
-    enabled: clicked,
+    args: [BigInt(transaction.nonce ? transaction.nonce : 0)],
+    enabled: clicked && transaction.type === "phone",
     onError(error) {
       console.log(error);
       toast.error(error.message);

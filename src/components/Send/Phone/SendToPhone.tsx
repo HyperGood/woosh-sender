@@ -1,25 +1,26 @@
 import { useEffect, useReducer, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import Button from "../Button";
-import StepIndicator from "../Form/StepIndicator";
-import DepositButton from "./DepositButton";
+import Button from "../../Button";
+import StepIndicator from "../../Form/StepIndicator";
+import DepositButton from "../../DepositVault/DepositButton";
 import EnterPhone from "./EnterPhone";
-import EnterAmount from "./EnterAmount";
-import ConfirmTransaction from "./ConfirmTransaction";
-import ShareTransaction from "./ShareTransaction";
-import SignDepositButton from "./SignDepositButton";
+import EnterAmount from "../EnterAmount";
+import ConfirmTransaction from "../ConfirmTransaction";
+import ShareTransaction from "../ShareTransaction";
+import SignDepositButton from "../../DepositVault/SignDepositButton";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 
 export interface TransactionForm {
   amount: number;
   token: string;
-  phone: string;
+  phone?: string;
   recipient?: string;
   countryCode?: string;
+  address?: string;
 }
 
-export const Send = () => {
+export const SendToPhone = () => {
   const [step, setStep] = useState<number>(1);
   const [transaction, setFields] = useReducer(
     (
@@ -159,4 +160,4 @@ export const Send = () => {
   );
 };
 
-export default Send;
+export default SendToPhone;

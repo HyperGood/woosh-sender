@@ -1,6 +1,6 @@
 import { useSignTypedData } from "wagmi";
 import { despositValutAddressHH } from "~/lib/constants";
-import type { TransactionForm } from "./Send";
+import type { TransactionForm } from "../Send/Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { parseEther } from "viem";

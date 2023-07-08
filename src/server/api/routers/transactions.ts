@@ -21,7 +21,9 @@ export const transactionsRouter = createTRPCRouter({
         phone: z.string().min(10).max(20).optional(),
         txId: z.string(),
         recipient: z.string().min(1).max(100).optional(),
-        nonce: z.number().min(0),
+        nonce: z.number().min(0).optional(),
+        type: z.enum(["wallet", "phone"]),
+        address: z.string().min(1).max(100).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -36,6 +38,8 @@ export const transactionsRouter = createTRPCRouter({
           txId: input.txId,
           recipient: input.recipient,
           nonce: input.nonce,
+          type: input.type,
+          address: input.address,
         },
       });
       return transaction;

@@ -1,16 +1,21 @@
 import Image from "next/image";
-import type { TransactionForm } from "./Send";
+import type { TransactionForm } from "./Phone/SendToPhone";
 import TransactionInfo from "./TransactionInfo";
 import CopyIcon from "public/images/icons/CopyIcon";
 import { toast } from "react-hot-toast";
+import { useContext } from "react";
+import { CryptoPricesContext } from "~/context/TokenPricesContext";
 
 export const ShareTransaction = ({
   transaction,
   secret,
 }: {
   transaction: TransactionForm;
-  secret: string;
+  secret?: string;
 }) => {
+  const { cryptoPrices } = useContext(CryptoPricesContext);
+  const ethPrice = cryptoPrices?.ethereum.usd || 0;
+  const amountInUSD = transaction.amount * ethPrice;
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -22,20 +27,41 @@ export const ShareTransaction = ({
       </div>
       <div className="flex flex-col gap-5">
         <TransactionInfo
-          label="Sent to"
+          label="Sent To"
           content={
             <div className="flex items-center gap-4">
               {transaction.recipient ? (
                 <>
-                  <span className="text-lg">{transaction.recipient}</span>
-                  <span>
-                    {transaction.countryCode}-{transaction.phone}
-                  </span>
+                  {transaction.phone ? (
+                    <>
+                      <span className="font-polysans text-lg">
+                        {transaction.recipient}
+                      </span>
+                      <span className="opacity-60">
+                        {transaction.countryCode}-{transaction.phone}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-polysans text-lg">
+                        {transaction.recipient}
+                      </span>
+                      <span className="opacity-60">{transaction.address}</span>
+                    </>
+                  )}
                 </>
               ) : (
-                <span className="font-polysans text-lg">
-                  {transaction.countryCode}-{transaction.phone}
-                </span>
+                <>
+                  {transaction.phone ? (
+                    <span className="font-polysans text-lg">
+                      {transaction.countryCode}-{transaction.phone}
+                    </span>
+                  ) : (
+                    <span className="font-polysans text-lg">
+                      {transaction.address}
+                    </span>
+                  )}
+                </>
               )}
             </div>
           }
@@ -54,27 +80,36 @@ export const ShareTransaction = ({
               <p className="text-lg">
                 {transaction.amount} {transaction.token}
               </p>{" "}
-              <span className="opacity-60">{transaction.amount} USD</span>
+              <span className="opacity-60">
+                {amountInUSD.toLocaleString("en-us", {
+                  style: "currency",
+                  currency: "USD",
+                  maximumFractionDigits: 2,
+                })}{" "}
+                USD
+              </span>
             </div>
           }
         />
-        <TransactionInfo
-          label="Secret"
-          content={
-            <div className="flex items-center justify-between gap-4">
-              <p className="break-all text-lg ">{secret}</p>
-              <div
-                onClick={() => {
-                  void navigator.clipboard.writeText(secret);
-                  toast.success("Secret copied!");
-                }}
-                className="h-7 w-7 shrink-0 cursor-pointer"
-              >
-                <CopyIcon />
+        {secret ? (
+          <TransactionInfo
+            label="Secret"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{secret}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(secret);
+                    toast.success("Secret copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
               </div>
-            </div>
-          }
-        />
+            }
+          />
+        ) : null}
         <a href="#" className="underline hover:text-success">
           View transaction on Etherscan
         </a>

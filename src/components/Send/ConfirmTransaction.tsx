@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { TransactionForm } from "./Send";
+import type { TransactionForm } from "./Phone/SendToPhone";
 import TransactionInfo from "./TransactionInfo";
 import { useContext } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
@@ -28,15 +28,36 @@ export const ConfirmTransaction = ({
             <div className="flex items-center gap-4">
               {transaction.recipient ? (
                 <>
-                  <span className="text-lg">{transaction.recipient}</span>
-                  <span>
-                    {transaction.countryCode}-{transaction.phone}
-                  </span>
+                  {transaction.phone ? (
+                    <>
+                      <span className="font-polysans text-lg">
+                        {transaction.recipient}
+                      </span>
+                      <span className="opacity-60">
+                        {transaction.countryCode}-{transaction.phone}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-polysans text-lg">
+                        {transaction.recipient}
+                      </span>
+                      <span className="opacity-60">{transaction.address}</span>
+                    </>
+                  )}
                 </>
               ) : (
-                <span className="font-polysans text-lg">
-                  {transaction.countryCode}-{transaction.phone}
-                </span>
+                <>
+                  {transaction.phone ? (
+                    <span className="font-polysans text-lg">
+                      {transaction.countryCode}-{transaction.phone}
+                    </span>
+                  ) : (
+                    <span className="font-polysans text-lg">
+                      {transaction.address}
+                    </span>
+                  )}
+                </>
               )}
             </div>
           }
