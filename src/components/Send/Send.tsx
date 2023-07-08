@@ -56,7 +56,20 @@ export const Send = () => {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow">
-            <Dialog.Close className="absolute right-8 top-4 h-6 w-6 hover:text-error">
+            <Dialog.Close
+              onClick={() => {
+                if (step === 4) {
+                  setFields({
+                    amount: 0,
+                    token: "ETH",
+                    phone: "",
+                    recipient: "",
+                  });
+                  setStep(1);
+                }
+              }}
+              className="absolute right-8 top-4 h-6 w-6 hover:text-error"
+            >
               <CloseIcon />
             </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-8">
