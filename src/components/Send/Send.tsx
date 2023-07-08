@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Button from "../Button";
 import StepIndicator from "../Form/StepIndicator";
@@ -32,6 +32,13 @@ export const Send = () => {
       phone: "",
     }
   );
+  const [fundsSent, setFundsSent] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (fundsSent) {
+      setStep(4);
+    }
+  }, [fundsSent]);
   return (
     <>
       <Dialog.Root>
@@ -40,15 +47,17 @@ export const Send = () => {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-brand-white shadow">
+          <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow">
             <div className="flex h-full flex-col justify-between p-8">
               <div>
-                <button
-                  className="mb-4 cursor-pointer self-start opacity-60"
-                  onClick={() => setStep(step < 2 ? step : step - 1)}
-                >
-                  Back
-                </button>
+                {step === 4 ? null : (
+                  <button
+                    className="mb-4 cursor-pointer self-start opacity-60"
+                    onClick={() => setStep(step < 2 ? step : step - 1)}
+                  >
+                    Back
+                  </button>
+                )}
                 <div className="flex justify-between">
                   <button
                     onClick={() => {
@@ -56,16 +65,16 @@ export const Send = () => {
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={1} currentStep={step} />
+                    <StepIndicator step={1} name="Phone" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(2)} className="cursor-pointer">
-                    <StepIndicator step={2} currentStep={step} />
+                    <StepIndicator step={2} name="Amount" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(3)} className="cursor-pointer">
-                    <StepIndicator step={3} currentStep={step} />
+                    <StepIndicator step={3} name="Confirm" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(4)} className="cursor-pointer">
-                    <StepIndicator step={4} currentStep={step} />
+                    <StepIndicator step={4} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>
@@ -85,7 +94,10 @@ export const Send = () => {
               </div>
 
               {step === 3 ? (
-                <DepositButton transaction={transaction} />
+                <DepositButton
+                  transaction={transaction}
+                  setFundsSent={setFundsSent}
+                />
               ) : (
                 <Button
                   intent="secondary"
@@ -96,7 +108,7 @@ export const Send = () => {
                   }}
                   // disabled={isValid || step > 2 ? false : true}
                 >
-                  Next
+                  {step === 4 ? "Share" : "Next"}
                 </Button>
               )}
             </div>
