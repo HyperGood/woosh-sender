@@ -110,6 +110,7 @@ export const Send = () => {
                     transaction={transaction}
                     setFundsSent={setFundsSent}
                     setNonce={setNonce}
+                    nonce={nonce}
                   />
                 )
               ) : (

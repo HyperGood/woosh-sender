@@ -18,10 +18,12 @@ export const DepositButton = ({
   transaction,
   setFundsSent,
   setNonce,
+  nonce,
 }: {
   transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
   setNonce: Dispatch<SetStateAction<bigint>>;
+  nonce: bigint;
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
 
@@ -102,6 +104,7 @@ export const DepositButton = ({
         ...transaction,
         amountInUSD: amountInUSD,
         txId: txId,
+        nonce: Number(nonce),
       });
     } else {
       console.log("Error saving transaction");

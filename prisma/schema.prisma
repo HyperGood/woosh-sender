@@ -69,6 +69,7 @@ model Transaction {
   userId      String
   amount      Int
   token       String
+  nonce       Int
   recipient   String?
   amountInUSD Int
   claimed     Boolean  @default(false)

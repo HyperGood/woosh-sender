@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { TransactionForm } from "./Send";
 import TransactionInfo from "./TransactionInfo";
+import CopyIcon from "public/images/icons/CopyIcon";
+import { toast } from "react-hot-toast";
 
 export const ShareTransaction = ({
   transaction,
@@ -61,7 +63,15 @@ export const ShareTransaction = ({
           content={
             <div className="flex items-center justify-between gap-4">
               <p className="break-all text-lg ">{secret}</p>
-              <span>Copy Icon</span>
+              <div
+                onClick={() => {
+                  void navigator.clipboard.writeText(secret);
+                  toast.success("Secret copied!");
+                }}
+                className="h-20 w-20 cursor-pointer"
+              >
+                <CopyIcon />
+              </div>
             </div>
           }
         />
