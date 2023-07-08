@@ -17,9 +17,11 @@ import type { Dispatch, SetStateAction } from "react";
 export const DepositButton = ({
   transaction,
   setFundsSent,
+  setNonce,
 }: {
   transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
+  setNonce: Dispatch<SetStateAction<bigint>>;
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
 
@@ -76,7 +78,8 @@ export const DepositButton = ({
     abi,
     eventName: "DepositMade",
     listener(log) {
-      console.log("Event: ", log);
+      if (log[0]?.args.depositIndex === undefined) return;
+      setNonce(log[0]?.args.depositIndex);
     },
   });
 

@@ -7,6 +7,7 @@ import EnterPhone from "./EnterPhone";
 import EnterAmount from "./EnterAmount";
 import ConfirmTransaction from "./ConfirmTransaction";
 import ShareTransaction from "./ShareTransaction";
+import SignDepositButton from "./SignDepositButton";
 
 export interface TransactionForm {
   amount: number;
@@ -33,12 +34,15 @@ export const Send = () => {
     }
   );
   const [fundsSent, setFundsSent] = useState<boolean>(false);
+  const [depositSigned, setDepositSigned] = useState<boolean>(false);
+  const [secret, setSecret] = useState<string>("");
+  const [nonce, setNonce] = useState<bigint>(BigInt(0));
 
   useEffect(() => {
-    if (fundsSent) {
+    if (depositSigned) {
       setStep(4);
     }
-  }, [fundsSent]);
+  }, [depositSigned]);
   return (
     <>
       <Dialog.Root>
@@ -89,15 +93,25 @@ export const Send = () => {
                 ) : step === 3 ? (
                   <ConfirmTransaction transaction={transaction} />
                 ) : step === 4 ? (
-                  <ShareTransaction transaction={transaction} />
+                  <ShareTransaction transaction={transaction} secret={secret} />
                 ) : null}
               </div>
 
               {step === 3 ? (
-                <DepositButton
-                  transaction={transaction}
-                  setFundsSent={setFundsSent}
-                />
+                fundsSent ? (
+                  <SignDepositButton
+                    setDepositSigned={setDepositSigned}
+                    setSecret={setSecret}
+                    transaction={transaction}
+                    nonce={nonce}
+                  />
+                ) : (
+                  <DepositButton
+                    transaction={transaction}
+                    setFundsSent={setFundsSent}
+                    setNonce={setNonce}
+                  />
+                )
               ) : (
                 <Button
                   intent="secondary"
