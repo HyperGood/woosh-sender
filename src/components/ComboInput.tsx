@@ -1,4 +1,4 @@
-import type {  ReactNode } from "react";
+import type { ReactNode } from "react";
 import ComboboxSelect from "./ComboboxSelect";
 import type { ComboboxProps } from "./ComboboxSelect";
 
@@ -19,14 +19,17 @@ const ComboInput = ({
   setSelectedItem,
   queryChange,
   input,
-  clickFunction
+  clickFunction,
 }: ComboInputProps) => {
   return (
-    <div className="flex flex-col">
-      {label && <label className="text-sm opacity-80 mb-2">{required ? label + "*" : label}</label>}
+    <div className="flex w-full flex-col">
+      {label && (
+        <label className="mb-2 text-sm opacity-80">
+          {required ? label + "*" : label}
+        </label>
+      )}
       <div className="relative">
-        
-        <div className="absolute h-full p-[1px] w-[8rem]">
+        <div className="absolute h-full w-[8rem] p-[1px]">
           <ComboboxSelect
             filteredData={filteredData}
             selectedItem={selectedItem}

@@ -18,11 +18,11 @@ export const transactionsRouter = createTRPCRouter({
       z.object({
         amount: z.number().min(0).max(1000000),
         token: z.string().min(1).max(5),
-        amountInUSD: z.number().min(0).max(1000000),
+        amountInUSD: z.number().min(0),
         phone: z.string().min(10).max(20).optional(),
         txId: z.string(),
         recipient: z.string().min(1).max(100).optional(),
-        nonce: z.number(),
+        nonce: z.number().min(0),
       })
     )
     .mutation(async ({ ctx, input }) => {

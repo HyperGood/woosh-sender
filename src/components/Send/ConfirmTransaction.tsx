@@ -11,6 +11,7 @@ export const ConfirmTransaction = ({
 }) => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
+  const amountInUSD = transaction.amount * ethPrice;
   return (
     <div className="flex flex-col">
       <div className="mb-6 flex flex-col gap-2">
@@ -55,7 +56,12 @@ export const ConfirmTransaction = ({
                 {transaction.amount} {transaction.token}
               </p>{" "}
               <span className="opacity-60">
-                ${transaction.amount * ethPrice} USD
+                {amountInUSD.toLocaleString("en-us", {
+                  style: "currency",
+                  currency: "USD",
+                  maximumFractionDigits: 2,
+                })}{" "}
+                USD
               </span>
             </div>
           }

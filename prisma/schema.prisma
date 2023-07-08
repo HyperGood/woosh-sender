@@ -67,11 +67,11 @@ model Transaction {
   phone       String?
   address     String?
   userId      String
-  amount      Int
+  amount      Float
   token       String
   nonce       Int
   recipient   String?
-  amountInUSD Int
+  amountInUSD Float
   claimed     Boolean  @default(false)
   createdAt   DateTime @default(now())
   txId        String
