@@ -12,7 +12,8 @@ import { despositValutAddressHH } from "~/lib/constants";
 import type { TransactionForm } from "./Send";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
-import type { Dispatch, SetStateAction } from "react";
+import { useContext, type Dispatch, type SetStateAction } from "react";
+import { CryptoPricesContext } from "~/context/TokenPricesContext";
 
 export const DepositButton = ({
   transaction,
@@ -25,6 +26,8 @@ export const DepositButton = ({
   setNonce: Dispatch<SetStateAction<bigint>>;
   nonce: bigint;
 }) => {
+  const { cryptoPrices } = useContext(CryptoPricesContext);
+  const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
 
   const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
@@ -99,7 +102,7 @@ export const DepositButton = ({
 
   const saveTransaction = ({ txId }: { txId: string }) => {
     if (transaction.amount !== 0 && transaction.phone !== "" && txId) {
-      const amountInUSD = transaction.amount * 2000;
+      const amountInUSD = transaction.amount * ethPrice;
       mutate({
         ...transaction,
         amountInUSD: amountInUSD,

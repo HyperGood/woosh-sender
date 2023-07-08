@@ -1,12 +1,16 @@
 import Image from "next/image";
 import type { TransactionForm } from "./Send";
 import TransactionInfo from "./TransactionInfo";
+import { useContext } from "react";
+import { CryptoPricesContext } from "~/context/TokenPricesContext";
 
 export const ConfirmTransaction = ({
   transaction,
 }: {
   transaction: TransactionForm;
 }) => {
+  const { cryptoPrices } = useContext(CryptoPricesContext);
+  const ethPrice = cryptoPrices?.ethereum.usd || 0;
   return (
     <div className="flex flex-col">
       <div className="mb-6 flex flex-col gap-2">
@@ -50,7 +54,9 @@ export const ConfirmTransaction = ({
               <p className="text-lg">
                 {transaction.amount} {transaction.token}
               </p>{" "}
-              <span className="opacity-60">{transaction.amount} USD</span>
+              <span className="opacity-60">
+                ${transaction.amount * ethPrice} USD
+              </span>
             </div>
           }
         />

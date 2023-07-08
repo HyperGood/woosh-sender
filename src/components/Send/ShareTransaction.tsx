@@ -68,7 +68,7 @@ export const ShareTransaction = ({
                   void navigator.clipboard.writeText(secret);
                   toast.success("Secret copied!");
                 }}
-                className="h-20 w-20 cursor-pointer"
+                className="h-7 w-7 shrink-0 cursor-pointer"
               >
                 <CopyIcon />
               </div>

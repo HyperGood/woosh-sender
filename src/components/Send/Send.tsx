@@ -8,6 +8,7 @@ import EnterAmount from "./EnterAmount";
 import ConfirmTransaction from "./ConfirmTransaction";
 import ShareTransaction from "./ShareTransaction";
 import SignDepositButton from "./SignDepositButton";
+import CloseIcon from "public/images/icons/CloseIcon";
 
 export interface TransactionForm {
   amount: number;
@@ -52,17 +53,20 @@ export const Send = () => {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow">
+            <Dialog.Close className="absolute right-8 top-4 h-6 w-6 hover:text-error">
+              <CloseIcon />
+            </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-8">
               <div>
-                {step === 4 ? null : (
+                {step === 4 || step === 1 ? null : (
                   <button
-                    className="mb-4 cursor-pointer self-start opacity-60"
+                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60"
                     onClick={() => setStep(step < 2 ? step : step - 1)}
                   >
                     Back
                   </button>
                 )}
-                <div className="flex justify-between">
+                <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
                       setStep(1);
