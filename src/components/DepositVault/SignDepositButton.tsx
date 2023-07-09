@@ -4,6 +4,7 @@ import type { TransactionForm } from "../Send/Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { parseEther } from "viem";
+import type { Transaction } from "@prisma/client";
 
 export const SignDepositButton = ({
   transaction,
@@ -11,9 +12,9 @@ export const SignDepositButton = ({
   setDepositSigned,
   nonce,
 }: {
-  transaction: TransactionForm;
+  transaction: TransactionForm | Transaction;
   setSecret: Dispatch<SetStateAction<string>>;
-  setDepositSigned: Dispatch<SetStateAction<boolean>>;
+  setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   nonce: bigint;
 }) => {
   const domain = {
@@ -45,7 +46,11 @@ export const SignDepositButton = ({
     },
     onSuccess(data) {
       setSecret(data);
-      setDepositSigned(true);
+      if (setDepositSigned) {
+        setDepositSigned(true);
+      } else {
+        alert(data);
+      }
     },
   });
 

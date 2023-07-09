@@ -1,6 +1,6 @@
 import type { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useContext, useState } from "react";
+import { use, useContext, useState } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { api } from "~/utils/api";
 import SignIn from "~/components/SignIn";
@@ -16,6 +16,7 @@ import Contacts from "~/components/Contacts";
 import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
+import SignDepositButton from "~/components/DepositVault/SignDepositButton";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -147,6 +148,7 @@ const Main = () => {
 
 const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const [clicked, setClicked] = useState(false);
+  const [secret, setSecret] = useState("");
 
   return (
     <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
@@ -179,6 +181,7 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
             currency: "USD",
           })}
         </span>
+
         {transaction.claimed || transaction.type === "wallet" ? null : (
           <div
             onClick={() => {
@@ -188,6 +191,15 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
             <CancelDepositButton transaction={transaction} clicked={clicked} />
           </div>
         )}
+        {!transaction.claimed && transaction.type === "phone" ? (
+          <div>
+            <SignDepositButton
+              transaction={transaction}
+              setSecret={setSecret}
+              nonce={BigInt(transaction.nonce || 0)}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
