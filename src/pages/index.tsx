@@ -217,26 +217,34 @@ const PreviousSends = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  if (!data) return <div>No data</div>;
+  if (!data) return <div>Oh no, something went horribly wrong!😟</div>;
 
   return (
-    <div className="h-full">
-      <p className="mb-5 font-polysans text-lg ">
-        previous sends ({data.length})
-      </p>
-      <div className="flex h-full flex-col gap-5 overflow-scroll pb-20">
-        {data.map((transaction) => (
-          <div key={transaction.id} className="w-full">
-            <TransactionCard transaction={transaction} />
+    <>
+      <div className="h-full">
+        <p className="mb-5 font-polysans text-lg ">
+          previous sends ({data.length})
+        </p>
+        {data.length !== 0 ? (
+          <div className="flex h-full flex-col gap-5 overflow-scroll pb-20">
+            {data.map((transaction) => (
+              <div key={transaction.id} className="w-full">
+                <TransactionCard transaction={transaction} />
+              </div>
+            ))}
+            {data.length > 6 && (
+              <span className="mt-2 text-center opacity-60">
+                That&apos;s all of them!
+              </span>
+            )}
           </div>
-        ))}
-        {data.length > 6 && (
-          <span className="mt-2 text-center opacity-60">
-            That&apos;s all of them!
+        ) : (
+          <span className="opacity-60">
+            Once you send funds the transactions will be here!
           </span>
         )}
       </div>
-    </div>
+    </>
   );
 };
 

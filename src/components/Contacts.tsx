@@ -31,7 +31,7 @@ export const Contacts = () => {
 
   return (
     <div>
-      <p className="mb-8 font-polysans text-lg">contacts ({data.length})</p>
+      <p className="mb-5 font-polysans text-lg">contacts ({data.length})</p>
       <div className="flex w-full justify-items-start gap-x-8 gap-y-8 overflow-scroll md:grid md:grid-cols-5 md:gap-x-0 md:overflow-hidden">
         {data.map((contact, index) => (
           <div className="shrink-0" key={index}>
@@ -39,6 +39,11 @@ export const Contacts = () => {
           </div>
         ))}
       </div>
+      {data.length === 0 && (
+        <span className="w-full opacity-60">
+          You can create and save contacts when you send funds!
+        </span>
+      )}
     </div>
   );
 };
