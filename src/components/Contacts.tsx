@@ -35,64 +35,9 @@ export const Contacts = () => {
     );
   };
 
-  const contactsArr = [
-    {
-      Name: "Ali",
-      Phone: "+1 (123) 456-7890",
-      Photo: 1,
-    },
-    {
-      Name: "Henry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 2,
-    },
-    {
-      Name: "Harry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 3,
-    },
-    {
-      Name: "Fred",
-      Phone: "+1 (123) 456-7890",
-      Photo: 4,
-    },
-    {
-      Name: "Jacqueline",
-      Phone: "+1 (123) 456-7890",
-      Photo: 5,
-    },
-    {
-      Name: "Ali",
-      Phone: "+1 (123) 456-7890",
-      Photo: 1,
-    },
-    {
-      Name: "Henry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 2,
-    },
-    {
-      Name: "Harry",
-      Phone: "+1 (123) 456-7890",
-      Photo: 3,
-    },
-    {
-      Name: "Fred",
-      Phone: "+1 (123) 456-7890",
-      Photo: 4,
-    },
-    {
-      Name: "Jacqueline",
-      Phone: "+1 (123) 456-7890",
-      Photo: 5,
-    },
-  ];
-
   return (
     <div>
-      <p className="mb-8 font-polysans text-lg">
-        contacts ({contactsArr.length})
-      </p>
+      <p className="mb-8 font-polysans text-lg">contacts ({data.length})</p>
       <div className="flex w-full justify-items-start gap-x-8 gap-y-8 overflow-scroll md:grid md:grid-cols-5 md:gap-x-0 md:overflow-hidden">
         {data.map((contact, index) => (
           <div className="shrink-0" key={index}>

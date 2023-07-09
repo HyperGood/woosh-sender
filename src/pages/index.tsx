@@ -1,11 +1,9 @@
 import type { Transaction } from "@prisma/client";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useContext, useState } from "react";
-import { useAccount, useBalance, useDisconnect } from "wagmi";
-import Layout from "~/components/layout";
+import { useAccount, useBalance } from "wagmi";
 import { api } from "~/utils/api";
 import SignIn from "~/components/SignIn";
-import Button from "~/components/Button";
 import Image from "next/image";
 import type { GetServerSideProps } from "next";
 import {
@@ -17,6 +15,7 @@ import Divider from "~/components/Divider";
 import Contacts from "~/components/Contacts";
 import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
+import Header from "~/components/header";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -134,7 +133,7 @@ const Balances = () => {
 
 const Main = () => {
   return (
-    <div className="mt-[8rem] px-4 lg:mt-0 lg:px-0">
+    <div className="mt-20 px-4 lg:mt-0 lg:px-0">
       <span className="block font-polysans text-lg">welcome</span>
       <span className="block font-polysans text-2xl">roysandoval.eth</span>
       <Balances />
@@ -148,7 +147,7 @@ const Main = () => {
 
 const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const [clicked, setClicked] = useState(false);
-  console.log(transaction);
+
   return (
     <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex flex-col gap-2">
@@ -209,14 +208,21 @@ const PreviousSends = () => {
   if (!data) return <div>No data</div>;
 
   return (
-    <div>
-      <p className="mb-5 font-polysans text-lg">previous sends</p>
-      <div className="flex flex-col gap-5">
+    <div className="h-full">
+      <p className="mb-5 font-polysans text-lg ">
+        previous sends ({data.length})
+      </p>
+      <div className="flex h-full flex-col gap-5 overflow-scroll pb-20">
         {data.map((transaction) => (
-          <div key={transaction.id}>
+          <div key={transaction.id} className="w-full">
             <TransactionCard transaction={transaction} />
           </div>
         ))}
+        {data.length > 6 && (
+          <span className="mt-2 text-center opacity-60">
+            That&apos;s all of them!
+          </span>
+        )}
       </div>
     </div>
   );
@@ -226,30 +232,20 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   const { setCryptoPrices } = useContext(CryptoPricesContext);
   const { isConnected } = useAccount();
   const { data: session } = useSession();
-  const { disconnect } = useDisconnect();
-  const onClickSignOut = async () => {
-    await signOut();
-    disconnect();
-  };
 
   if (coinsData) {
     setCryptoPrices(coinsData);
   }
 
   return (
-    <Layout>
+    <main>
       {isConnected && session ? (
-        <div className="relative h-full min-h-screen w-full items-center lg:grid lg:h-screen lg:grid-cols-[1fr_44%]">
-          <div className="mx-auto">
+        <div className="relative h-full min-h-screen w-full lg:grid lg:h-screen lg:grid-cols-[1fr_44%] lg:items-center">
+          <Header />
+          <div className="lg:mx-auto">
             <Main />
-            <button
-              onClick={() => void onClickSignOut()}
-              className="absolute rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 lg:mt-20"
-            >
-              Sign Out
-            </button>
           </div>
-          <div className="flex h-full w-full flex-col gap-20 bg-brand-black px-4 pb-20 pt-20 text-brand-white lg:px-8 lg:pb-0 lg:pt-40">
+          <div className="grid h-full max-h-screen w-full grid-cols-1 grid-rows-2 gap-20 overflow-hidden bg-brand-black px-4 pb-20 pt-20 text-brand-white lg:px-8 lg:pb-2 lg:pt-40">
             <Contacts />
             <PreviousSends />
           </div>
@@ -257,7 +253,7 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
       ) : (
         <SignIn />
       )}
-    </Layout>
+    </main>
   );
 }
 
