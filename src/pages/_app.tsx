@@ -3,7 +3,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import { hardhat, localhost } from "wagmi/chains";
+import { hardhat } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { CryptoPricesProvider } from "~/context/TokenPricesContext";

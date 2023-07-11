@@ -7,9 +7,8 @@ import {
 import { api } from "~/utils/api";
 import { despositValutAddressHH } from "~/lib/constants";
 import { toast } from "react-hot-toast";
-import { LoadingSpinner } from "../Loading";
 import type { Transaction } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
 export const CancelDepositButton = ({
@@ -24,7 +23,7 @@ export const CancelDepositButton = ({
   const { mutate, isLoading: isRemoving } = api.transaction.remove.useMutation({
     onSuccess: () => {
       console.log("Removed!");
-      void ctx.transaction.getTransactions.invalidate();
+      void ctx.transaction.getTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);

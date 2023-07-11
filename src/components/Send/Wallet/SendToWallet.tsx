@@ -10,6 +10,7 @@ import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import SendButton from "./SendButton";
 import type { TransactionForm } from "../Phone/SendToPhone";
+import type { Transaction } from "@prisma/client";
 
 export const SendToWallet = () => {
   const [step, setStep] = useState<number>(1);
@@ -29,6 +30,7 @@ export const SendToWallet = () => {
   );
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
+  const [savedTransaction, setSavedTransaction] = useState<Transaction>();
 
   useEffect(() => {
     if (fundsSent) {
@@ -106,8 +108,8 @@ export const SendToWallet = () => {
                   />
                 ) : step === 3 ? (
                   <ConfirmTransaction transaction={transaction} />
-                ) : step === 4 ? (
-                  <ShareTransaction transaction={transaction} />
+                ) : step === 4 && savedTransaction ? (
+                  <ShareTransaction transaction={savedTransaction} />
                 ) : null}
               </div>
 
@@ -116,6 +118,7 @@ export const SendToWallet = () => {
                   transaction={transaction}
                   setFundsSent={setFundsSent}
                   saveContact={saveContact}
+                  setSavedTransaction={setSavedTransaction}
                 />
               ) : (
                 <Button

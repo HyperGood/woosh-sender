@@ -7,7 +7,7 @@ export const UserPlaceholder = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_54_886)">
+      <g clipPath="url(#clip0_54_886)">
         <circle cx="24" cy="24.5" r="24" fill="#F1F3F2" />
         <circle cx="23.5" cy="46.919" r="8.08108" fill="#ACADAE" />
         <circle cx="23.5" cy="26.5" r="13.5" fill="#ACADAE" />

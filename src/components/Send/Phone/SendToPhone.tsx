@@ -66,8 +66,11 @@ export const SendToPhone = () => {
                     amount: 0,
                     token: "ETH",
                     phone: "",
-                    recipient: "",
+                    recipient: undefined,
                   });
+                  setDepositSigned(false);
+                  setFundsSent(false);
+                  setSaveContact(false);
                   setStep(1);
                 }
               }}

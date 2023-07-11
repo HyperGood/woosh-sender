@@ -13,7 +13,7 @@ export const ShareTransaction = ({
 }: {
   transaction: Transaction;
   secret?: string;
-  countryCode: string;
+  countryCode?: string;
 }) => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;

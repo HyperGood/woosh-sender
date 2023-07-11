@@ -207,7 +207,7 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
 
 const PreviousSends = () => {
   const { data: session } = useSession();
-  const { data, isLoading } = api.transaction.getTransactions.useQuery(
+  const { data, isLoading } = api.transaction.getTransactionsByUser.useQuery(
     undefined,
     {
       enabled: session?.user !== undefined,

@@ -12,14 +12,17 @@ import { useContext, type Dispatch, type SetStateAction } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import { LoadingSpinner } from "~/components/Loading";
+import type { Transaction } from "@prisma/client";
 
 export const SendButton = ({
   transaction,
   setFundsSent,
   saveContact,
+  setSavedTransaction,
 }: {
   transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
+  setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
   saveContact: CheckedState;
 }) => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -31,16 +34,19 @@ export const SendButton = ({
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
       console.log("Successfully added contact");
+
       void ctx.contact.getContacts.invalidate();
     },
     onError: (error) => {
       console.log(error);
     },
   });
-  const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
-    onSuccess: () => {
+  const { mutate } = api.transaction.add.useMutation({
+    onSuccess: (data) => {
       console.log("Saved!");
-      void ctx.transaction.getTransactions.invalidate();
+      setSavedTransaction(data);
+      setFundsSent(true);
+      void ctx.transaction.getTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);
@@ -64,7 +70,6 @@ export const SendButton = ({
     onSuccess(txData) {
       console.log("txData: ", txData);
       saveTransaction({ txId: txData.transactionHash });
-      setFundsSent(true);
       toast.success(`Funds sent!`);
     },
     onError(error) {

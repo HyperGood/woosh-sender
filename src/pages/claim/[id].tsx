@@ -7,8 +7,8 @@ import { useAccount, useDisconnect } from "wagmi";
 import Button from "~/components/Button";
 import WithdrawButton from "~/components/DepositVault/WithdrawButton";
 import {
-  getOneTransaction,
-  getPhoneTransactions,
+  getTransactionById,
+  getAllPhoneTransactions,
 } from "~/server/api/routers/transactions";
 import { prisma } from "~/server/db";
 
@@ -69,7 +69,7 @@ export default function Claim({
 }
 
 export async function getStaticPaths() {
-  const transactions = await getPhoneTransactions({ prisma });
+  const transactions = await getAllPhoneTransactions({ prisma });
 
   const paths = transactions.map((transaction) => ({
     params: { id: transaction.id },
@@ -79,7 +79,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-  const transaction = await getOneTransaction({
+  const transaction = await getTransactionById({
     prisma,
     input: { id: params.id },
   });

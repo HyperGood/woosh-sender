@@ -11,7 +11,7 @@ import {
 // });
 // type TransactionInput = z.infer<typeof getTransactionInput>;
 
-export async function getPhoneTransactions({
+export async function getAllPhoneTransactions({
   prisma,
 }: {
   prisma: PrismaClient;
@@ -24,7 +24,7 @@ export async function getPhoneTransactions({
   return transactions;
 }
 
-export async function getOneTransaction({
+export async function getTransactionById({
   prisma,
   input,
 }: {
@@ -41,7 +41,7 @@ export async function getOneTransaction({
 
 export const transactionsRouter = createTRPCRouter({
   //Get all transactions that belong to the logged in user
-  getTransactions: protectedProcedure.query(async ({ ctx }) => {
+  getTransactionsByUser: protectedProcedure.query(async ({ ctx }) => {
     const transactions = await ctx.prisma.transaction.findMany({
       where: {
         userId: ctx.session.user.id,

@@ -41,7 +41,6 @@ export const DepositButton = ({
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
-  const [innerNonce, setInnerNonce] = useState<bigint>();
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
@@ -52,11 +51,16 @@ export const DepositButton = ({
       console.log(error);
     },
   });
-  const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
+  const {
+    mutate,
+    isLoading: isSaving,
+    isError: errorSavingTransaction,
+  } = api.transaction.add.useMutation({
     onSuccess: (data) => {
       console.log("Saved!");
       setSavedTransaction(data);
-      void ctx.transaction.getTransactions.invalidate();
+      setFundsSent(true);
+      void ctx.transaction.getTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);
@@ -92,7 +96,7 @@ export const DepositButton = ({
     onSuccess(txData) {
       console.log("txData: ", txData);
       saveTransaction({ txId: txData.transactionHash });
-      setFundsSent(true);
+
       toast.success(`Funds sent!`);
     },
     onError(error) {
@@ -111,7 +115,6 @@ export const DepositButton = ({
       // if (log[0]?.args.depositIndex === undefined) return;
       if (log[0]?.args.depositIndex) {
         setNonce(log[0]?.args.depositIndex);
-        setInnerNonce(log[0]?.args.depositIndex);
         console.log(nonce);
       }
       // console.log(nonce);
@@ -149,7 +152,7 @@ export const DepositButton = ({
         ...transaction,
         amountInUSD: amountInUSD,
         txId: txId,
-        nonce: Number(innerNonce),
+        nonce: Number(nonce),
         type: "phone",
       });
     } else {
@@ -159,19 +162,26 @@ export const DepositButton = ({
 
   return (
     <>
-      {isDepositing && (
+      {isDepositing || isSaving ? (
         <div className="flex items-center gap-4">
           <span>Sending funds</span> <LoadingSpinner />{" "}
         </div>
+      ) : null}
+      {errorSavingTransaction ? (
+        <div>There was an error, retry</div>
+      ) : (
+        <button
+          onClick={() => void sendFunction()}
+          disabled={isSaving || isDepositLoading || isDepositing}
+          className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isDepositLoading
+            ? "Waiting for approval"
+            : isSaving
+            ? "Please wait"
+            : "Send"}
+        </button>
       )}
-
-      <button
-        onClick={() => void sendFunction()}
-        disabled={isSaving || isDepositLoading || isDepositing}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isDepositLoading ? "Waiting for approval" : "Send"}
-      </button>
     </>
   );
 };
