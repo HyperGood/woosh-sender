@@ -1,5 +1,43 @@
+import { type PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
+
+// const getTransactionInput = z.object({
+//   id: z.string(),
+// });
+// type TransactionInput = z.infer<typeof getTransactionInput>;
+
+export async function getPhoneTransactions({
+  prisma,
+}: {
+  prisma: PrismaClient;
+}) {
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      type: "phone",
+    },
+  });
+  return transactions;
+}
+
+export async function getOneTransaction({
+  prisma,
+  input,
+}: {
+  prisma: PrismaClient;
+  input: { id: string };
+}) {
+  const transaction = await prisma.transaction.findUnique({
+    where: {
+      id: input.id,
+    },
+  });
+  return transaction;
+}
 
 export const transactionsRouter = createTRPCRouter({
   //Get all transactions that belong to the logged in user
@@ -11,6 +49,7 @@ export const transactionsRouter = createTRPCRouter({
     });
     return transactions;
   }),
+
   //Add a new transaction
   add: protectedProcedure
     .input(
@@ -51,6 +90,29 @@ export const transactionsRouter = createTRPCRouter({
       const transaction = await ctx.prisma.transaction.delete({
         where: {
           id: input.id,
+        },
+      });
+      return transaction;
+    }),
+  //Update transaction status
+  updateStatus: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        claimed: z.boolean(),
+        claimedAt: z.date(),
+        claimedBy: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const transaction = await ctx.prisma.transaction.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          claimed: input.claimed,
+          claimedAt: input.claimedAt,
+          claimedBy: input.claimedBy,
         },
       });
       return transaction;

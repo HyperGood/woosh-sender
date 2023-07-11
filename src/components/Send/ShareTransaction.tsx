@@ -1,21 +1,24 @@
 import Image from "next/image";
-import type { TransactionForm } from "./Phone/SendToPhone";
 import TransactionInfo from "./TransactionInfo";
 import CopyIcon from "public/images/icons/CopyIcon";
 import { toast } from "react-hot-toast";
 import { useContext } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
+import type { Transaction } from "@prisma/client";
 
 export const ShareTransaction = ({
   transaction,
+  countryCode,
   secret,
 }: {
-  transaction: TransactionForm;
+  transaction: Transaction;
   secret?: string;
+  countryCode: string;
 }) => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const amountInUSD = transaction.amount * ethPrice;
+  const url = `http://localhost:3000/claim/${transaction.id}`;
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -38,7 +41,7 @@ export const ShareTransaction = ({
                         {transaction.recipient}
                       </span>
                       <span className="opacity-60">
-                        {transaction.countryCode}-{transaction.phone}
+                        {countryCode}-{transaction.phone}
                       </span>
                     </>
                   ) : (
@@ -54,7 +57,7 @@ export const ShareTransaction = ({
                 <>
                   {transaction.phone ? (
                     <span className="font-polysans text-lg">
-                      {transaction.countryCode}-{transaction.phone}
+                      {countryCode}-{transaction.phone}
                     </span>
                   ) : (
                     <span className="font-polysans text-lg">
@@ -101,6 +104,25 @@ export const ShareTransaction = ({
                   onClick={() => {
                     void navigator.clipboard.writeText(secret);
                     toast.success("Secret copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
+              </div>
+            }
+          />
+        ) : null}
+        {transaction.type === "phone" ? (
+          <TransactionInfo
+            label="Claim Link"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{url}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(url);
+                    toast.success("Claim link copied!");
                   }}
                   className="h-7 w-7 shrink-0 cursor-pointer"
                 >

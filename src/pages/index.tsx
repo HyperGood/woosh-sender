@@ -1,6 +1,6 @@
 import type { Transaction } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { use, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { api } from "~/utils/api";
 import SignIn from "~/components/SignIn";

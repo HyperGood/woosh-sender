@@ -12,9 +12,15 @@ import { despositValutAddressHH } from "~/lib/constants";
 import type { TransactionForm } from "../Send/Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
-import { useContext, type Dispatch, type SetStateAction } from "react";
+import {
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+  useState,
+} from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { CheckedState } from "@radix-ui/react-checkbox";
+import type { Transaction } from "@prisma/client";
 
 export const DepositButton = ({
   transaction,
@@ -22,10 +28,12 @@ export const DepositButton = ({
   setNonce,
   nonce,
   saveContact,
+  setSavedTransaction,
 }: {
   transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
   setNonce: Dispatch<SetStateAction<bigint>>;
+  setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
   nonce: bigint;
   saveContact: CheckedState;
 }) => {
@@ -33,6 +41,7 @@ export const DepositButton = ({
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
+  const [innerNonce, setInnerNonce] = useState<bigint>();
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
@@ -44,8 +53,9 @@ export const DepositButton = ({
     },
   });
   const { mutate, isLoading: isSaving } = api.transaction.add.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       console.log("Saved!");
+      setSavedTransaction(data);
       void ctx.transaction.getTransactions.invalidate();
     },
     onError: (error) => {
@@ -96,8 +106,15 @@ export const DepositButton = ({
     abi,
     eventName: "DepositMade",
     listener(log) {
-      if (log[0]?.args.depositIndex === undefined) return;
-      setNonce(log[0]?.args.depositIndex);
+      // console.log(log);
+      // console.log(log[0]?.args.depositIndex);
+      // if (log[0]?.args.depositIndex === undefined) return;
+      if (log[0]?.args.depositIndex) {
+        setNonce(log[0]?.args.depositIndex);
+        setInnerNonce(log[0]?.args.depositIndex);
+        console.log(nonce);
+      }
+      // console.log(nonce);
     },
   });
 
@@ -132,7 +149,7 @@ export const DepositButton = ({
         ...transaction,
         amountInUSD: amountInUSD,
         txId: txId,
-        nonce: Number(nonce),
+        nonce: Number(innerNonce),
         type: "phone",
       });
     } else {

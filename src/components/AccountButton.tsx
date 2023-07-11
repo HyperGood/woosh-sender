@@ -4,6 +4,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useDisconnect } from "wagmi";
 import { signOut } from "next-auth/react";
 import { toast } from "react-hot-toast";
+import CopyIcon from "public/images/icons/CopyIcon";
 
 export const AccountButton = () => {
   const { disconnect } = useDisconnect();
@@ -27,16 +28,14 @@ export const AccountButton = () => {
             {isConnected ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
-                  <div className="bg-brand flex items-center gap-4 rounded-md bg-brand-white px-4 py-2">
+                  <div className="bg-brand flex items-center gap-4 rounded-md bg-brand-white px-4 py-2 ">
                     <UserPlaceholder />
                     <div className="flex flex-col items-start gap-1">
-                      <span className="text-lg">
-                        {ensName ? ensName : truncatedAddress}
-                      </span>
+                      <span>{ensName ? ensName : truncatedAddress}</span>
                       {chain && (
-                        <div className="flex items-center gap-2">
-                          <span className=" opacity-60">Network:</span>
-                          <ChainIcon id={chain.id} />
+                        <div className="flex items-center gap-2 text-sm ">
+                          <span className="opacity-60">Network:</span>
+                          <ChainIcon size="1rem" id={chain.id} />
                           <span>{chain.name}</span>
                         </div>
                       )}
@@ -44,7 +43,7 @@ export const AccountButton = () => {
                   </div>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
-                  <DropdownMenu.Content className="mt-2 flex w-[--radix-dropdown-menu-trigger-width] flex-col rounded-md bg-brand-white">
+                  <DropdownMenu.Content className="mt-2 flex w-[--radix-dropdown-menu-trigger-width] flex-col rounded-md bg-brand-white shadow">
                     <DropdownMenu.Item className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent">
                       <button
                         className="w-full"
@@ -57,11 +56,16 @@ export const AccountButton = () => {
                           }
                         }}
                       >
-                        <div className="flex flex-col items-start gap-1">
-                          <span>Copy Address</span>
-                          <span className="text-sm opacity-60">
-                            {truncatedAddress}
-                          </span>
+                        <div className="flex w-full items-center justify-between">
+                          <div className="flex flex-col items-start gap-1">
+                            <span>Copy Address</span>
+                            <span className="text-sm opacity-60">
+                              {truncatedAddress}
+                            </span>
+                          </div>
+                          <div className="h-6 w-6">
+                            <CopyIcon />
+                          </div>
                         </div>
                       </button>
                     </DropdownMenu.Item>
@@ -79,7 +83,7 @@ export const AccountButton = () => {
                       <button className="w-full">
                         <div className="flex w-full items-center justify-between gap-1">
                           <span>Preferred Currency</span>
-                          <span>🇺🇸 USD</span>
+                          <span className="font-polysans">🇺🇸 USD</span>
                         </div>
                       </button>
                     </DropdownMenu.Item>

@@ -10,6 +10,7 @@ import ShareTransaction from "../ShareTransaction";
 import SignDepositButton from "../../DepositVault/SignDepositButton";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
+import type { Transaction } from "@prisma/client";
 
 export interface TransactionForm {
   amount: number;
@@ -41,6 +42,7 @@ export const SendToPhone = () => {
   const [secret, setSecret] = useState<string>("");
   const [nonce, setNonce] = useState<bigint>(BigInt(0));
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
+  const [savedTransaction, setSavedTransaction] = useState<Transaction>();
 
   useEffect(() => {
     if (depositSigned) {
@@ -118,9 +120,15 @@ export const SendToPhone = () => {
                   />
                 ) : step === 3 ? (
                   <ConfirmTransaction transaction={transaction} />
-                ) : step === 4 ? (
-                  <ShareTransaction transaction={transaction} secret={secret} />
-                ) : null}
+                ) : step === 4 && savedTransaction ? (
+                  <ShareTransaction
+                    transaction={savedTransaction}
+                    secret={secret}
+                    countryCode={transaction.countryCode || "+1"}
+                  />
+                ) : (
+                  <div>Something went wrong!</div>
+                )}
               </div>
 
               {step === 3 ? (
@@ -138,6 +146,7 @@ export const SendToPhone = () => {
                     setNonce={setNonce}
                     nonce={nonce}
                     saveContact={saveContact}
+                    setSavedTransaction={setSavedTransaction}
                   />
                 )
               ) : (

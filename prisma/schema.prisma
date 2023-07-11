@@ -73,7 +73,9 @@ model Transaction {
   recipient   String?
   amountInUSD Float
   claimed     Boolean  @default(false)
+  claimedBy   String?
   createdAt   DateTime @default(now())
+  claimedAt   DateTime?
   txId        String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

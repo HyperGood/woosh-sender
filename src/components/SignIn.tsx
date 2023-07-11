@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import { AccountButton } from "./AccountButton";
+import Link from "next/link";
 
 export const SignIn = () => {
   // Hooks
@@ -57,6 +58,12 @@ export const SignIn = () => {
           Send crypto to any phone number
         </h1>
         <AccountButton />
+        <Link
+          href="/claim"
+          className="mt-8 block rounded-md bg-brand-gray-light p-2 text-center underline hover:bg-brand-accent"
+        >
+          Claim Funds
+        </Link>
       </div>
     </div>
   );
