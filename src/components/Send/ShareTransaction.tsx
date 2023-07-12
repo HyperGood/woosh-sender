@@ -25,7 +25,7 @@ export const ShareTransaction = ({
         <h2 className="text-2xl">Share</h2>
         <p>
           Click on copy link and share it with{" "}
-          {transaction.recipient ? transaction.recipient : "the recipient"}!
+          {transaction.contact ? transaction.contact : "the recipient"}!
         </p>
       </div>
       <div className="flex flex-col gap-5">
@@ -33,12 +33,12 @@ export const ShareTransaction = ({
           label="Sent To"
           content={
             <div className="flex items-center gap-4">
-              {transaction.recipient ? (
+              {transaction.contact ? (
                 <>
                   {transaction.phone ? (
                     <>
                       <span className="font-polysans text-lg">
-                        {transaction.recipient}
+                        {transaction.contact}
                       </span>
                       <span className="opacity-60">
                         {countryCode}-{transaction.phone}
@@ -47,7 +47,7 @@ export const ShareTransaction = ({
                   ) : (
                     <>
                       <span className="font-polysans text-lg">
-                        {transaction.recipient}
+                        {transaction.contact}
                       </span>
                       <span className="opacity-60">{transaction.address}</span>
                     </>

@@ -31,11 +31,7 @@ export const EnterAddress = ({
   return (
     <div className="flex flex-col gap-12">
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl">Enter recipient&apos;s phone number</h2>
-        <p>
-          Your recipient will input this number in order to get access to the
-          funds you send them.
-        </p>
+        <h2 className="text-2xl">Enter a Ethereum Address or ENS name</h2>
       </div>
       <div className="flex flex-col items-start">
         <div className="flex w-full flex-col gap-2">

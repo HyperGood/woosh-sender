@@ -95,7 +95,7 @@ export const StepIndicator = ({
           {status === "complete" ? (
             <CheckIcon />
           ) : (
-            <span className="leading-none">{step}</span>
+            <span className="leading-none">{step + 1}</span>
           )}
         </div>
       </motion.div>

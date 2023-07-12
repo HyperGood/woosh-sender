@@ -9,18 +9,13 @@ import {
 } from "wagmi";
 import { api } from "~/utils/api";
 import { despositValutAddressHH } from "~/lib/constants";
-import type { TransactionForm } from "../Send/Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
-import {
-  useContext,
-  type Dispatch,
-  type SetStateAction,
-  useState,
-} from "react";
+import { useContext, type Dispatch, type SetStateAction } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
+import type { PhoneTransaction } from "~/models/transactions";
 
 export const DepositButton = ({
   transaction,
@@ -30,7 +25,7 @@ export const DepositButton = ({
   saveContact,
   setSavedTransaction,
 }: {
-  transaction: TransactionForm;
+  transaction: PhoneTransaction;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
   setNonce: Dispatch<SetStateAction<bigint>>;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
@@ -55,12 +50,12 @@ export const DepositButton = ({
     mutate,
     isLoading: isSaving,
     isError: errorSavingTransaction,
-  } = api.transaction.add.useMutation({
+  } = api.transaction.addPhoneTransaction.useMutation({
     onSuccess: (data) => {
       console.log("Saved!");
       setSavedTransaction(data);
       setFundsSent(true);
-      void ctx.transaction.getTransactionsByUser.invalidate();
+      void ctx.transaction.getAllTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);
@@ -105,6 +100,7 @@ export const DepositButton = ({
     },
   });
 
+  //Trigger this only after the deposit has been made
   useContractEvent({
     address: despositValutAddressHH,
     abi,
@@ -122,9 +118,9 @@ export const DepositButton = ({
   });
 
   function saveContactFunction() {
-    if (transaction.recipient && transaction.phone) {
+    if (transaction.contact && transaction.phone) {
       mutateContact({
-        name: transaction.recipient,
+        name: transaction.contact,
         phone: transaction.phone,
       });
     } else {
@@ -153,7 +149,6 @@ export const DepositButton = ({
         amountInUSD: amountInUSD,
         txId: txId,
         nonce: Number(nonce),
-        type: "phone",
       });
     } else {
       console.log("Error saving transaction");

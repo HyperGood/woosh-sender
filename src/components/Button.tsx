@@ -1,29 +1,29 @@
-import { cva } from 'class-variance-authority';
-import type { VariantProps } from 'class-variance-authority';
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 
 export const buttonStyles = cva(
-  'flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-colors',
+  "flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-colors",
   {
     variants: {
       intent: {
-        primary: 'bg-brand-gray-light text-brand-black',
+        primary: "bg-brand-gray-light text-brand-black",
         secondary:
-          'bg-brand-black text-brand-white focus:ring-brand-accent   transition-colors',
-        danger: 'bg-red-500 text-white focus:ring-red-500',
+          "bg-brand-black text-brand-white focus:ring-brand-accent   transition-colors",
+        danger: "bg-red-500 text-white focus:ring-red-500",
       },
       fullWidth: {
-        true: 'w-full',
+        true: "w-full",
       },
       disabled: {
-        true: 'opacity-20 cursor-not-allowed',
+        true: "opacity-20 cursor-not-allowed",
       },
       hover: {
-        true: 'hover:bg-brand-accent hover:text-brand-black',
-        false: 'hover:bg-brand-gray-dark',
+        true: "hover:bg-brand-accent hover:text-brand-black",
+        false: "hover:bg-brand-gray-dark",
       },
     },
     defaultVariants: {
-      intent: 'primary',
+      intent: "primary",
     },
   }
 );
@@ -47,11 +47,12 @@ const Button = ({
 }: Props) => {
   return (
     <>
-      {' '}
+      {" "}
       <button
         className={buttonStyles({ intent, fullWidth, disabled, hover })}
         onClick={onClick}
         disabled={disabled}
+        type="button"
       >
         {children}
       </button>

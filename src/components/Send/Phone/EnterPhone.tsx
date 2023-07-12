@@ -1,29 +1,32 @@
 import { PatternFormat } from "react-number-format";
 import { COUNTRIES } from "~/lib/countries";
 import { useState, type Dispatch, useEffect, type SetStateAction } from "react";
-import type { TransactionForm } from "./SendToPhone";
 import type { Data } from "../../ComboboxSelect";
 import ComboInput from "../../ComboInput";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAnimate } from "framer-motion";
+import {
+  type Control,
+  Controller,
+  type UseFormRegister,
+} from "react-hook-form";
+import { type PhoneTransaction } from "~/models/transactions";
 
 export const EnterPhone = ({
-  transaction,
-  setFields,
   saveContact,
   setSaveContact,
+  control,
+  register,
 }: {
-  transaction: TransactionForm;
-  setFields: Dispatch<Partial<TransactionForm>>;
   saveContact: Checkbox.CheckedState;
   setSaveContact: Dispatch<SetStateAction<Checkbox.CheckedState>>;
+  control: Control<PhoneTransaction>;
+  register: UseFormRegister<PhoneTransaction>;
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
   );
   const [countryQuery, setCountryQuery] = useState("");
-
-  // const [isValid, setIsValid] = useState<boolean>(false);
 
   const filteredCountries =
     countryQuery === ""
@@ -40,29 +43,15 @@ export const EnterPhone = ({
           );
         });
 
-  // function validatePhoneNumber(number: string) {
-  //   const isValidPhoneNumber = validator.isMobilePhone(number, "any", {
-  //     strictMode: false,
-  //   });
-  //   return isValidPhoneNumber;
-  // }
-
-  // useEffect(() => {
-  //   setIsValid(validatePhoneNumber(transaction.phone.replaceAll(/[()-]/g, "")));
-  // }, [transaction.phone, selectedCountry, step]);
-  useEffect(() => {
-    setFields({ countryCode: selectedCountry.displayValue });
-  }, [selectedCountry]);
-
   const [ref, animate] = useAnimate();
 
   useEffect(() => {
     if (saveContact) {
       void animate(ref.current, { backgroundColor: "var(--brand-accent)" });
-      void animate("div", { scale: 1 }, { type: "spring" });
+      void animate(".indicator", { scale: 1 }, { type: "spring" });
     } else {
       void animate(ref.current, { backgroundColor: "var(--brand-gray-light)" });
-      void animate("div", { scale: 0 });
+      void animate(".indicator", { scale: 0 });
     }
   }, [saveContact]);
 
@@ -75,53 +64,52 @@ export const EnterPhone = ({
           funds you send them.
         </p>
       </div>
-      <div className="flex flex-col items-start">
+      <div className="flex w-full flex-col items-start">
         <ComboInput
           filteredData={filteredCountries}
           selectedItem={selectedCountry}
           setSelectedItem={setSelectedCountry}
           queryChange={setCountryQuery}
           label="Recipient Phone Number"
-          required
           input={
-            <PatternFormat
-              className="w-full rounded-[0.5rem] border-[1px] border-brand-black bg-transparent py-3 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
-              format="(###)-###-####"
-              mask="_"
-              onChange={(e) =>
-                setFields({
-                  phone: e.target.value,
-                })
-              }
-              value={transaction.phone}
-              placeholder="###-###-####"
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange } }) => (
+                <PatternFormat
+                  format={`(###) ###-####`}
+                  mask="_"
+                  placeholder={`(___) ___-____`}
+                  className="w-full rounded-[0.5rem] border-[1px] border-brand-black bg-transparent py-3 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
+                  onChange={onChange}
+                />
+              )}
             />
           }
         />
-        <div
+
+        <Checkbox.Root
+          checked={saveContact}
+          onCheckedChange={setSaveContact}
           className="my-6 flex cursor-pointer items-center gap-2"
-          onClick={() => setSaveContact(!saveContact)}
         >
-          <Checkbox.Root
-            checked={saveContact}
-            onCheckedChange={setSaveContact}
+          <div
             ref={ref}
-            className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-[0.25rem] border border-brand-black/10 transition-colors"
+            className="flex h-6 w-6  items-center justify-center rounded-[0.25rem] border border-brand-black/10 transition-colors"
           >
             <Checkbox.Indicator forceMount>
-              <div className="h-2 w-2 rounded-sm bg-brand-black"></div>
+              <div className="indicator h-2 w-2 rounded-sm bg-brand-black"></div>
             </Checkbox.Indicator>
-          </Checkbox.Root>
-
+          </div>
           <span>Save as contact</span>
-        </div>
+        </Checkbox.Root>
+
         {saveContact ? (
           <div className="flex w-full flex-col gap-2">
             <label className="text-sm opacity-80">Contact Name</label>
             <input
               type="text"
-              value={transaction.recipient}
-              onChange={(e) => setFields({ recipient: e.target.value })}
+              {...register("contact")}
               className="rounded-lg border-[1px] border-brand-black bg-brand-white px-4 py-3 focus:border-2 focus:border-brand-black focus:outline-none "
               placeholder="Enter a name or alias"
             />

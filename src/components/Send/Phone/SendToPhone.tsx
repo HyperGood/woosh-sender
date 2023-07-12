@@ -1,16 +1,22 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Button from "../../Button";
 import StepIndicator from "../../Form/StepIndicator";
 import DepositButton from "../../DepositVault/DepositButton";
 import EnterPhone from "./EnterPhone";
-import EnterAmount from "../EnterAmount";
+import EnterAmount from "../RHF-EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
 import SignDepositButton from "../../DepositVault/SignDepositButton";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  PhoneTransactionSchema,
+  type PhoneTransaction,
+} from "~/models/transactions";
 
 export interface TransactionForm {
   amount: number;
@@ -20,23 +26,38 @@ export interface TransactionForm {
   countryCode?: string;
   address?: string;
 }
+export interface ValidSteps {
+  step1: boolean;
+  step2: boolean;
+  step3: boolean;
+  step4: boolean;
+}
 
 export const SendToPhone = () => {
-  const [step, setStep] = useState<number>(1);
-  const [transaction, setFields] = useReducer(
-    (
-      current: TransactionForm,
-      update: Partial<TransactionForm>
-    ): TransactionForm => ({
-      ...current,
-      ...update,
-    }),
-    {
+  const [step, setStep] = useState<number>(0);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    getFieldState,
+    reset,
+    control,
+  } = useForm<PhoneTransaction>({
+    resolver: zodResolver(PhoneTransactionSchema),
+    mode: "all",
+    defaultValues: {
       amount: 0,
       token: "ETH",
       phone: "",
-    }
-  );
+      type: "phone",
+    },
+  });
+
+  const onSubmit: SubmitHandler<PhoneTransaction> = (data) => {
+    console.log(data);
+  };
+
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
   const [secret, setSecret] = useState<string>("");
@@ -46,7 +67,7 @@ export const SendToPhone = () => {
 
   useEffect(() => {
     if (depositSigned) {
-      setStep(4);
+      setStep(3);
     }
   }, [depositSigned]);
 
@@ -54,24 +75,19 @@ export const SendToPhone = () => {
     <>
       <Dialog.Root>
         <Dialog.Trigger className="flex items-center justify-center rounded-full bg-brand-gray-light px-8 py-5 text-brand-black transition-colors hover:bg-brand-accent hover:text-brand-black focus:outline-none">
-          Send To A Phone Number
+          React Hook Form Version
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow">
             <Dialog.Close
               onClick={() => {
-                if (step === 4) {
-                  setFields({
-                    amount: 0,
-                    token: "ETH",
-                    phone: "",
-                    recipient: undefined,
-                  });
+                if (step === 3) {
+                  reset();
                   setDepositSigned(false);
                   setFundsSent(false);
                   setSaveContact(false);
-                  setStep(1);
+                  setStep(0);
                 }
               }}
               className="absolute right-8 top-4 h-6 w-6 hover:text-error"
@@ -91,60 +107,56 @@ export const SendToPhone = () => {
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
-                      setStep(1);
+                      setStep(0);
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={1} name="Phone" currentStep={step} />
+                    <StepIndicator step={0} name="Phone" currentStep={step} />
+                  </button>
+                  <button onClick={() => setStep(1)} className="cursor-pointer">
+                    <StepIndicator step={1} name="Amount" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(2)} className="cursor-pointer">
-                    <StepIndicator step={2} name="Amount" currentStep={step} />
+                    <StepIndicator step={2} name="Confirm" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(3)} className="cursor-pointer">
-                    <StepIndicator step={3} name="Confirm" currentStep={step} />
-                  </button>
-                  <button onClick={() => setStep(4)} className="cursor-pointer">
-                    <StepIndicator step={4} name="Share" currentStep={step} />
+                    <StepIndicator step={3} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>
-              <div>
-                {step === 1 ? (
+              <form onSubmit={void handleSubmit(onSubmit)}>
+                {step === 0 ? (
                   <EnterPhone
-                    transaction={transaction}
-                    setFields={setFields}
                     saveContact={saveContact}
                     setSaveContact={setSaveContact}
+                    control={control}
+                    register={register}
                   />
+                ) : step === 1 ? (
+                  <EnterAmount phone={getValues("phone")} register={register} />
                 ) : step === 2 ? (
-                  <EnterAmount
-                    transaction={transaction}
-                    setFields={setFields}
-                  />
-                ) : step === 3 ? (
-                  <ConfirmTransaction transaction={transaction} />
-                ) : step === 4 && savedTransaction ? (
+                  <ConfirmTransaction transactionData={getValues()} />
+                ) : step === 3 && savedTransaction ? (
                   <ShareTransaction
                     transaction={savedTransaction}
                     secret={secret}
-                    countryCode={transaction.countryCode || "+1"}
                   />
                 ) : (
                   <div>Something went wrong!</div>
                 )}
-              </div>
+              </form>
 
-              {step === 3 ? (
+              {step === 2 ? (
                 fundsSent ? (
                   <SignDepositButton
                     setDepositSigned={setDepositSigned}
                     setSecret={setSecret}
-                    transaction={transaction}
+                    transaction={getValues()}
                     nonce={nonce}
                   />
                 ) : (
                   <DepositButton
-                    transaction={transaction}
+                    transaction={getValues()}
                     setFundsSent={setFundsSent}
                     setNonce={setNonce}
                     nonce={nonce}
@@ -152,18 +164,31 @@ export const SendToPhone = () => {
                     setSavedTransaction={setSavedTransaction}
                   />
                 )
+              ) : step === 3 && savedTransaction ? (
+                <Button intent="secondary" fullWidth>
+                  Share
+                </Button>
               ) : (
                 <Button
                   intent="secondary"
                   fullWidth
                   onClick={() => {
-                    setStep(step > 4 ? step : step + 1);
+                    setStep(step > 3 ? step : step + 1);
                   }}
-                  // disabled={isValid || step > 2 ? false : true}
+                  disabled={
+                    step === 0
+                      ? getFieldState("phone").invalid
+                      : saveContact
+                      ? getFieldState("contact").invalid
+                      : step === 1
+                      ? getFieldState("amount").invalid
+                      : false
+                  }
                 >
-                  {step === 4 ? "Share" : "Next"}
+                  Next
                 </Button>
               )}
+              <span>{errors.amount?.message}</span>
             </div>
           </Dialog.Content>
         </Dialog.Portal>

@@ -5,11 +5,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-
-// const getTransactionInput = z.object({
-//   id: z.string(),
-// });
-// type TransactionInput = z.infer<typeof getTransactionInput>;
+import {
+  PhoneTransactionSchema,
+  WalletTransactionSchema,
+} from "~/models/transactions";
 
 export async function getAllPhoneTransactions({
   prisma,
@@ -41,7 +40,7 @@ export async function getTransactionById({
 
 export const transactionsRouter = createTRPCRouter({
   //Get all transactions that belong to the logged in user
-  getTransactionsByUser: protectedProcedure.query(async ({ ctx }) => {
+  getAllTransactionsByUser: protectedProcedure.query(async ({ ctx }) => {
     const transactions = await ctx.prisma.transaction.findMany({
       where: {
         userId: ctx.session.user.id,
@@ -51,20 +50,8 @@ export const transactionsRouter = createTRPCRouter({
   }),
 
   //Add a new transaction
-  add: protectedProcedure
-    .input(
-      z.object({
-        amount: z.number().min(0).max(1000000),
-        token: z.string().min(1).max(5),
-        amountInUSD: z.number().min(0),
-        phone: z.string().min(10).max(20).optional(),
-        txId: z.string(),
-        recipient: z.string().min(1).max(100).optional(),
-        nonce: z.number().min(0).optional(),
-        type: z.enum(["wallet", "phone"]),
-        address: z.string().min(1).max(100).optional(),
-      })
-    )
+  addPhoneTransaction: protectedProcedure
+    .input(PhoneTransactionSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const transaction = await ctx.prisma.transaction.create({
@@ -75,10 +62,27 @@ export const transactionsRouter = createTRPCRouter({
           phone: input.phone,
           userId: userId,
           txId: input.txId,
-          recipient: input.recipient,
+          contact: input.contact,
           nonce: input.nonce,
           type: input.type,
+        },
+      });
+      return transaction;
+    }),
+  addWalletTransaction: protectedProcedure
+    .input(WalletTransactionSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const transaction = await ctx.prisma.transaction.create({
+        data: {
+          amount: input.amount,
+          token: input.token,
+          amountInUSD: input.amountInUSD,
           address: input.address,
+          userId: userId,
+          txId: input.txId,
+          contact: input.contact,
+          type: input.type,
         },
       });
       return transaction;
@@ -95,7 +99,7 @@ export const transactionsRouter = createTRPCRouter({
       return transaction;
     }),
   //Update transaction status
-  updateStatus: publicProcedure
+  updateClaimedStatus: publicProcedure
     .input(
       z.object({
         id: z.string(),

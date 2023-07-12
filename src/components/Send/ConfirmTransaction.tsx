@@ -1,17 +1,16 @@
 import Image from "next/image";
-import type { TransactionForm } from "./Phone/SendToPhone";
 import TransactionInfo from "./TransactionInfo";
-import { useContext } from "react";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
+import useTokenPrices from "~/hooks/useTokenPrices";
+import type { PhoneTransaction } from "~/models/transactions";
 
 export const ConfirmTransaction = ({
-  transaction,
+  transactionData,
 }: {
-  transaction: TransactionForm;
+  transactionData: PhoneTransaction;
 }) => {
-  const { cryptoPrices } = useContext(CryptoPricesContext);
+  const { cryptoPrices } = useTokenPrices();
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
-  const amountInUSD = transaction.amount * ethPrice;
+  const amountInUSD = transactionData.amount * ethPrice;
 
   return (
     <div className="flex flex-col">
@@ -27,36 +26,34 @@ export const ConfirmTransaction = ({
           label="Sending To"
           content={
             <div className="flex items-center gap-4">
-              {transaction.recipient ? (
+              {transactionData.contact ? (
                 <>
-                  {transaction.phone ? (
+                  {transactionData.phone ? (
                     <>
                       <span className="font-polysans text-lg">
-                        {transaction.recipient}
+                        {transactionData.contact}
                       </span>
                       <span className="opacity-60">
-                        {transaction.countryCode}-{transaction.phone}
+                        countryCode-{transactionData.phone}
                       </span>
                     </>
                   ) : (
                     <>
                       <span className="font-polysans text-lg">
-                        {transaction.recipient}
+                        {transactionData.contact}
                       </span>
-                      <span className="opacity-60">{transaction.address}</span>
+                      <span className="opacity-60">address</span>
                     </>
                   )}
                 </>
               ) : (
                 <>
-                  {transaction.phone ? (
+                  {transactionData.phone ? (
                     <span className="font-polysans text-lg">
-                      {transaction.countryCode}-{transaction.phone}
+                      countryCode-{transactionData.phone}
                     </span>
                   ) : (
-                    <span className="font-polysans text-lg">
-                      {transaction.address}
-                    </span>
+                    <span className="font-polysans text-lg">address</span>
                   )}
                 </>
               )}
@@ -68,14 +65,14 @@ export const ConfirmTransaction = ({
           content={
             <div className="flex items-center gap-4">
               <Image
-                src={`/images/tokens/${transaction.token}.svg`}
-                alt={transaction.token}
+                src={`/images/tokens/${transactionData.token}.svg`}
+                alt={transactionData.token}
                 width={24}
                 height={24}
                 className="h-6 w-6 object-contain"
               />
               <p className="text-lg">
-                {transaction.amount} {transaction.token}
+                {transactionData.amount} {transactionData.token}
               </p>{" "}
               <span className="opacity-60">
                 {amountInUSD.toLocaleString("en-us", {

@@ -3,34 +3,41 @@
 @tailwind utilities;
 
 :root {
-  --brand-accent: #C8FD6A;
-  --brand-black: #19181D;
-  --brand-white: #F9FBFA;
-  --brand-gray-light: #F1F3F2;
+  --brand-accent: #c8fd6a;
+  --brand-black: #19181d;
+  --brand-white: #f9fbfa;
+  --brand-gray-light: #f1f3f2;
 }
 
 @font-face {
-    font-family: 'PolySans';
-    src: local(''), url('/fonts/PolySans-Median.woff2') format('woff2');
-  }
+  font-family: "PolySans";
+  src: local(""), url("/fonts/PolySans-Median.woff2") format("woff2");
+}
 
-  @font-face {
-    font-family: 'FH Oscar';
-    src: local(''), url('/fonts/fhoscar-medium.woff2') format('woff2');
-  }
+@font-face {
+  font-family: "FH Oscar";
+  src: local(""), url("/fonts/fhoscar-medium.woff2") format("woff2");
+}
 
-  body {
-    background-color: #F9FBFA;
-    color: #19181D;
-  }
-  
-  h1,
-  h2 {
-    @apply font-polysans;
-    letter-spacing: -0.01em;
-  }
+body {
+  background-color: #f9fbfa;
+  color: #19181d;
+}
 
-  p, span, div, a, li, input, textarea, button{
-    @apply font-fhoscar;
-    letter-spacing: 0.01em;
-  }
+h1,
+h2 {
+  @apply font-polysans;
+  letter-spacing: -0.01em;
+}
+
+p,
+span,
+div,
+a,
+li,
+input,
+textarea,
+button {
+  @apply font-fhoscar;
+  letter-spacing: 0.01em;
+}

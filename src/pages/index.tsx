@@ -1,6 +1,6 @@
 import type { Transaction } from "@prisma/client";
-import { useSession } from "next-auth/react";
-import { useContext, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { useContext, useEffect, useState } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { api } from "~/utils/api";
 import SignIn from "~/components/SignIn";
@@ -17,6 +17,7 @@ import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import SignDepositButton from "~/components/DepositVault/SignDepositButton";
+import ReactHookFormSendToPhone from "~/components/Send/Phone/SendToPhone";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -141,6 +142,7 @@ const Main = () => {
       <div className="my-12 flex flex-col gap-8 lg:mb-0 lg:mt-14">
         <SendToPhone />
         <SendToWallet />
+        <ReactHookFormSendToPhone />
       </div>
     </div>
   );
@@ -154,9 +156,9 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
     <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          {transaction.recipient ? (
+          {transaction.contact ? (
             <>
-              <span className="font-polysans">{transaction.recipient}</span>
+              <span className="font-polysans">{transaction.contact}</span>
               <span className="opacity-60">
                 {transaction.phone ? transaction.phone : transaction.address}
               </span>
@@ -207,7 +209,7 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
 
 const PreviousSends = () => {
   const { data: session } = useSession();
-  const { data, isLoading } = api.transaction.getTransactionsByUser.useQuery(
+  const { data, isLoading } = api.transaction.getAllTransactionsByUser.useQuery(
     undefined,
     {
       enabled: session?.user !== undefined,
@@ -226,7 +228,7 @@ const PreviousSends = () => {
           previous sends ({data.length})
         </p>
         {data.length !== 0 ? (
-          <div className="flex h-full flex-col gap-5 overflow-scroll pb-20">
+          <div className=" flex h-full flex-col gap-5 overflow-auto  pb-20">
             {data.map((transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />
@@ -251,11 +253,18 @@ const PreviousSends = () => {
 export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   const { setCryptoPrices } = useContext(CryptoPricesContext);
   const { isConnected } = useAccount();
+
   const { data: session } = useSession();
 
   if (coinsData) {
     setCryptoPrices(coinsData);
   }
+
+  useEffect(() => {
+    if (!isConnected && session) {
+      void signOut();
+    }
+  }, [isConnected]);
 
   return (
     <main>

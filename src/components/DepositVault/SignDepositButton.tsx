@@ -1,9 +1,9 @@
 import { useSignTypedData } from "wagmi";
 import { despositValutAddressHH } from "~/lib/constants";
-import type { TransactionForm } from "../Send/Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { parseEther } from "viem";
+import type { PhoneTransaction } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 
 export const SignDepositButton = ({
@@ -12,7 +12,7 @@ export const SignDepositButton = ({
   setDepositSigned,
   nonce,
 }: {
-  transaction: TransactionForm | Transaction;
+  transaction: PhoneTransaction | Transaction;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   nonce: bigint;
