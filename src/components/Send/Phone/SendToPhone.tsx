@@ -40,8 +40,8 @@ export const SendToPhone = () => {
     handleSubmit,
     formState: { errors },
     getValues,
-    getFieldState,
     reset,
+    trigger,
     control,
   } = useForm<PhoneTransaction>({
     resolver: zodResolver(PhoneTransactionSchema),
@@ -58,12 +58,27 @@ export const SendToPhone = () => {
     console.log(data);
   };
 
+  console.log("Form errors: ", errors);
+
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
   const [secret, setSecret] = useState<string>("");
   const [nonce, setNonce] = useState<bigint>(BigInt(0));
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
+  const [isValid, setIsValid] = useState<boolean>();
+
+  const validateField = async (input: "phone" | "contact" | "amount") => {
+    setIsValid(await trigger(input));
+  };
+
+  const handleStepIndicator = async (
+    input: "phone" | "contact" | "amount",
+    nextStep: number
+  ) => {
+    const validPrev = await trigger(input);
+    if (validPrev) setStep(nextStep);
+  };
 
   useEffect(() => {
     if (depositSigned) {
@@ -75,7 +90,7 @@ export const SendToPhone = () => {
     <>
       <Dialog.Root>
         <Dialog.Trigger className="flex items-center justify-center rounded-full bg-brand-gray-light px-8 py-5 text-brand-black transition-colors hover:bg-brand-accent hover:text-brand-black focus:outline-none">
-          React Hook Form Version
+          Send To Phone
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
@@ -113,13 +128,24 @@ export const SendToPhone = () => {
                   >
                     <StepIndicator step={0} name="Phone" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(1)} className="cursor-pointer">
+                  <button
+                    onClick={() => void handleStepIndicator("phone", 1)}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={1} name="Amount" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(2)} className="cursor-pointer">
+                  <button
+                    onClick={() => void handleStepIndicator("amount", 2)}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={2} name="Confirm" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(3)} className="cursor-pointer">
+                  <button
+                    onClick={() => {
+                      if (depositSigned) setStep(3);
+                    }}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={3} name="Share" currentStep={step} />
                   </button>
                 </div>
@@ -131,9 +157,14 @@ export const SendToPhone = () => {
                     setSaveContact={setSaveContact}
                     control={control}
                     register={register}
+                    validateField={validateField}
                   />
                 ) : step === 1 ? (
-                  <EnterAmount phone={getValues("phone")} register={register} />
+                  <EnterAmount
+                    phone={getValues("phone")}
+                    register={register}
+                    validateField={validateField}
+                  />
                 ) : step === 2 ? (
                   <ConfirmTransaction transactionData={getValues()} />
                 ) : step === 3 && savedTransaction ? (
@@ -172,18 +203,14 @@ export const SendToPhone = () => {
                 <Button
                   intent="secondary"
                   fullWidth
+                  disabled={!isValid}
                   onClick={() => {
-                    setStep(step > 3 ? step : step + 1);
+                    if (isValid) {
+                      setStep(step > 3 ? step : step + 1);
+                      const amount = getValues("amount");
+                      if (amount === 0) setIsValid(false);
+                    }
                   }}
-                  disabled={
-                    step === 0
-                      ? getFieldState("phone").invalid
-                      : saveContact
-                      ? getFieldState("contact").invalid
-                      : step === 1
-                      ? getFieldState("amount").invalid
-                      : false
-                  }
                 >
                   Next
                 </Button>

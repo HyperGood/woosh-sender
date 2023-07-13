@@ -17,11 +17,13 @@ export const EnterPhone = ({
   setSaveContact,
   control,
   register,
+  validateField,
 }: {
   saveContact: Checkbox.CheckedState;
   setSaveContact: Dispatch<SetStateAction<Checkbox.CheckedState>>;
   control: Control<PhoneTransaction>;
   register: UseFormRegister<PhoneTransaction>;
+  validateField: (args0: "phone" | "contact") => Promise<void>;
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
@@ -75,13 +77,17 @@ export const EnterPhone = ({
             <Controller
               control={control}
               name="phone"
-              render={({ field: { onChange } }) => (
+              render={({ field: { onChange, value } }) => (
                 <PatternFormat
                   format={`(###) ###-####`}
                   mask="_"
                   placeholder={`(___) ___-____`}
                   className="w-full rounded-[0.5rem] border-[1px] border-brand-black bg-transparent py-3 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
-                  onChange={onChange}
+                  onChange={(e) => {
+                    onChange(e.target.value);
+                    void validateField("phone");
+                  }}
+                  value={value}
                 />
               )}
             />
@@ -112,6 +118,9 @@ export const EnterPhone = ({
               {...register("contact")}
               className="rounded-lg border-[1px] border-brand-black bg-brand-white px-4 py-3 focus:border-2 focus:border-brand-black focus:outline-none "
               placeholder="Enter a name or alias"
+              onChange={() => {
+                if (saveContact) void validateField("contact");
+              }}
             />
           </div>
         ) : null}

@@ -17,7 +17,6 @@ import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import SignDepositButton from "~/components/DepositVault/SignDepositButton";
-import ReactHookFormSendToPhone from "~/components/Send/Phone/SendToPhone";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -142,7 +141,6 @@ const Main = () => {
       <div className="my-12 flex flex-col gap-8 lg:mb-0 lg:mt-14">
         <SendToPhone />
         <SendToWallet />
-        <ReactHookFormSendToPhone />
       </div>
     </div>
   );

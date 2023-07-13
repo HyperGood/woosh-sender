@@ -17,7 +17,6 @@ export const SignDepositButton = ({
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   nonce: bigint;
 }) => {
-  console.log(nonce);
   const domain = {
     name: "DepositVault",
     version: "1.0.0",

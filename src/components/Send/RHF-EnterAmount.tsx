@@ -1,5 +1,5 @@
 import { TOKENS } from "~/lib/tokens";
-import { useState, type Dispatch } from "react";
+import { useState } from "react";
 import type { Data } from "../ComboboxSelect";
 import ComboInput from "../ComboInput";
 import TransactionInfo from "./TransactionInfo";
@@ -10,10 +10,12 @@ export const EnterAmount = ({
   register,
   phone,
   contact,
+  validateField,
 }: {
   register: UseFormRegister<PhoneTransaction>;
-  phone: any;
-  contact?: any;
+  phone: string;
+  contact?: string;
+  validateField: (args0: "amount") => Promise<void>;
 }) => {
   const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
 
@@ -83,7 +85,10 @@ export const EnterAmount = ({
             type="number"
             min={0}
             step={0.01}
-            {...register("amount", { valueAsNumber: true })}
+            {...register("amount", {
+              valueAsNumber: true,
+              onChange: () => void validateField("amount"),
+            })}
           />
         }
       />
