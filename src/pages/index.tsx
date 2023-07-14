@@ -155,9 +155,11 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
 
   useEffect(() => {
     if (!isConnected && session) {
-      void signOut();
+      console.log("Signing Out");
+      void signOut({ redirect: false });
+      console.log("Signed Out");
     }
-  }, [isConnected]);
+  }, [isConnected, session]);
 
   return (
     <main>

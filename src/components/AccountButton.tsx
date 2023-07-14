@@ -2,16 +2,76 @@ import { ChainIcon, ConnectKitButton } from "connectkit";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useDisconnect } from "wagmi";
-import { signOut } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import CopyIcon from "public/images/icons/CopyIcon";
+import Button from "./Button";
+import { useEffect } from "react";
+import { SiweMessage } from "siwe";
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
+import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
 
 export const AccountButton = () => {
-  const { disconnect } = useDisconnect();
-  const onClickSignOut = async () => {
-    await signOut();
+  const onClickSignOut = () => {
+    void signOut({ redirect: false });
     disconnect();
   };
+  // Hooks
+  const { data: sessionData } = useSession();
+  // Wagmi Hooks
+  const { disconnect } = useDisconnect();
+  const { chain } = useNetwork();
+  const { signMessageAsync } = useSignMessage({
+    onError(error) {
+      console.log("Wagmi error ", error);
+      console.log("Cause: ", error.cause);
+      console.log("Message: ", error.message);
+      console.log("Name", error.name);
+      console.log("Stack", error.stack);
+      if (error.name === "UserRejectedRequestError") {
+        toast.error(
+          "Sign in cancelled. You must accept the sign in using your wallet."
+        );
+        disconnect();
+      }
+    },
+  });
+  const { address, isConnected } = useAccount();
+
+  // Functions
+  /**
+   * Attempts SIWE and establish session
+   */
+  async function onClickSignIn() {
+    try {
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement: "Sign in with Ethereum to the app.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        // nonce is used from CSRF token
+        nonce: await getCsrfToken(),
+      });
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+      });
+      void signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    if (isConnected && !sessionData) {
+      void onClickSignIn();
+    }
+  }, [isConnected, sessionData]);
+
   return (
     <ConnectKitButton.Custom>
       {({
@@ -25,7 +85,7 @@ export const AccountButton = () => {
       }) => {
         return (
           <>
-            {isConnected ? (
+            {isConnected && sessionData ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                   <div className="bg-brand flex items-center gap-4 rounded-md bg-brand-white px-4 py-2 ">
@@ -44,9 +104,9 @@ export const AccountButton = () => {
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content className="mt-2 flex w-[--radix-dropdown-menu-trigger-width] flex-col rounded-md bg-brand-white shadow">
-                    <DropdownMenu.Item className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent">
+                    <DropdownMenu.Item asChild>
                       <button
-                        className="w-full"
+                        className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent"
                         onClick={() => {
                           if (address) {
                             void navigator.clipboard.writeText(address);
@@ -93,10 +153,10 @@ export const AccountButton = () => {
                         </div>
                       </button>
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent">
+                    <DropdownMenu.Item asChild>
                       <button
-                        className="w-full text-left"
                         onClick={() => void onClickSignOut()}
+                        className=" w-full rounded-md bg-brand-white p-4 text-left transition-colors hover:bg-brand-accent"
                       >
                         Sign Out
                       </button>
@@ -105,15 +165,16 @@ export const AccountButton = () => {
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
             ) : (
-              <button
+              <Button
                 onClick={show}
-                className="w-full rounded-full bg-brand-black py-4 text-brand-white transition-colors hover:bg-brand-accent hover:text-brand-black"
+                intent="secondary"
+                fullWidth
                 disabled={isConnected || isConnecting}
               >
                 {isConnected || isConnecting
-                  ? "Signing In"
+                  ? "Signing in..."
                   : "Sign In With Wallet"}
-              </button>
+              </Button>
             )}
           </>
         );
