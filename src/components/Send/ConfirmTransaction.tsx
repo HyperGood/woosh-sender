@@ -1,13 +1,16 @@
 import Image from "next/image";
 import TransactionInfo from "./TransactionInfo";
 import useTokenPrices from "~/hooks/useTokenPrices";
-import type { PhoneTransaction } from "~/models/transactions";
+import type {
+  PhoneTransaction,
+  WalletTransaction,
+} from "~/models/transactions";
 
 export const ConfirmTransaction = ({
   transactionData,
   countryCode,
 }: {
-  transactionData: PhoneTransaction;
+  transactionData: PhoneTransaction | WalletTransaction;
   countryCode: string;
 }) => {
   const { cryptoPrices } = useTokenPrices();

@@ -69,7 +69,10 @@ export const AccountButton = () => {
                         </div>
                       </button>
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent">
+                    <DropdownMenu.Item
+                      className="hidden w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent"
+                      disabled
+                    >
                       <button className="w-full">
                         <div className="flex flex-col items-start gap-1">
                           <span>Edit Profile</span>
@@ -79,7 +82,10 @@ export const AccountButton = () => {
                         </div>
                       </button>
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent">
+                    <DropdownMenu.Item
+                      className=" hidden w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent"
+                      disabled
+                    >
                       <button className="w-full">
                         <div className="flex w-full items-center justify-between gap-1">
                           <span>Preferred Currency</span>

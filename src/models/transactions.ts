@@ -48,3 +48,4 @@ export const PhoneTransactionSchema = TransactionSchema.extend({
 });
 
 export type PhoneTransactionForm = z.infer<typeof PhoneTransactionFormSchema>;
+export type PhoneTransaction = z.infer<typeof PhoneTransactionSchema>;

@@ -18,6 +18,12 @@ import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import SignDepositButton from "~/components/DepositVault/SignDepositButton";
 import { makePhoneReadable } from "~/lib/formatPhone";
+import * as Dialog from "@radix-ui/react-dialog";
+import TransactionInfo from "~/components/Send/TransactionInfo";
+import CloseIcon from "public/images/icons/CloseIcon";
+import { toast } from "react-hot-toast";
+import CopyIcon from "public/images/icons/CopyIcon";
+import Button from "~/components/Button";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -151,38 +157,102 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
   const phone = makePhoneReadable(transaction.phone || "");
+  const url = `http://localhost:3000/claim/${transaction.id}`;
+  const [open, setOpen] = useState(false);
+  console.log(transaction.nonce);
+
+  const SecretDialog = () => (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 flex w-[640px] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl bg-brand-white px-4 py-8 shadow">
+          <Dialog.Title className="text-2xl">Transaction Secret</Dialog.Title>
+          <TransactionInfo
+            label="Claim Link"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{url}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(url);
+                    toast.success("Claim link copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
+              </div>
+            }
+          />
+          <TransactionInfo
+            label="Secret"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{secret}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(secret);
+                    toast.success("Secret copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
+              </div>
+            }
+          />
+
+          <Dialog.Close className="mt-8">
+            <Button fullWidth intent="secondary">
+              Close
+            </Button>
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+
+  useEffect(() => {
+    if (secret) {
+      setOpen(true);
+    }
+  }, [secret]);
+
   return (
-    <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          {transaction.contact ? (
-            <>
-              <span className="font-polysans">{transaction.contact}</span>
-              <span className="opacity-60">
+    <div className="flex flex-col rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
+      <div className="flex w-full justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            {transaction.contact ? (
+              <>
+                <span className="font-polysans">{transaction.contact}</span>
+                <span className="opacity-60">
+                  {phone ? phone : transaction.address}
+                </span>
+              </>
+            ) : (
+              <span className="font-polysans">
                 {phone ? phone : transaction.address}
               </span>
-            </>
-          ) : (
-            <span className="font-polysans">
-              {phone ? phone : transaction.address}
-            </span>
-          )}
+            )}
+          </div>
+          <span className="opacity-60">
+            {transaction.claimed ? "Claimed" : "Unclaimed"}
+          </span>
         </div>
-        <span className="opacity-60">
-          {transaction.claimed ? "Claimed" : "Unclaimed"}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <div className="font-polysans">
+            {transaction.amount} {transaction.token}
+          </div>
+          <span className="opacity-60">
+            {transaction.amountInUSD.toLocaleString("en-us", {
+              style: "currency",
+              currency: "USD",
+            })}
+          </span>
+        </div>
       </div>
-      <div className="flex flex-col items-end gap-2">
-        <div className="font-polysans">
-          {transaction.amount} {transaction.token}
-        </div>
-        <span className="opacity-60">
-          {transaction.amountInUSD.toLocaleString("en-us", {
-            style: "currency",
-            currency: "USD",
-          })}
-        </span>
-
+      <div className="mt-6 flex w-full items-center justify-between">
         {transaction.claimed || transaction.type === "wallet" ? null : (
           <div
             onClick={() => {
@@ -193,15 +263,23 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
           </div>
         )}
         {!transaction.claimed && transaction.type === "phone" ? (
-          <div>
+          <div
+            onClick={() => {
+              if (secret && !open) setOpen(true);
+            }}
+            className="opacity-80 hover:opacity-100"
+          >
             <SignDepositButton
               transaction={transaction}
               setSecret={setSecret}
               nonce={BigInt(transaction.nonce || 0)}
+              secret={secret}
+              card
             />
           </div>
         ) : null}
       </div>
+      <SecretDialog />
     </div>
   );
 };

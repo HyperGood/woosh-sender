@@ -11,7 +11,7 @@ import SignDepositButton from "../../DepositVault/SignDepositButton";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Data } from "../../ComboboxSelect";
 import { COUNTRIES, type Country } from "~/lib/countries";
@@ -19,6 +19,7 @@ import {
   PhoneTransactionFormSchema,
   type PhoneTransactionForm,
 } from "~/models/transactions";
+import { get } from "http";
 
 export interface TransactionForm {
   amount: number;
@@ -34,7 +35,6 @@ export const SendToPhone = () => {
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
     getValues,
     reset,
@@ -51,10 +51,6 @@ export const SendToPhone = () => {
       type: "phone",
     },
   });
-
-  const onSubmit: SubmitHandler<PhoneTransactionForm> = (data) => {
-    console.log(data);
-  };
 
   const [fundsSent, setFundsSent] = useState<boolean>(false);
 
@@ -96,25 +92,14 @@ export const SendToPhone = () => {
   return (
     <>
       <Dialog.Root>
-        <Dialog.Trigger className="flex items-center justify-center rounded-full bg-brand-gray-light px-8 py-5 text-brand-black transition-colors hover:bg-brand-accent hover:text-brand-black focus:outline-none">
+        <Dialog.Trigger className="flex items-center justify-center rounded-full bg-brand-black px-8 py-5 text-brand-white transition-colors hover:bg-brand-accent hover:text-brand-black focus:outline-none">
           Send To A Phone
         </Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay
-            className="fixed inset-0 bg-black opacity-20"
-            onClick={() => {
-              if (step === 3) {
-                reset();
-                setDepositSigned(false);
-                setFundsSent(false);
-                setSaveContact(false);
-                setStep(0);
-              }
-            }}
-          />
+          <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content
             className="fixed left-1/2 top-1/2 min-h-[700px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow"
-            style={{ height: step === 3 ? "90%" : "80%" }}
+            style={{ height: step === 3 ? "100%" : "80%" }}
           >
             <Dialog.Close
               onClick={() => {
@@ -123,6 +108,7 @@ export const SendToPhone = () => {
                   setDepositSigned(false);
                   setFundsSent(false);
                   setSaveContact(false);
+                  setIsValid(false);
                   setStep(0);
                 }
               }}
@@ -132,7 +118,21 @@ export const SendToPhone = () => {
             </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-8">
               <div>
-                {step === 3 || step === 0 ? null : (
+                {step === 3 ? (
+                  <button
+                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    onClick={() => {
+                      reset();
+                      setDepositSigned(false);
+                      setFundsSent(false);
+                      setSaveContact(false);
+                      setIsValid(false);
+                      setStep(0);
+                    }}
+                  >
+                    Make a new send
+                  </button>
+                ) : step === 0 ? null : (
                   <button
                     className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
                     onClick={() => setStep(step < 1 ? step : step - 1)}
@@ -140,6 +140,7 @@ export const SendToPhone = () => {
                     Back
                   </button>
                 )}
+
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
@@ -171,7 +172,7 @@ export const SendToPhone = () => {
                   </button>
                 </div>
               </div>
-              <form onSubmit={void handleSubmit(onSubmit)}>
+              <form>
                 {step === 0 ? (
                   <EnterPhone
                     saveContact={saveContact}
@@ -192,6 +193,7 @@ export const SendToPhone = () => {
                     validateField={validateField}
                     amountErrorMessage={errors.amount?.message}
                     countryCode={selectedCountry.displayValue}
+                    contact={getValues("contact")}
                   />
                 ) : step === 2 ? (
                   <ConfirmTransaction
@@ -236,7 +238,10 @@ export const SendToPhone = () => {
                 <Button
                   intent="secondary"
                   fullWidth
-                  disabled={!isValid}
+                  disabled={
+                    !isValid ||
+                    (saveContact === true && getValues("contact") === undefined)
+                  }
                   onClick={() => {
                     console.log(getValues());
                     if (isValid) {

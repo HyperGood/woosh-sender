@@ -5,17 +5,22 @@ import type { Dispatch, SetStateAction } from "react";
 import { parseEther } from "viem";
 import type { PhoneTransaction } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
+import Button from "../Button";
 
 export const SignDepositButton = ({
   transaction,
   setSecret,
   setDepositSigned,
   nonce,
+  card,
+  secret,
 }: {
   transaction: PhoneTransaction | Transaction;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   nonce: bigint;
+  card?: boolean;
+  secret?: string;
 }) => {
   const domain = {
     name: "DepositVault",
@@ -48,21 +53,21 @@ export const SignDepositButton = ({
       setSecret(data);
       if (setDepositSigned) {
         setDepositSigned(true);
-      } else {
-        alert(data);
       }
     },
   });
 
   return (
     <>
-      <button
-        onClick={() => signTypedData()}
+      <Button
+        onClick={() => {
+          if (!secret) signTypedData();
+        }}
         disabled={isLoading}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+        intent={card ? "none" : "primary"}
       >
         {isLoading ? "Waiting for Signature" : "Generate Secret"}
-      </button>
+      </Button>
     </>
   );
 };

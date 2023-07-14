@@ -10,6 +10,7 @@ export const buttonStyles = cva(
         secondary:
           "bg-brand-black text-brand-white focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
+        none: "px-0 py-0 hover:bg-brand-gray-light",
       },
       fullWidth: {
         true: "w-full",

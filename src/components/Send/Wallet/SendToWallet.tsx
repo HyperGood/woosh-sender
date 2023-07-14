@@ -13,7 +13,7 @@ import type { TransactionForm } from "../Phone/SendToPhone";
 import type { Transaction } from "@prisma/client";
 
 export const SendToWallet = () => {
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(0);
   const [transaction, setFields] = useReducer(
     (
       current: TransactionForm,
@@ -34,7 +34,7 @@ export const SendToWallet = () => {
 
   useEffect(() => {
     if (fundsSent) {
-      setStep(4);
+      setStep(3);
     }
   }, [fundsSent]);
 
@@ -80,16 +80,16 @@ export const SendToWallet = () => {
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={1} name="Phone" currentStep={step} />
+                    <StepIndicator step={0} name="Phone" currentStep={step} />
+                  </button>
+                  <button onClick={() => setStep(1)} className="cursor-pointer">
+                    <StepIndicator step={1} name="Amount" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(2)} className="cursor-pointer">
-                    <StepIndicator step={2} name="Amount" currentStep={step} />
+                    <StepIndicator step={2} name="Confirm" currentStep={step} />
                   </button>
                   <button onClick={() => setStep(3)} className="cursor-pointer">
-                    <StepIndicator step={3} name="Confirm" currentStep={step} />
-                  </button>
-                  <button onClick={() => setStep(4)} className="cursor-pointer">
-                    <StepIndicator step={4} name="Share" currentStep={step} />
+                    <StepIndicator step={3} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>

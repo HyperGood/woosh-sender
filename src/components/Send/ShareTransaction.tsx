@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useContext } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { Transaction } from "@prisma/client";
-import { formatPhone, makePhoneReadable } from "~/lib/formatPhone";
+import { makePhoneReadable } from "~/lib/formatPhone";
 
 export const ShareTransaction = ({
   transaction,

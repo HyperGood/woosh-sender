@@ -23,7 +23,7 @@ export const CancelDepositButton = ({
   const { mutate, isLoading: isRemoving } = api.transaction.remove.useMutation({
     onSuccess: () => {
       console.log("Removed!");
-      void ctx.transaction.getTransactionsByUser.invalidate();
+      void ctx.transaction.getAllTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);
@@ -77,7 +77,9 @@ export const CancelDepositButton = ({
         <span>Removing...</span>
       ) : (
         <AlertDialog.Root>
-          <AlertDialog.Trigger>Cancel</AlertDialog.Trigger>
+          <AlertDialog.Trigger className="text-brand-black/60 transition-colors hover:text-error">
+            Cancel Transaction
+          </AlertDialog.Trigger>
           <AlertDialog.Portal>
             <AlertDialog.Overlay className="fixed inset-0 bg-black/50" />
             <AlertDialog.Content className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform rounded-2xl bg-brand-white p-8">

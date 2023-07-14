@@ -51,14 +51,14 @@ export const EnterAmount = ({
               <>
                 {phone ? (
                   <>
-                    <span className="font-polysans text-lg">contact</span>
+                    <span className="font-polysans text-lg">{contact}</span>
                     <span className="opacity-60">
                       {countryCode}-{phone}
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="font-polysans text-lg">contact</span>
+                    <span className="font-polysans text-lg">{contact}</span>
                     <span className="opacity-60">address</span>
                   </>
                 )}

@@ -41,12 +41,12 @@ export const SendButton = ({
       console.log(error);
     },
   });
-  const { mutate } = api.transaction.add.useMutation({
+  const { mutate } = api.transaction.addWalletTransaction.useMutation({
     onSuccess: (data) => {
       console.log("Saved!");
       setSavedTransaction(data);
       setFundsSent(true);
-      void ctx.transaction.getTransactionsByUser.invalidate();
+      void ctx.transaction.getAllTransactionsByUser.invalidate();
     },
     onError: (error) => {
       console.log(error);
