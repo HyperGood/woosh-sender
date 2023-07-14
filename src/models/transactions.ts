@@ -4,7 +4,7 @@ import { formatPhone } from "~/lib/formatPhone";
 
 export const TransactionSchema = z.object({
   amount: z
-    .number()
+    .number({ invalid_type_error: "Please enter a number " })
     .min(0.000001, { message: "The amount must be at least 0.000001" })
     .max(1000000),
   token: z.string().min(1).max(5),

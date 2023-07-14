@@ -57,7 +57,7 @@ export const SendToPhone = () => {
   const [nonce, setNonce] = useState<bigint>(BigInt(0));
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
-  const [isValid, setIsValid] = useState<boolean>();
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
@@ -68,11 +68,18 @@ export const SendToPhone = () => {
   };
 
   const handleStepIndicator = async (
-    input: "phone" | "contact" | "amount",
+    input: "address" | "contact" | "amount",
     nextStep: number
   ) => {
     if (step === 3) return;
-    const validPrev = await trigger(input);
+    let validPrev = await trigger(input);
+    console.log(saveContact);
+    if (saveContact && step === 0) {
+      void validateField("contact");
+      if (getValues("contact") === "") return;
+      validPrev = isValid;
+      if (validPrev === false) return;
+    }
     if (validPrev) setStep(nextStep);
   };
 
@@ -137,7 +144,13 @@ export const SendToPhone = () => {
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
-                      if (step !== 3) setStep(0);
+                      if (step !== 3) {
+                        setStep(0);
+                        void validateField("phone");
+                        if (saveContact) {
+                          void validateField("contact");
+                        }
+                      }
                     }}
                     className="cursor-pointer"
                   >

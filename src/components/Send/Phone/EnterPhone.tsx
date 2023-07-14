@@ -136,6 +136,9 @@ export const EnterPhone = ({
               })}
               className="rounded-lg border-[1px] border-brand-black bg-brand-white px-4 py-3 focus:border-2 focus:border-brand-black focus:outline-none "
               placeholder="Enter a name or alias"
+              onBlur={() => {
+                if (saveContact) void validateField("contact");
+              }}
             />
             {contactErrorMessage ? (
               <span className="mt-2 text-sm text-error">
