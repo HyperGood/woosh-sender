@@ -25,7 +25,7 @@ export const TransactionCard = ({
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 flex w-[640px] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl bg-brand-white px-4 py-8 shadow">
+        <Dialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
           <Dialog.Title className="text-2xl">Transaction Secret</Dialog.Title>
           <TransactionInfo
             label="Claim Link"
@@ -79,19 +79,19 @@ export const TransactionCard = ({
   }, [secret]);
 
   return (
-    <div className="flex flex-col rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
+    <div className="flex w-full flex-col rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex w-full justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             {transaction.contact ? (
               <>
                 <span className="font-polysans">{transaction.contact}</span>
-                <span className="opacity-60">
+                <span className="break-all opacity-60">
                   {!transaction.address ? phone : transaction.address}
                 </span>
               </>
             ) : (
-              <span className="font-polysans">
+              <span className="break-all font-polysans">
                 {!transaction.address ? phone : transaction.address}
               </span>
             )}
@@ -167,12 +167,12 @@ export const PreviousSends = () => {
 
   return (
     <>
-      <div className="h-full">
+      <div className="h-full w-full">
         <p className="mb-5 font-polysans text-lg ">
           previous sends ({data.length})
         </p>
         {data.length !== 0 ? (
-          <div className=" flex h-full flex-col gap-5 overflow-auto  pb-20">
+          <div className=" flex h-full w-full flex-col gap-5 overflow-auto pb-20">
             {data.map((transaction: Transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />
@@ -186,7 +186,7 @@ export const PreviousSends = () => {
           </div>
         ) : (
           <span className="opacity-60">
-            Once you send funds the transactions will be here!
+            Once you send funds the transaction details will be here!
           </span>
         )}
       </div>

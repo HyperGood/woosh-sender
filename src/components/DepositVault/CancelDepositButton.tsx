@@ -82,14 +82,14 @@ export const CancelDepositButton = ({
           </AlertDialog.Trigger>
           <AlertDialog.Portal>
             <AlertDialog.Overlay className="fixed inset-0 bg-black/50" />
-            <AlertDialog.Content className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform rounded-2xl bg-brand-white p-8">
+            <AlertDialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
               <AlertDialog.Title className="mb-4 font-polysans text-2xl">
                 Cancel Send
               </AlertDialog.Title>
               <AlertDialog.Description className="mb-4">
                 Are you sure you want to cancel this send?
               </AlertDialog.Description>
-              <div className="flex gap-4">
+              <div className="flex w-full justify-between gap-4">
                 <AlertDialog.Cancel asChild>
                   <button>Nevermind</button>
                 </AlertDialog.Cancel>

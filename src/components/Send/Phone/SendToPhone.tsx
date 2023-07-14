@@ -98,7 +98,7 @@ export const SendToPhone = () => {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content
-            className="fixed left-1/2 top-1/2 min-h-[700px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow"
+            className="fixed bottom-0 left-1/2 min-h-[700px] w-full -translate-x-1/2  rounded-t-xl bg-brand-white shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl"
             style={{ height: step === 3 ? "100%" : "80%" }}
           >
             <Dialog.Close
@@ -112,11 +112,11 @@ export const SendToPhone = () => {
                   setStep(0);
                 }
               }}
-              className="absolute right-8 top-4 h-6 w-6 transition-colors hover:text-error"
+              className="absolute right-4 top-4 h-6 w-6 transition-colors hover:text-error lg:right-8"
             >
               <CloseIcon />
             </Dialog.Close>
-            <div className="flex h-full flex-col justify-between p-8">
+            <div className="flex h-full flex-col justify-between p-4 lg:p-8">
               <div>
                 {step === 3 ? (
                   <button
@@ -134,7 +134,7 @@ export const SendToPhone = () => {
                   </button>
                 ) : step === 0 ? null : (
                   <button
-                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    className="absolute left-4 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100 lg:left-8"
                     onClick={() => setStep(step < 1 ? step : step - 1)}
                   >
                     Back
