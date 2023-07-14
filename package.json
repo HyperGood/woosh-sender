@@ -2,6 +2,11 @@
   "name": "woosh-sender",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "pnpm": "8.6.6",
+    "yarn": "please-use-pnpm",
+    "npm": "please-use-pnpm"
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
