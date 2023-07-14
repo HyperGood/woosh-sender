@@ -1,7 +1,6 @@
 import { PatternFormat } from "react-number-format";
 import { COUNTRIES } from "~/lib/countries";
 import { useState, type Dispatch, useEffect, type SetStateAction } from "react";
-
 import ComboInput from "../../ComboInput";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAnimate } from "framer-motion";

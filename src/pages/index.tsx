@@ -20,7 +20,6 @@ import SignDepositButton from "~/components/DepositVault/SignDepositButton";
 import { makePhoneReadable } from "~/lib/formatPhone";
 import * as Dialog from "@radix-ui/react-dialog";
 import TransactionInfo from "~/components/Send/TransactionInfo";
-import CloseIcon from "public/images/icons/CloseIcon";
 import { toast } from "react-hot-toast";
 import CopyIcon from "public/images/icons/CopyIcon";
 import Button from "~/components/Button";
@@ -222,23 +221,25 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
     <div className="flex flex-col rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex w-full justify-between">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {transaction.contact ? (
               <>
                 <span className="font-polysans">{transaction.contact}</span>
                 <span className="opacity-60">
-                  {phone ? phone : transaction.address}
+                  {!transaction.address ? phone : transaction.address}
                 </span>
               </>
             ) : (
               <span className="font-polysans">
-                {phone ? phone : transaction.address}
+                {!transaction.address ? phone : transaction.address}
               </span>
             )}
           </div>
-          <span className="opacity-60">
-            {transaction.claimed ? "Claimed" : "Unclaimed"}
-          </span>
+          {transaction.type === "phone" ? (
+            <span className="opacity-60">
+              {transaction.claimed ? "Claimed" : "Unclaimed"}
+            </span>
+          ) : null}
         </div>
         <div className="flex flex-col items-end gap-2">
           <div className="font-polysans">
@@ -252,33 +253,38 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
           </span>
         </div>
       </div>
-      <div className="mt-6 flex w-full items-center justify-between">
-        {transaction.claimed || transaction.type === "wallet" ? null : (
-          <div
-            onClick={() => {
-              setClicked(!clicked);
-            }}
-          >
-            <CancelDepositButton transaction={transaction} clicked={clicked} />
-          </div>
-        )}
-        {!transaction.claimed && transaction.type === "phone" ? (
-          <div
-            onClick={() => {
-              if (secret && !open) setOpen(true);
-            }}
-            className="opacity-80 hover:opacity-100"
-          >
-            <SignDepositButton
-              transaction={transaction}
-              setSecret={setSecret}
-              nonce={BigInt(transaction.nonce || 0)}
-              secret={secret}
-              card
-            />
-          </div>
-        ) : null}
-      </div>
+      {transaction.type === "phone" ? (
+        <div className="mt-6 flex w-full items-center justify-between">
+          {transaction.claimed ? null : (
+            <div
+              onClick={() => {
+                setClicked(!clicked);
+              }}
+            >
+              <CancelDepositButton
+                transaction={transaction}
+                clicked={clicked}
+              />
+            </div>
+          )}
+          {!transaction.claimed ? (
+            <div
+              onClick={() => {
+                if (secret && !open) setOpen(true);
+              }}
+              className="opacity-80 hover:opacity-100"
+            >
+              <SignDepositButton
+                transaction={transaction}
+                setSecret={setSecret}
+                nonce={BigInt(transaction.nonce || 0)}
+                secret={secret}
+                card
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <SecretDialog />
     </div>
   );
@@ -306,7 +312,7 @@ const PreviousSends = () => {
         </p>
         {data.length !== 0 ? (
           <div className=" flex h-full flex-col gap-5 overflow-auto  pb-20">
-            {data.map((transaction) => (
+            {data.map((transaction: Transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />
               </div>

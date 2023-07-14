@@ -6,13 +6,13 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { api } from "~/utils/api";
-import type { TransactionForm } from "../Phone/SendToPhone";
 import { toast } from "react-hot-toast";
 import { useContext, type Dispatch, type SetStateAction } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import { LoadingSpinner } from "~/components/Loading";
 import type { Transaction } from "@prisma/client";
+import { type WalletTransaction } from "~/models/transactions";
 
 export const SendButton = ({
   transaction,
@@ -20,7 +20,7 @@ export const SendButton = ({
   saveContact,
   setSavedTransaction,
 }: {
-  transaction: TransactionForm;
+  transaction: WalletTransaction;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
   saveContact: CheckedState;
@@ -79,9 +79,9 @@ export const SendButton = ({
   });
 
   function saveContactFunction() {
-    if (transaction.recipient && transaction.address) {
+    if (transaction.contact && transaction.address) {
       mutateContact({
-        name: transaction.recipient,
+        name: transaction.contact,
         address: transaction.address,
       });
     } else {
@@ -90,8 +90,8 @@ export const SendButton = ({
   }
 
   const sendFunction = () => {
-    if (transaction.phone === "") {
-      alert("Please enter a phone number");
+    if (transaction.address === "") {
+      alert("Please enter an ETH address or ENS name");
     } else if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {

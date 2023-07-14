@@ -1,8 +1,8 @@
 import { TOKENS } from "~/lib/tokens";
 import { useState } from "react";
-import type { Data } from "../ComboboxSelect";
-import ComboInput from "../ComboInput";
-import TransactionInfo from "./TransactionInfo";
+import type { Data } from "../../ComboboxSelect";
+import ComboInput from "../../ComboInput";
+import TransactionInfo from "../TransactionInfo";
 import { type UseFormRegister } from "react-hook-form";
 import { type PhoneTransaction } from "~/models/transactions";
 
@@ -35,12 +35,6 @@ export const EnterAmount = ({
             .includes(tokenQuery.toLowerCase());
         });
 
-  // useEffect(() => {
-  //   setFields({ token: selectedToken.displayValue });
-  //   setIsValid(transaction.amount > 0);
-  //   console.log(transaction);
-  // }, [transaction.amount, selectedToken, step]);
-
   return (
     <div className="flex flex-col">
       <TransactionInfo
@@ -49,29 +43,16 @@ export const EnterAmount = ({
           <div className="flex items-center gap-4">
             {contact ? (
               <>
-                {phone ? (
-                  <>
-                    <span className="font-polysans text-lg">{contact}</span>
-                    <span className="opacity-60">
-                      {countryCode}-{phone}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="font-polysans text-lg">{contact}</span>
-                    <span className="opacity-60">address</span>
-                  </>
-                )}
+                <span className="font-polysans text-lg">{contact}</span>
+                <span className="opacity-60">
+                  {countryCode}-{phone}
+                </span>
               </>
             ) : (
               <>
-                {phone ? (
-                  <span className="font-polysans text-lg">
-                    {countryCode}-{phone}
-                  </span>
-                ) : (
-                  <span className="font-polysans text-lg">address</span>
-                )}
+                <span className="font-polysans text-lg">
+                  {countryCode}-{phone}
+                </span>
               </>
             )}
           </div>

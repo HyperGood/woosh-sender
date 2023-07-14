@@ -1,36 +1,58 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Button from "../../Button";
 import StepIndicator from "../../Form/StepIndicator";
-import EnterAccount from "./EnterAddress";
-import EnterAmount from "../EnterAmount";
+import EnterAddress from "./EnterAddress";
+import EnterAmount from "../Wallet/EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import SendButton from "./SendButton";
-import type { TransactionForm } from "../Phone/SendToPhone";
 import type { Transaction } from "@prisma/client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  type WalletTransaction,
+  WalletTransactionSchema,
+} from "~/models/transactions";
 
 export const SendToWallet = () => {
   const [step, setStep] = useState<number>(0);
-  const [transaction, setFields] = useReducer(
-    (
-      current: TransactionForm,
-      update: Partial<TransactionForm>
-    ): TransactionForm => ({
-      ...current,
-      ...update,
-    }),
-    {
+  const {
+    register,
+    formState: { errors },
+    getValues,
+    reset,
+    trigger,
+    resetField,
+  } = useForm<WalletTransaction>({
+    resolver: zodResolver(WalletTransactionSchema),
+    mode: "all",
+    defaultValues: {
       amount: 0,
       token: "ETH",
       address: "",
-    }
-  );
+      type: "wallet",
+    },
+  });
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
+  const [isValid, setIsValid] = useState<boolean>();
+
+  const validateField = async (input: "address" | "contact" | "amount") => {
+    setIsValid(await trigger(input));
+  };
+
+  const handleStepIndicator = async (
+    input: "address" | "contact" | "amount",
+    nextStep: number
+  ) => {
+    if (step === 3) return;
+    const validPrev = await trigger(input);
+    if (validPrev) setStep(nextStep);
+  };
 
   useEffect(() => {
     if (fundsSent) {
@@ -46,29 +68,43 @@ export const SendToWallet = () => {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 h-[695px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow">
+          <Dialog.Content
+            className="fixed left-1/2 top-1/2 min-h-[700px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-white shadow"
+            style={{ height: step === 3 ? "100%" : "80%" }}
+          >
             <Dialog.Close
               onClick={() => {
-                if (step === 4) {
-                  setFields({
-                    amount: 0,
-                    token: "ETH",
-                    address: "",
-                    recipient: "",
-                  });
-                  setStep(1);
+                if (step === 3) {
+                  reset();
+                  setFundsSent(false);
+                  setSaveContact(false);
+                  setIsValid(false);
+                  setStep(0);
                 }
               }}
-              className="absolute right-8 top-4 h-6 w-6 hover:text-error"
+              className="absolute right-8 top-4 h-6 w-6 transition-colors hover:text-error"
             >
               <CloseIcon />
             </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-8">
               <div>
-                {step === 4 || step === 1 ? null : (
+                {step === 3 ? (
                   <button
-                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60"
-                    onClick={() => setStep(step < 2 ? step : step - 1)}
+                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    onClick={() => {
+                      reset();
+                      setFundsSent(false);
+                      setSaveContact(false);
+                      setIsValid(false);
+                      setStep(0);
+                    }}
+                  >
+                    Make a new send
+                  </button>
+                ) : step === 0 ? null : (
+                  <button
+                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    onClick={() => setStep(step < 1 ? step : step - 1)}
                   >
                     Back
                   </button>
@@ -76,60 +112,89 @@ export const SendToWallet = () => {
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
-                      setStep(1);
+                      if (step !== 3) setStep(0);
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={0} name="Phone" currentStep={step} />
+                    <StepIndicator step={0} name="Address" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(1)} className="cursor-pointer">
+                  <button
+                    onClick={() => void handleStepIndicator("address", 1)}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={1} name="Amount" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(2)} className="cursor-pointer">
+                  <button
+                    onClick={() => void handleStepIndicator("amount", 2)}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={2} name="Confirm" currentStep={step} />
                   </button>
-                  <button onClick={() => setStep(3)} className="cursor-pointer">
+                  <button
+                    onClick={() => {
+                      if (fundsSent) setStep(3);
+                    }}
+                    className="cursor-pointer"
+                  >
                     <StepIndicator step={3} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>
-              <div>
-                {step === 1 ? (
-                  <EnterAccount
-                    transaction={transaction}
-                    setFields={setFields}
+              <form>
+                {step === 0 ? (
+                  <EnterAddress
+                    register={register}
                     saveContact={saveContact}
                     setSaveContact={setSaveContact}
+                    validateField={validateField}
+                    addressErrorMessage={errors.address?.message}
+                    contactErrorMessage={errors.contact?.message}
+                    resetContact={() => resetField("contact")}
+                  />
+                ) : step === 1 ? (
+                  <EnterAmount
+                    contact={getValues("contact")}
+                    register={register}
+                    validateField={validateField}
+                    amountErrorMessage={errors.amount?.message}
+                    address={getValues("address")}
                   />
                 ) : step === 2 ? (
-                  <EnterAmount
-                    transaction={transaction}
-                    setFields={setFields}
-                  />
-                ) : step === 3 ? (
-                  <ConfirmTransaction transaction={transaction} />
-                ) : step === 4 && savedTransaction ? (
+                  <ConfirmTransaction transactionData={getValues()} />
+                ) : step === 3 && savedTransaction ? (
                   <ShareTransaction transaction={savedTransaction} />
                 ) : null}
-              </div>
+              </form>
 
-              {step === 3 ? (
+              {step === 2 ? (
                 <SendButton
-                  transaction={transaction}
+                  transaction={getValues()}
                   setFundsSent={setFundsSent}
                   saveContact={saveContact}
                   setSavedTransaction={setSavedTransaction}
                 />
+              ) : step === 3 && savedTransaction ? (
+                <Button intent="secondary" fullWidth>
+                  Share
+                </Button>
               ) : (
                 <Button
                   intent="secondary"
                   fullWidth
+                  disabled={
+                    !isValid ||
+                    (saveContact === true && getValues("contact") === undefined)
+                  }
                   onClick={() => {
-                    setStep(step > 4 ? step : step + 1);
+                    console.log(getValues());
+                    if (isValid) {
+                      setStep(step > 3 ? step : step + 1);
+                      const amount = getValues("amount");
+                      if (amount === 0) setIsValid(false);
+                    }
                   }}
-                  // disabled={isValid || step > 2 ? false : true}
                 >
-                  {step === 4 ? "Share" : "Next"}
+                  Next
                 </Button>
               )}
             </div>

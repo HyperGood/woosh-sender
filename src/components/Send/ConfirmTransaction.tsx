@@ -11,7 +11,7 @@ export const ConfirmTransaction = ({
   countryCode,
 }: {
   transactionData: PhoneTransaction | WalletTransaction;
-  countryCode: string;
+  countryCode?: string;
 }) => {
   const { cryptoPrices } = useTokenPrices();
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
@@ -33,7 +33,7 @@ export const ConfirmTransaction = ({
             <div className="flex items-center gap-4">
               {transactionData.contact ? (
                 <>
-                  {transactionData.phone ? (
+                  {"phone" in transactionData ? (
                     <>
                       <span className="font-polysans text-lg">
                         {transactionData.contact}
@@ -47,18 +47,22 @@ export const ConfirmTransaction = ({
                       <span className="font-polysans text-lg">
                         {transactionData.contact}
                       </span>
-                      <span className="opacity-60">address</span>
+                      <span className="opacity-60">
+                        {transactionData.address}
+                      </span>
                     </>
                   )}
                 </>
               ) : (
                 <>
-                  {transactionData.phone ? (
+                  {"phone" in transactionData ? (
                     <span className="font-polysans text-lg">
                       {countryCode}-{transactionData.phone}
                     </span>
                   ) : (
-                    <span className="font-polysans text-lg">address</span>
+                    <span className="font-polysans text-lg">
+                      {transactionData.address}
+                    </span>
                   )}
                 </>
               )}

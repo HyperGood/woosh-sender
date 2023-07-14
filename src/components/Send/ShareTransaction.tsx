@@ -38,7 +38,7 @@ export const ShareTransaction = ({
             <div className="flex items-center gap-4">
               {transaction.contact ? (
                 <>
-                  {formattedPhone ? (
+                  {!transaction.address ? (
                     <>
                       <span className="font-polysans text-lg">
                         {transaction.contact}
@@ -59,7 +59,7 @@ export const ShareTransaction = ({
                 </>
               ) : (
                 <>
-                  {formattedPhone ? (
+                  {!transaction.address ? (
                     <span className="font-polysans text-lg">
                       {countryCode?.slice(0, 5)}
                       {formattedPhone}

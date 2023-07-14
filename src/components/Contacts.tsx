@@ -1,5 +1,6 @@
+import { type Contact } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
+// import Image from "next/image";
 import EditIcon from "public/images/icons/EditIcon";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
 import { api } from "~/utils/api";
@@ -33,7 +34,7 @@ export const Contacts = () => {
     <div>
       <p className="mb-5 font-polysans text-lg">contacts ({data.length})</p>
       <div className="flex w-full justify-items-start gap-x-8 gap-y-8 overflow-scroll md:grid md:grid-cols-5 md:gap-x-0 md:overflow-hidden">
-        {data.map((contact, index) => (
+        {data.map((contact: Contact, index: number) => (
           <div className="shrink-0" key={index}>
             <Contact name={contact.name} />
           </div>

@@ -4,7 +4,7 @@ import Button from "../../Button";
 import StepIndicator from "../../Form/StepIndicator";
 import DepositButton from "../../DepositVault/DepositButton";
 import EnterPhone from "./EnterPhone";
-import EnterAmount from "../RHF-EnterAmount";
+import EnterAmount from "./EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
 import SignDepositButton from "../../DepositVault/SignDepositButton";
@@ -19,7 +19,6 @@ import {
   PhoneTransactionFormSchema,
   type PhoneTransactionForm,
 } from "~/models/transactions";
-import { get } from "http";
 
 export interface TransactionForm {
   amount: number;
@@ -53,17 +52,11 @@ export const SendToPhone = () => {
   });
 
   const [fundsSent, setFundsSent] = useState<boolean>(false);
-
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
-
   const [secret, setSecret] = useState<string>("");
-
   const [nonce, setNonce] = useState<bigint>(BigInt(0));
-
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
-
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
-
   const [isValid, setIsValid] = useState<boolean>();
 
   const [selectedCountry, setSelectedCountry] = useState<Data>(
@@ -206,9 +199,7 @@ export const SendToPhone = () => {
                     secret={secret}
                     countryCode={selectedCountry.displayValue}
                   />
-                ) : (
-                  <div>Something went wrong!</div>
-                )}
+                ) : null}
               </form>
 
               {step === 2 ? (
