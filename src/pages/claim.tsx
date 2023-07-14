@@ -4,7 +4,7 @@ import {
   type CryptoPrices,
   CryptoPricesContext,
 } from "~/context/TokenPricesContext";
-import Header from "~/components/header";
+import Header from "~/components/Header";
 import { ConnectKitButton } from "connectkit";
 import Button from "~/components/Button";
 import { useRouter } from "next/router";

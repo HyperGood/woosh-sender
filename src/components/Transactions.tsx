@@ -1,0 +1,197 @@
+import SignDepositButton from "~/components/DepositVault/SignDepositButton";
+import { makePhoneReadable } from "~/lib/formatPhone";
+import * as Dialog from "@radix-ui/react-dialog";
+import TransactionInfo from "~/components/Send/TransactionInfo";
+import { toast } from "react-hot-toast";
+import CopyIcon from "public/images/icons/CopyIcon";
+import Button from "~/components/Button";
+import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
+import { api } from "~/utils/api";
+import type { Transaction } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+
+export const TransactionCard = ({
+  transaction,
+}: {
+  transaction: Transaction;
+}) => {
+  const [clicked, setClicked] = useState(false);
+  const [secret, setSecret] = useState("");
+  const phone = makePhoneReadable(transaction.phone || "");
+  const url = `http://localhost:3000/claim/${transaction.id}`;
+  const [open, setOpen] = useState(false);
+  console.log(transaction.nonce);
+
+  const SecretDialog = () => (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 flex w-[640px] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl bg-brand-white px-4 py-8 shadow">
+          <Dialog.Title className="text-2xl">Transaction Secret</Dialog.Title>
+          <TransactionInfo
+            label="Claim Link"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{url}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(url);
+                    toast.success("Claim link copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
+              </div>
+            }
+          />
+          <TransactionInfo
+            label="Secret"
+            content={
+              <div className="flex items-center justify-between gap-4">
+                <p className="break-all text-lg ">{secret}</p>
+                <div
+                  onClick={() => {
+                    void navigator.clipboard.writeText(secret);
+                    toast.success("Secret copied!");
+                  }}
+                  className="h-7 w-7 shrink-0 cursor-pointer"
+                >
+                  <CopyIcon />
+                </div>
+              </div>
+            }
+          />
+
+          <Dialog.Close className="mt-8">
+            <Button fullWidth intent="secondary">
+              Close
+            </Button>
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+
+  useEffect(() => {
+    if (secret) {
+      setOpen(true);
+    }
+  }, [secret]);
+
+  return (
+    <div className="flex flex-col rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
+      <div className="flex w-full justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {transaction.contact ? (
+              <>
+                <span className="font-polysans">{transaction.contact}</span>
+                <span className="opacity-60">
+                  {!transaction.address ? phone : transaction.address}
+                </span>
+              </>
+            ) : (
+              <span className="font-polysans">
+                {!transaction.address ? phone : transaction.address}
+              </span>
+            )}
+          </div>
+          {transaction.type === "phone" ? (
+            <span className="opacity-60">
+              {transaction.claimed ? "Claimed" : "Unclaimed"}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <div className="font-polysans">
+            {transaction.amount} {transaction.token}
+          </div>
+          <span className="opacity-60">
+            {transaction.amountInUSD.toLocaleString("en-us", {
+              style: "currency",
+              currency: "USD",
+            })}
+          </span>
+        </div>
+      </div>
+      {transaction.type === "phone" ? (
+        <div className="mt-6 flex w-full items-center justify-between">
+          {transaction.claimed ? null : (
+            <div
+              onClick={() => {
+                setClicked(!clicked);
+              }}
+            >
+              <CancelDepositButton
+                transaction={transaction}
+                clicked={clicked}
+              />
+            </div>
+          )}
+          {!transaction.claimed ? (
+            <div
+              onClick={() => {
+                if (secret && !open) setOpen(true);
+              }}
+              className="opacity-80 hover:opacity-100"
+            >
+              <SignDepositButton
+                transaction={transaction}
+                setSecret={setSecret}
+                nonce={BigInt(transaction.nonce || 0)}
+                secret={secret}
+                card
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      <SecretDialog />
+    </div>
+  );
+};
+
+export const PreviousSends = () => {
+  const { data: session } = useSession();
+  const { data, isLoading } = api.transaction.getAllTransactionsByUser.useQuery(
+    undefined,
+    {
+      enabled: session?.user !== undefined,
+    }
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (!data) return <div>Oh no, something went horribly wrong!😟</div>;
+
+  return (
+    <>
+      <div className="h-full">
+        <p className="mb-5 font-polysans text-lg ">
+          previous sends ({data.length})
+        </p>
+        {data.length !== 0 ? (
+          <div className=" flex h-full flex-col gap-5 overflow-auto  pb-20">
+            {data.map((transaction: Transaction) => (
+              <div key={transaction.id} className="w-full">
+                <TransactionCard transaction={transaction} />
+              </div>
+            ))}
+            {data.length > 6 && (
+              <span className="mt-2 text-center opacity-60">
+                That&apos;s all of them!
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="opacity-60">
+            Once you send funds the transactions will be here!
+          </span>
+        )}
+      </div>
+    </>
+  );
+};
