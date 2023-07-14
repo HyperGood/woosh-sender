@@ -149,9 +149,9 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
 
   const { data: session } = useSession();
 
-  if (coinsData) {
+  useEffect(() => {
     setCryptoPrices(coinsData);
-  }
+  }, [coinsData]);
 
   useEffect(() => {
     if (!isConnected && session) {
