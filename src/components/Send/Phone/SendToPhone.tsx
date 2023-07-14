@@ -68,7 +68,7 @@ export const SendToPhone = () => {
   };
 
   const handleStepIndicator = async (
-    input: "address" | "contact" | "amount",
+    input: "phone" | "contact" | "amount",
     nextStep: number
   ) => {
     if (step === 3) return;
