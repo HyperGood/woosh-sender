@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { useContext } from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { Transaction } from "@prisma/client";
+import { formatPhone, makePhoneReadable } from "~/lib/formatPhone";
 
 export const ShareTransaction = ({
   transaction,
@@ -19,6 +20,8 @@ export const ShareTransaction = ({
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const amountInUSD = transaction.amount * ethPrice;
   const url = `http://localhost:3000/claim/${transaction.id}`;
+  const formattedPhone = makePhoneReadable(transaction.phone || "");
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -35,13 +38,14 @@ export const ShareTransaction = ({
             <div className="flex items-center gap-4">
               {transaction.contact ? (
                 <>
-                  {transaction.phone ? (
+                  {formattedPhone ? (
                     <>
                       <span className="font-polysans text-lg">
                         {transaction.contact}
                       </span>
                       <span className="opacity-60">
-                        {countryCode}-{transaction.phone}
+                        {countryCode?.slice(0, 5)}
+                        {formattedPhone}
                       </span>
                     </>
                   ) : (
@@ -55,9 +59,10 @@ export const ShareTransaction = ({
                 </>
               ) : (
                 <>
-                  {transaction.phone ? (
+                  {formattedPhone ? (
                     <span className="font-polysans text-lg">
-                      {countryCode}-{transaction.phone}
+                      {countryCode?.slice(0, 5)}
+                      {formattedPhone}
                     </span>
                   ) : (
                     <span className="font-polysans text-lg">

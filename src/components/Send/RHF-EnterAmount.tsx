@@ -11,13 +11,18 @@ export const EnterAmount = ({
   phone,
   contact,
   validateField,
+  amountErrorMessage,
+  countryCode,
 }: {
   register: UseFormRegister<PhoneTransaction>;
   phone: string;
   contact?: string;
   validateField: (args0: "amount") => Promise<void>;
+  amountErrorMessage?: string;
+  countryCode: string;
 }) => {
   const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
+  const [touched, setTouched] = useState<boolean>(false);
 
   const [tokenQuery, setTokenQuery] = useState("");
 
@@ -47,7 +52,9 @@ export const EnterAmount = ({
                 {phone ? (
                   <>
                     <span className="font-polysans text-lg">contact</span>
-                    <span className="opacity-60">code-{phone}</span>
+                    <span className="opacity-60">
+                      {countryCode}-{phone}
+                    </span>
                   </>
                 ) : (
                   <>
@@ -60,7 +67,7 @@ export const EnterAmount = ({
               <>
                 {phone ? (
                   <span className="font-polysans text-lg">
-                    countryCode-{phone}
+                    {countryCode}-{phone}
                   </span>
                 ) : (
                   <span className="font-polysans text-lg">address</span>
@@ -87,11 +94,17 @@ export const EnterAmount = ({
             step={0.01}
             {...register("amount", {
               valueAsNumber: true,
-              onChange: () => void validateField("amount"),
+              onChange: () => {
+                void validateField("amount");
+                setTouched(true);
+              },
             })}
           />
         }
       />
+      {amountErrorMessage && touched ? (
+        <span className="mt-2 text-sm text-error">{amountErrorMessage}</span>
+      ) : null}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { PatternFormat } from "react-number-format";
 import { COUNTRIES } from "~/lib/countries";
 import { useState, type Dispatch, useEffect, type SetStateAction } from "react";
-import type { Data } from "../../ComboboxSelect";
+
 import ComboInput from "../../ComboInput";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAnimate } from "framer-motion";
@@ -10,7 +10,8 @@ import {
   Controller,
   type UseFormRegister,
 } from "react-hook-form";
-import { type PhoneTransaction } from "~/models/transactions";
+import { type PhoneTransactionForm } from "~/models/transactions";
+import type { Data } from "~/components/ComboboxSelect";
 
 export const EnterPhone = ({
   saveContact,
@@ -18,16 +19,24 @@ export const EnterPhone = ({
   control,
   register,
   validateField,
+  phoneErrorMessage,
+  contactErrorMessage,
+  resetContact,
+  selectedCountry,
+  setSelectedCountry,
 }: {
   saveContact: Checkbox.CheckedState;
   setSaveContact: Dispatch<SetStateAction<Checkbox.CheckedState>>;
-  control: Control<PhoneTransaction>;
-  register: UseFormRegister<PhoneTransaction>;
+  control: Control<PhoneTransactionForm>;
+  register: UseFormRegister<PhoneTransactionForm>;
   validateField: (args0: "phone" | "contact") => Promise<void>;
+  phoneErrorMessage?: string;
+  contactErrorMessage?: string;
+  resetContact: () => void;
+  selectedCountry: Data;
+  setSelectedCountry: Dispatch<SetStateAction<Data>>;
 }) => {
-  const [selectedCountry, setSelectedCountry] = useState<Data>(
-    COUNTRIES[0] as Data
-  );
+  const [touched, setTouched] = useState<boolean>(false);
   const [countryQuery, setCountryQuery] = useState("");
 
   const filteredCountries =
@@ -54,6 +63,8 @@ export const EnterPhone = ({
     } else {
       void animate(ref.current, { backgroundColor: "var(--brand-gray-light)" });
       void animate(".indicator", { scale: 0 });
+      resetContact();
+      void validateField("phone");
     }
   }, [saveContact]);
 
@@ -88,11 +99,15 @@ export const EnterPhone = ({
                     void validateField("phone");
                   }}
                   value={value}
+                  onBlur={() => setTouched(true)}
                 />
               )}
             />
           }
         />
+        {phoneErrorMessage && touched ? (
+          <span className="mt-2 text-sm text-error">{phoneErrorMessage}</span>
+        ) : null}
 
         <Checkbox.Root
           checked={saveContact}
@@ -115,13 +130,19 @@ export const EnterPhone = ({
             <label className="text-sm opacity-80">Contact Name</label>
             <input
               type="text"
-              {...register("contact")}
+              {...register("contact", {
+                onChange: () => {
+                  if (saveContact) void validateField("contact");
+                },
+              })}
               className="rounded-lg border-[1px] border-brand-black bg-brand-white px-4 py-3 focus:border-2 focus:border-brand-black focus:outline-none "
               placeholder="Enter a name or alias"
-              onChange={() => {
-                if (saveContact) void validateField("contact");
-              }}
             />
+            {contactErrorMessage ? (
+              <span className="mt-2 text-sm text-error">
+                {contactErrorMessage}
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>

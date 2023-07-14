@@ -40,8 +40,6 @@ const ComboInput = ({
         </div>
         {input}
       </div>
-
-      <span className="text-sm text-red-500">{errorMesage}</span>
     </div>
   );
 };

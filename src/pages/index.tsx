@@ -17,6 +17,7 @@ import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import SignDepositButton from "~/components/DepositVault/SignDepositButton";
+import { makePhoneReadable } from "~/lib/formatPhone";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -149,7 +150,7 @@ const Main = () => {
 const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
-
+  const phone = makePhoneReadable(transaction.phone || "");
   return (
     <div className="flex justify-between rounded-md bg-[#F1F3F2] px-4 py-5 text-brand-black">
       <div className="flex flex-col gap-2">
@@ -158,12 +159,12 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
             <>
               <span className="font-polysans">{transaction.contact}</span>
               <span className="opacity-60">
-                {transaction.phone ? transaction.phone : transaction.address}
+                {phone ? phone : transaction.address}
               </span>
             </>
           ) : (
             <span className="font-polysans">
-              {transaction.phone ? transaction.phone : transaction.address}
+              {phone ? phone : transaction.address}
             </span>
           )}
         </div>

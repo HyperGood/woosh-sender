@@ -5,8 +5,10 @@ import type { PhoneTransaction } from "~/models/transactions";
 
 export const ConfirmTransaction = ({
   transactionData,
+  countryCode,
 }: {
   transactionData: PhoneTransaction;
+  countryCode: string;
 }) => {
   const { cryptoPrices } = useTokenPrices();
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
@@ -34,7 +36,7 @@ export const ConfirmTransaction = ({
                         {transactionData.contact}
                       </span>
                       <span className="opacity-60">
-                        countryCode-{transactionData.phone}
+                        {countryCode}-{transactionData.phone}
                       </span>
                     </>
                   ) : (
@@ -50,7 +52,7 @@ export const ConfirmTransaction = ({
                 <>
                   {transactionData.phone ? (
                     <span className="font-polysans text-lg">
-                      countryCode-{transactionData.phone}
+                      {countryCode}-{transactionData.phone}
                     </span>
                   ) : (
                     <span className="font-polysans text-lg">address</span>
