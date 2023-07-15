@@ -11,39 +11,46 @@ import { api } from "~/utils/api";
 import { despositValutAddressHH } from "~/lib/constants";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
-import { useContext, type Dispatch, type SetStateAction } from "react";
+import {
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
 import type { PhoneTransactionForm } from "~/models/transactions";
 import { type Country } from "~/lib/countries";
 import { formatPhone } from "~/lib/formatPhone";
+import { type UseFormSetValue } from "react-hook-form";
 
 export const DepositButton = ({
   transaction,
   setFundsSent,
   setNonce,
-  nonce,
   saveContact,
   setSavedTransaction,
   countryCode,
 }: {
   transaction: PhoneTransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
-  setNonce: Dispatch<SetStateAction<bigint>>;
+  setNonce: UseFormSetValue<PhoneTransactionForm>;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
-  nonce: bigint;
   saveContact: CheckedState;
   countryCode: Country;
 }) => {
+  // const [transaction, setTransaction] = useState(getTransaction());
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
+  const [nonceIn, setNonceIn] = useState<bigint>();
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
-      console.log("Successfully added contact");
+      toast.success("Contact saved!");
       void ctx.contact.getContacts.invalidate();
     },
     onError: (error) => {
@@ -56,7 +63,6 @@ export const DepositButton = ({
     isError: errorSavingTransaction,
   } = api.transaction.addPhoneTransaction.useMutation({
     onSuccess: (data) => {
-      console.log("Transaction saved to database! Here's the data: ", data);
       setSavedTransaction(data);
       setFundsSent(true);
       void ctx.transaction.getAllTransactionsByUser.invalidate();
@@ -90,11 +96,13 @@ export const DepositButton = ({
     },
   });
 
-  const { isLoading: isDepositing } = useWaitForTransaction({
+  const {
+    isLoading: isDepositing,
+    data: txData,
+    isSuccess: txSuccess,
+  } = useWaitForTransaction({
     hash: depositData?.hash,
-    onSuccess(txData) {
-      console.log("txData: ", txData);
-      saveTransaction({ txId: txData.transactionHash });
+    onSuccess() {
       toast.success(`Funds sent!`);
     },
     onError(error) {
@@ -103,15 +111,17 @@ export const DepositButton = ({
     },
   });
 
-  //Trigger this only after the deposit has been made
-  useContractEvent({
+  //Get the nonce from the contract
+  const unwatch = useContractEvent({
     address: despositValutAddressHH,
     abi,
     eventName: "DepositMade",
     listener(log) {
       if (log[0]?.args.depositIndex) {
-        setNonce(log[0]?.args.depositIndex);
-        console.log("Nonce: ", nonce);
+        setNonceIn(log[0]?.args.depositIndex);
+        if (log[0]?.args.depositIndex === nonceIn) {
+          unwatch?.();
+        }
       }
     },
   });
@@ -142,24 +152,34 @@ export const DepositButton = ({
   };
 
   const saveTransaction = ({ txId }: { txId: string }) => {
-    if (transaction.amount !== 0 && transaction.phone !== "" && txId) {
+    if (
+      transaction.amount !== 0 &&
+      transaction.phone !== "" &&
+      txId &&
+      nonceIn
+    ) {
+      // setTransaction(getTransaction());
       const amountInUSD = transaction.amount * ethPrice;
-      console.log(
-        "Saving transaction to database with this data...",
-        transaction
-      );
       const formattedPhone = formatPhone(transaction.phone);
+      const numberNonce = Number(nonceIn);
       mutate({
         ...transaction,
         phone: countryCode.additionalProperties.code + formattedPhone,
         amountInUSD: amountInUSD,
         txId: txId,
-        nonce: Number(nonce),
+        nonce: numberNonce,
       });
     } else {
-      console.log("Error saving transaction");
+      console.error("Error saving transaction");
     }
   };
+
+  useEffect(() => {
+    if (nonceIn && txData && txSuccess) {
+      setNonce("nonce", Number(nonceIn));
+      saveTransaction({ txId: txData.transactionHash });
+    }
+  }, [nonceIn, txData, txSuccess]);
 
   return (
     <>
@@ -175,11 +195,10 @@ export const DepositButton = ({
           onClick={() => void sendFunction()}
           disabled={isSaving || isDepositLoading || isDepositing}
           className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-          type="submit"
         >
           {isDepositLoading
             ? "Waiting for approval"
-            : isSaving
+            : isSaving || isDepositing
             ? "Please wait"
             : "Send"}
         </button>

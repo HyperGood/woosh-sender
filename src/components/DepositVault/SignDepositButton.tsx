@@ -11,14 +11,12 @@ export const SignDepositButton = ({
   transaction,
   setSecret,
   setDepositSigned,
-  nonce,
   card,
   secret,
 }: {
   transaction: PhoneTransaction | Transaction;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
-  nonce: bigint;
   card?: boolean;
   secret?: string;
 }) => {
@@ -38,7 +36,7 @@ export const SignDepositButton = ({
 
   const message = {
     amount: parseEther(transaction.amount.toString()),
-    nonce: nonce,
+    nonce: BigInt(transaction.nonce || 0),
   } as const;
 
   const { isLoading, signTypedData } = useSignTypedData({

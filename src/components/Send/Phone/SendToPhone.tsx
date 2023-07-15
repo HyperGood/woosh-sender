@@ -40,6 +40,7 @@ export const SendToPhone = () => {
     trigger,
     control,
     resetField,
+    setValue,
   } = useForm<PhoneTransactionForm>({
     resolver: zodResolver(PhoneTransactionFormSchema),
     mode: "all",
@@ -54,7 +55,6 @@ export const SendToPhone = () => {
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
   const [secret, setSecret] = useState<string>("");
-  const [nonce, setNonce] = useState<bigint>(BigInt(0));
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -221,15 +221,13 @@ export const SendToPhone = () => {
                     setDepositSigned={setDepositSigned}
                     setSecret={setSecret}
                     transaction={getValues()}
-                    nonce={nonce}
                   />
                 ) : (
                   <DepositButton
                     transaction={getValues()}
                     countryCode={selectedCountry as Country}
                     setFundsSent={setFundsSent}
-                    setNonce={setNonce}
-                    nonce={nonce}
+                    setNonce={setValue}
                     saveContact={saveContact}
                     setSavedTransaction={setSavedTransaction}
                   />

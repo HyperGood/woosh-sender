@@ -62,7 +62,7 @@ export const TransactionCard = ({
             }
           />
 
-          <Dialog.Close className="mt-8">
+          <Dialog.Close className="mt-8" asChild>
             <Button fullWidth intent="secondary">
               Close
             </Button>
@@ -138,7 +138,6 @@ export const TransactionCard = ({
               <SignDepositButton
                 transaction={transaction}
                 setSecret={setSecret}
-                nonce={BigInt(transaction.nonce || 0)}
                 secret={secret}
                 card
               />
