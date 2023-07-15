@@ -33,6 +33,7 @@ export const DepositButton = ({
   saveContact,
   setSavedTransaction,
   countryCode,
+  fundsSent,
 }: {
   transaction: PhoneTransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
@@ -40,13 +41,14 @@ export const DepositButton = ({
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
   saveContact: CheckedState;
   countryCode: Country;
+  fundsSent: boolean;
 }) => {
   // const [transaction, setTransaction] = useState(getTransaction());
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
-  const [nonceIn, setNonceIn] = useState<bigint>();
+  const [nonceIn, setNonceIn] = useState<bigint>(BigInt(0));
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
@@ -119,7 +121,10 @@ export const DepositButton = ({
     listener(log) {
       if (log[0]?.args.depositIndex) {
         setNonceIn(log[0]?.args.depositIndex);
-        if (log[0]?.args.depositIndex === nonceIn) {
+        if (
+          log[0]?.args.depositIndex === nonceIn ||
+          log[0]?.args.depositIndex === BigInt(0)
+        ) {
           unwatch?.();
         }
       }
@@ -167,7 +172,7 @@ export const DepositButton = ({
         phone: countryCode.additionalProperties.code + formattedPhone,
         amountInUSD: amountInUSD,
         txId: txId,
-        nonce: numberNonce,
+        nonce: numberNonce + 1,
       });
     } else {
       console.error("Error saving transaction");
@@ -176,10 +181,17 @@ export const DepositButton = ({
 
   useEffect(() => {
     if (nonceIn && txData && txSuccess) {
-      setNonce("nonce", Number(nonceIn));
+      setNonce("nonce", Number(nonceIn) + 1);
       saveTransaction({ txId: txData.transactionHash });
     }
   }, [nonceIn, txData, txSuccess]);
+
+  useEffect(() => {
+    if (!fundsSent && txSuccess && txData && nonceIn) {
+      saveTransaction({ txId: txData.transactionHash });
+      setFundsSent(true);
+    }
+  }, [txSuccess, fundsSent]);
 
   return (
     <>

@@ -227,6 +227,7 @@ export const SendToPhone = () => {
                     transaction={getValues()}
                     countryCode={selectedCountry as Country}
                     setFundsSent={setFundsSent}
+                    fundsSent={fundsSent}
                     setNonce={setValue}
                     saveContact={saveContact}
                     setSavedTransaction={setSavedTransaction}
