@@ -71,7 +71,7 @@ export default function Claim({
 export async function getStaticPaths() {
   const transactions = await getAllPhoneTransactions({ prisma });
 
-  const paths = transactions.map((transaction) => ({
+  const paths = transactions.map((transaction: Transaction) => ({
     params: { id: transaction.id },
   }));
 

@@ -13,8 +13,6 @@ import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { api } from "~/utils/api";
 import { isHex } from "viem";
-// import { useContext } from "react";
-// import { CryptoPricesContext } from "~/context/TokenPricesContext";
 
 export const WithdrawButton = ({
   transactionId,
@@ -32,7 +30,7 @@ export const WithdrawButton = ({
   const debouncedAmount = useDebounce(amount, 500);
   const debouncedSecret = useDebounce(secret, 500);
   const { address: claimerAddress } = useAccount();
-  const { mutate } = api.transaction.updateStatus.useMutation({
+  const { mutate } = api.transaction.updateClaimedStatus.useMutation({
     onSuccess: () => {
       console.log("Transaction status updated");
     },
@@ -40,20 +38,6 @@ export const WithdrawButton = ({
       console.log(error);
     },
   });
-
-  //If tx success then update transaction to claimed
-  function updateTransaction() {
-    if (withdrawSuccess && claimerAddress) {
-      mutate({
-        id: transactionId,
-        claimed: true,
-        claimedAt: new Date(),
-        claimedBy: claimerAddress,
-      });
-    } else {
-      console.log("error updating transaction");
-    }
-  }
 
   const { config: contractWriteConfig } = usePrepareContractWrite({
     address: despositValutAddressHH,
@@ -87,19 +71,18 @@ export const WithdrawButton = ({
     },
   });
 
-  const { isLoading: isWithdrawing, isSuccess: withdrawSuccess } =
-    useWaitForTransaction({
-      hash: withdrawData?.hash,
-      onSuccess(txData) {
-        updateTransaction();
-        console.log("txData: ", txData);
-        toast.success(`Funds withdrew!`);
-      },
-      onError(error) {
-        console.log(error);
-        toast.error(`Transaction error: ${error.message}`);
-      },
-    });
+  const { isLoading: isWithdrawing } = useWaitForTransaction({
+    hash: withdrawData?.hash,
+    onSuccess(txData) {
+      updateTransaction();
+      console.log("txData: ", txData);
+      toast.success(`Funds withdrew!`);
+    },
+    onError(error) {
+      console.log(error);
+      toast.error(`Transaction error: ${error.message}`);
+    },
+  });
 
   useContractEvent({
     address: despositValutAddressHH,
@@ -117,6 +100,21 @@ export const WithdrawButton = ({
       withdraw?.();
     }
   };
+
+  //If tx success then update transaction to claimed
+  function updateTransaction() {
+    if (claimerAddress) {
+      mutate({
+        id: transactionId,
+        claimed: true,
+        claimedAt: new Date(),
+        claimedBy: claimerAddress,
+      });
+    } else {
+      console.log("error updating transaction");
+      console.log("Claimer address: ", claimerAddress);
+    }
+  }
 
   return (
     <>
@@ -138,5 +136,3 @@ export const WithdrawButton = ({
 };
 
 export default WithdrawButton;
-
-// 0x9aa17648c919a27676e171565c47fff16bf43d8f5cdf3d27161783b47e7ccace274af74f007d48ec4e99ed882b2e89554662386612ddce5374b71fce8dd155531b

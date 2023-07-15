@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const SignIn = () => {
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center px-6 lg:px-0">
+    <div className="flex h-screen w-full flex-col items-center justify-center px-4 lg:px-0">
       <div>
         <Logo />
         <h1 className="mb-16 mt-4 max-w-[10ch] text-4xl">

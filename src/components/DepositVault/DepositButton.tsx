@@ -11,66 +11,35 @@ import { api } from "~/utils/api";
 import { despositValutAddressHH } from "~/lib/constants";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
-import {
-  useContext,
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useState,
-} from "react";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
+import { type Dispatch, type SetStateAction } from "react";
 import type { CheckedState } from "@radix-ui/react-checkbox";
-import type { Transaction } from "@prisma/client";
 import type { PhoneTransactionForm } from "~/models/transactions";
 import { type Country } from "~/lib/countries";
-import { formatPhone } from "~/lib/formatPhone";
 import { type UseFormSetValue } from "react-hook-form";
 
 export const DepositButton = ({
   transaction,
   setFundsSent,
-  setNonce,
   saveContact,
-  setSavedTransaction,
   countryCode,
-  fundsSent,
+  setFormValue,
 }: {
   transaction: PhoneTransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
-  setNonce: UseFormSetValue<PhoneTransactionForm>;
-  setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
+  setFormValue: UseFormSetValue<PhoneTransactionForm>;
   saveContact: CheckedState;
   countryCode: Country;
-  fundsSent: boolean;
 }) => {
-  // const [transaction, setTransaction] = useState(getTransaction());
-  const { cryptoPrices } = useContext(CryptoPricesContext);
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
-  const [nonceIn, setNonceIn] = useState<bigint>(BigInt(0));
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
-      toast.success("Contact saved!");
+      console.log("Successfully added contact");
       void ctx.contact.getContacts.invalidate();
     },
     onError: (error) => {
       console.log("There was an error saving the contact", error);
-    },
-  });
-  const {
-    mutate,
-    isLoading: isSaving,
-    isError: errorSavingTransaction,
-  } = api.transaction.addPhoneTransaction.useMutation({
-    onSuccess: (data) => {
-      setSavedTransaction(data);
-      setFundsSent(true);
-      void ctx.transaction.getAllTransactionsByUser.invalidate();
-    },
-    onError: (error) => {
-      console.log("There was an error saving the transaction ", error);
     },
   });
 
@@ -98,13 +67,13 @@ export const DepositButton = ({
     },
   });
 
-  const {
-    isLoading: isDepositing,
-    data: txData,
-    isSuccess: txSuccess,
-  } = useWaitForTransaction({
+  const { isLoading: isDepositing } = useWaitForTransaction({
     hash: depositData?.hash,
-    onSuccess() {
+    onSuccess(txData) {
+      console.log("txData: ", txData);
+      setFormValue("txId", txData.transactionHash);
+      setFormValue("nonce", Number(txData.logs[0]?.topics[2]));
+      setFundsSent(true);
       toast.success(`Funds sent!`);
     },
     onError(error) {
@@ -113,23 +82,25 @@ export const DepositButton = ({
     },
   });
 
-  //Get the nonce from the contract
-  const unwatch = useContractEvent({
-    address: despositValutAddressHH,
-    abi,
-    eventName: "DepositMade",
-    listener(log) {
-      if (log[0]?.args.depositIndex) {
-        setNonceIn(log[0]?.args.depositIndex);
-        if (
-          log[0]?.args.depositIndex === nonceIn ||
-          log[0]?.args.depositIndex === BigInt(0)
-        ) {
-          unwatch?.();
-        }
-      }
-    },
-  });
+  // // Get the nonce from the contract
+  // const unwatch = useContractEvent({
+  //   address: despositValutAddressHH,
+  //   abi,
+  //   eventName: "DepositMade",
+  //   listener(log) {
+  //     console.log("Event triggered!");
+  //     console.log(log);
+  //     if (
+  //       log[0]?.args.depositIndex ||
+  //       log[0]?.args.depositIndex === BigInt(0)
+  //     ) {
+  //       console.log("Setting nonce...");
+  //       setFormValue("nonce", Number(log[0]?.args.depositIndex) + 1);
+  //       console.log("Nonce is set");
+  //       unwatch?.();
+  //     }
+  //   },
+  // });
 
   function saveContactFunction() {
     if (transaction.contact && transaction.phone) {
@@ -156,65 +127,22 @@ export const DepositButton = ({
     }
   };
 
-  const saveTransaction = ({ txId }: { txId: string }) => {
-    if (
-      transaction.amount !== 0 &&
-      transaction.phone !== "" &&
-      txId &&
-      nonceIn
-    ) {
-      // setTransaction(getTransaction());
-      const amountInUSD = transaction.amount * ethPrice;
-      const formattedPhone = formatPhone(transaction.phone);
-      const numberNonce = Number(nonceIn);
-      mutate({
-        ...transaction,
-        phone: countryCode.additionalProperties.code + formattedPhone,
-        amountInUSD: amountInUSD,
-        txId: txId,
-        nonce: numberNonce + 1,
-      });
-    } else {
-      console.error("Error saving transaction");
-    }
-  };
-
-  useEffect(() => {
-    if (nonceIn && txData && txSuccess) {
-      setNonce("nonce", Number(nonceIn) + 1);
-      saveTransaction({ txId: txData.transactionHash });
-    }
-  }, [nonceIn, txData, txSuccess]);
-
-  useEffect(() => {
-    if (!fundsSent && txSuccess && txData && nonceIn) {
-      saveTransaction({ txId: txData.transactionHash });
-      setFundsSent(true);
-    }
-  }, [txSuccess, fundsSent]);
-
   return (
     <>
-      {isDepositing || isSaving ? (
+      {isDepositing ? (
         <div className="flex items-center gap-4">
           <span>Sending funds</span> <LoadingSpinner />{" "}
         </div>
       ) : null}
-      {errorSavingTransaction ? (
-        <div>There was an error saving the transaction!</div>
-      ) : (
-        <button
-          onClick={() => void sendFunction()}
-          disabled={isSaving || isDepositLoading || isDepositing}
-          className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isDepositLoading
-            ? "Waiting for approval"
-            : isSaving || isDepositing
-            ? "Please wait"
-            : "Send"}
-        </button>
-      )}
+
+      <button
+        onClick={() => void sendFunction()}
+        disabled={isDepositLoading || isDepositing}
+        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+        type="submit"
+      >
+        {isDepositLoading ? "Waiting for approval" : "Send"}
+      </button>
     </>
   );
 };

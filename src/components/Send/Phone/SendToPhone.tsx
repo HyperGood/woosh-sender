@@ -7,7 +7,7 @@ import EnterPhone from "./EnterPhone";
 import EnterAmount from "./EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
-import SignDepositButton from "../../DepositVault/SignDepositButton";
+import SignDepositButton from "../../DepositVault/SignDepositButtonWithSave";
 import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
@@ -49,6 +49,7 @@ export const SendToPhone = () => {
       token: "ETH",
       phone: "",
       type: "phone",
+      nonce: 0,
     },
   });
 
@@ -82,6 +83,10 @@ export const SendToPhone = () => {
     }
     if (validPrev) setStep(nextStep);
   };
+
+  // useEffect(() => {
+  //   console.log("Nonce: ", getValues("nonce"));
+  // }, [nonce]);
 
   useEffect(() => {
     if (depositSigned) {
@@ -221,16 +226,16 @@ export const SendToPhone = () => {
                     setDepositSigned={setDepositSigned}
                     setSecret={setSecret}
                     transaction={getValues()}
+                    setSavedTransaction={setSavedTransaction}
+                    countryCode={selectedCountry as Country}
                   />
                 ) : (
                   <DepositButton
                     transaction={getValues()}
                     countryCode={selectedCountry as Country}
                     setFundsSent={setFundsSent}
-                    fundsSent={fundsSent}
-                    setNonce={setValue}
                     saveContact={saveContact}
-                    setSavedTransaction={setSavedTransaction}
+                    setFormValue={setValue}
                   />
                 )
               ) : step === 3 && savedTransaction ? (
