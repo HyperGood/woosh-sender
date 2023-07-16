@@ -3,13 +3,13 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { WagmiConfig, createConfig } from "wagmi";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import { hardhat } from "wagmi/chains";
+import { hardhat, optimismGoerli } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { CryptoPricesProvider } from "~/context/TokenPricesContext";
 import { Toaster } from "react-hot-toast";
 
-const chains = [hardhat];
+const chains = [optimismGoerli, hardhat];
 
 const config = createConfig(
   getDefaultConfig({
@@ -19,13 +19,13 @@ const config = createConfig(
     walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || "",
 
     // Required
-    appName: "Woosh Sender",
+    appName: "Woosh",
     autoConnect: false,
 
     // Optional
-    appDescription: "Your App Description",
-    appUrl: "https://family.co", // your app's url
-    appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
+    appDescription:
+      "Send crypto to your friends and family even if they don't have a wallet",
+    // appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
   })
 );
 

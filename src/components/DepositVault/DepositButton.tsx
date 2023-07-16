@@ -3,11 +3,12 @@ import { parseEther } from "ethers";
 import useDebounce from "~/hooks/useDebounce";
 import {
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
 import { api } from "~/utils/api";
-import { despositValutAddressHH } from "~/lib/constants";
+import depositVaultAddresses, { Addresses } from "~/lib/depositVaultAddresses";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { type Dispatch, type SetStateAction } from "react";
@@ -32,6 +33,12 @@ export const DepositButton = ({
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
+  const { chain } = useNetwork();
+  const chainId = chain?.id;
+  const depositVaultAddress =
+    chainId && chainId in depositVaultAddresses
+      ? depositVaultAddresses[chainId as keyof Addresses][0]
+      : "0x12";
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
@@ -44,7 +51,7 @@ export const DepositButton = ({
   });
 
   const { config: contractWriteConfig } = usePrepareContractWrite({
-    address: despositValutAddressHH,
+    address: depositVaultAddress,
     abi,
     functionName: "deposit",
     value: parseEther(debouncedAmount.toString()),

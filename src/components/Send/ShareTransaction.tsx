@@ -137,7 +137,10 @@ export const ShareTransaction = ({
             }
           />
         ) : null}
-        <a href="#" className="underline hover:text-success">
+        <a
+          href={`https://goerli-optimism.etherscan.io/tx/${transaction.txId}`}
+          className="underline hover:text-success"
+        >
           View transaction on Etherscan
         </a>
       </div>

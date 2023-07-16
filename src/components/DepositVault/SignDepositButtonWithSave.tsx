@@ -1,5 +1,7 @@
-import { useSignTypedData } from "wagmi";
-import { despositValutAddressHH } from "~/lib/constants";
+import { useNetwork, useSignTypedData } from "wagmi";
+import depositVaultAddresses, {
+  type Addresses,
+} from "~/lib/depositVaultAddresses";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { useContext } from "react";
@@ -27,6 +29,12 @@ export const SignDepositButton = ({
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
   countryCode: Country;
 }) => {
+  const { chain } = useNetwork();
+  const chainId = chain?.id;
+  const depositVaultAddress =
+    chainId && chainId in depositVaultAddresses
+      ? depositVaultAddresses[chainId as keyof Addresses][0]
+      : "0x12";
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const ctx = api.useContext();
@@ -44,8 +52,8 @@ export const SignDepositButton = ({
   const domain = {
     name: "DepositVault",
     version: "1.0.0",
-    chainId: 31337,
-    verifyingContract: despositValutAddressHH,
+    chainId: chainId,
+    verifyingContract: depositVaultAddress,
   } as const;
 
   const types = {

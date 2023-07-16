@@ -39,16 +39,16 @@ const Balances = () => {
       tokenName: "ethereum",
       balance: Number(ethBalance?.formatted) || 0,
     },
-    {
-      token: "DAI",
-      tokenName: "dai",
-      balance: 200,
-    },
-    {
-      token: "USDC",
-      tokenName: "usd-coin",
-      balance: 800,
-    },
+    // {
+    //   token: "DAI",
+    //   tokenName: "dai",
+    //   balance: 200,
+    // },
+    // {
+    //   token: "USDC",
+    //   tokenName: "usd-coin",
+    //   balance: 800,
+    // },
   ];
 
   if (ethBalanceLoading) return <p>Loading...</p>;
@@ -114,25 +114,32 @@ const Balances = () => {
           style: "currency",
           currency: "USD",
         })}
-      </p>
+      </p>{" "}
+      <Divider />
       <Balance
         token="ETH"
         tokenName="ethereum"
         balance={Number(ethBalance?.formatted) || 0}
       />
       <Divider />
-      <Balance token="USDC" tokenName="usd-coin" balance={800} />
+      {/* <Balance token="USDC" tokenName="usd-coin" balance={800} />
       <Divider />
-      <Balance token="DAI" tokenName="dai" balance={200} />
+      <Balance token="DAI" tokenName="dai" balance={200} /> */}
     </div>
   );
 };
 
 const Main = () => {
+  const { address } = useAccount();
+  let truncatedAddress;
+  if (address)
+    truncatedAddress = address?.slice(0, 4) + "..." + address?.slice(-4);
   return (
-    <div className="mt-20 px-4 lg:mt-0 lg:px-0">
+    <div className="mt-20 px-4 lg:mt-0 lg:min-w-[500px] lg:max-w-[50vw] lg:px-0">
       <span className="block font-polysans text-lg">welcome</span>
-      <span className="block font-polysans text-2xl">roysandoval.eth</span>
+      <span className="block break-all font-polysans text-xl">
+        {truncatedAddress}
+      </span>
       <Balances />
       <div className="my-12 flex flex-col gap-8 lg:mb-0 lg:mt-14">
         <SendToPhone />

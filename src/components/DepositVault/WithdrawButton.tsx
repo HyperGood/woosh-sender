@@ -5,10 +5,13 @@ import {
   useAccount,
   useContractEvent,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { despositValutAddressHH } from "~/lib/constants";
+import depositVaultAddresses, {
+  type Addresses,
+} from "~/lib/depositVaultAddresses";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { api } from "~/utils/api";
@@ -27,6 +30,12 @@ export const WithdrawButton = ({
 }) => {
   //   const { cryptoPrices } = useContext(CryptoPricesContext);
   //   const ethPrice = cryptoPrices?.ethereum.usd || 0;
+  const { chain } = useNetwork();
+  const chainId = chain?.id;
+  const depositVaultAddress =
+    chainId && chainId in depositVaultAddresses
+      ? depositVaultAddresses[chainId as keyof Addresses][0]
+      : "0x12";
   const debouncedAmount = useDebounce(amount, 500);
   const debouncedSecret = useDebounce(secret, 500);
   const { address: claimerAddress } = useAccount();
@@ -40,7 +49,7 @@ export const WithdrawButton = ({
   });
 
   const { config: contractWriteConfig } = usePrepareContractWrite({
-    address: despositValutAddressHH,
+    address: depositVaultAddress,
     abi,
     functionName: "withdraw",
     args: [
@@ -92,7 +101,7 @@ export const WithdrawButton = ({
   });
 
   useContractEvent({
-    address: despositValutAddressHH,
+    address: depositVaultAddress,
     abi,
     eventName: "WithdrawalMade",
     listener(log) {

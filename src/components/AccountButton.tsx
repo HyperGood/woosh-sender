@@ -1,4 +1,4 @@
-import { ChainIcon, ConnectKitButton } from "connectkit";
+import { ChainIcon, ConnectKitButton, useChains } from "connectkit";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useDisconnect } from "wagmi";
@@ -17,9 +17,10 @@ export const AccountButton = () => {
   };
   // Hooks
   const { data: sessionData } = useSession();
+  const { chain } = useNetwork();
+  console.log(chain);
   // Wagmi Hooks
   const { disconnect } = useDisconnect();
-  const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage({
     onError(error) {
       if (error.name === "UserRejectedRequestError") {
@@ -81,6 +82,7 @@ export const AccountButton = () => {
         chain,
         address,
       }) => {
+        console.log(chain);
         return (
           <>
             {isConnected && sessionData ? (

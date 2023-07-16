@@ -1,11 +1,14 @@
 import { abi } from "../../lib/contract-abi";
 import {
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
 import { api } from "~/utils/api";
-import { despositValutAddressHH } from "~/lib/constants";
+import depositVaultAddresses, {
+  type Addresses,
+} from "~/lib/depositVaultAddresses";
 import { toast } from "react-hot-toast";
 import type { Transaction } from "@prisma/client";
 import { useEffect } from "react";
@@ -20,7 +23,12 @@ export const CancelDepositButton = ({
   clicked: boolean;
 }) => {
   const ctx = api.useContext();
-
+  const { chain } = useNetwork();
+  const chainId = chain?.id;
+  const depositVaultAddress =
+    chainId && chainId in depositVaultAddresses
+      ? depositVaultAddresses[chainId as keyof Addresses][0]
+      : "0x12";
   const { mutate, isLoading: isRemoving } = api.transaction.remove.useMutation({
     onSuccess: () => {
       console.log("Removed!");
@@ -32,7 +40,7 @@ export const CancelDepositButton = ({
   });
 
   const { config: contractWriteConfig } = usePrepareContractWrite({
-    address: despositValutAddressHH,
+    address: depositVaultAddress,
     abi,
     functionName: "withdrawDeposit",
     args: [BigInt(transaction.nonce ? transaction.nonce : 0)],
