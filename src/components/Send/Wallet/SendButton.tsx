@@ -13,6 +13,7 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import { LoadingSpinner } from "~/components/Loading";
 import type { Transaction } from "@prisma/client";
 import { type WalletTransaction } from "~/models/transactions";
+import Button from "~/components/Button";
 
 export const SendButton = ({
   transaction,
@@ -63,7 +64,20 @@ export const SendButton = ({
     data: sendData,
     sendTransaction,
     isSuccess: waitingForApproval,
-  } = useSendTransaction(config);
+  } = useSendTransaction({
+    ...config,
+    onError(error) {
+      if (error.message.includes("User rejected the request")) {
+        toast.error("Don't worry no funds were sent.");
+        toast.error(
+          "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+        );
+      } else {
+        console.log("There was an error depositing the funds ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
+    },
+  });
 
   const { isLoading: isSending } = useWaitForTransaction({
     hash: sendData?.hash,
@@ -124,13 +138,17 @@ export const SendButton = ({
         </div>
       )}
 
-      <button
+      <Button
         onClick={() => void sendFunction()}
         disabled={waitingForApproval || isSending}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+        intent="secondary"
       >
-        {waitingForApproval ? "Waiting for approval" : "Send"}
-      </button>
+        {waitingForApproval
+          ? "Waiting for approval"
+          : isSending
+          ? "Sending Funds"
+          : "Send"}
+      </Button>
     </>
   );
 };

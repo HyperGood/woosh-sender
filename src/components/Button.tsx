@@ -54,6 +54,9 @@ const Button = ({
         onClick={onClick}
         disabled={disabled}
         type="button"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && onClick) onClick();
+        }}
       >
         {children}
       </button>

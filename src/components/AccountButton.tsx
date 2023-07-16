@@ -22,16 +22,14 @@ export const AccountButton = () => {
   const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage({
     onError(error) {
-      console.log("Wagmi error ", error);
-      console.log("Cause: ", error.cause);
-      console.log("Message: ", error.message);
-      console.log("Name", error.name);
-      console.log("Stack", error.stack);
       if (error.name === "UserRejectedRequestError") {
         toast.error(
           "Sign in cancelled. You must accept the sign in using your wallet."
         );
         disconnect();
+      } else {
+        toast.error("There was an error signing in. Please try again.");
+        console.error("Error signing in: ", error);
       }
     },
   });
@@ -169,11 +167,9 @@ export const AccountButton = () => {
                 onClick={show}
                 intent="secondary"
                 fullWidth
-                disabled={isConnected || isConnecting}
+                disabled={isConnecting}
               >
-                {isConnected || isConnecting
-                  ? "Signing in..."
-                  : "Sign In With Wallet"}
+                {isConnecting ? "Signing in..." : "Sign In With Wallet"}
               </Button>
             )}
           </>

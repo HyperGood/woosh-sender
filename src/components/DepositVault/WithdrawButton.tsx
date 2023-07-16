@@ -66,8 +66,15 @@ export const WithdrawButton = ({
   } = useContractWrite({
     ...contractWriteConfig,
     onError(error) {
-      console.log(error);
-      toast.error(`Deposit error: ${error.message}`);
+      if (error.message.includes("User rejected the request")) {
+        toast.error("Don't worry no funds were sent.");
+        toast.error(
+          "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+        );
+      } else {
+        console.log("There was an error depositing the funds ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
     },
   });
 

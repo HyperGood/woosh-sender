@@ -74,7 +74,6 @@ export const SendToPhone = () => {
   ) => {
     if (step === 3) return;
     let validPrev = await trigger(input);
-    console.log(saveContact);
     if (saveContact && step === 0) {
       void validateField("contact");
       if (getValues("contact") === "") return;
@@ -83,10 +82,6 @@ export const SendToPhone = () => {
     }
     if (validPrev) setStep(nextStep);
   };
-
-  // useEffect(() => {
-  //   console.log("Nonce: ", getValues("nonce"));
-  // }, [nonce]);
 
   useEffect(() => {
     if (depositSigned) {
@@ -104,7 +99,7 @@ export const SendToPhone = () => {
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content
             className="fixed bottom-0 left-1/2 min-h-[700px] w-full -translate-x-1/2  rounded-t-xl bg-brand-white shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl"
-            style={{ height: step === 3 ? "100%" : "80%" }}
+            style={{ height: step === 3 ? "95%" : "80%" }}
           >
             <Dialog.Close
               onClick={() => {
@@ -251,7 +246,6 @@ export const SendToPhone = () => {
                     (saveContact === true && getValues("contact") === undefined)
                   }
                   onClick={() => {
-                    console.log(getValues());
                     if (isValid) {
                       setStep(step > 3 ? step : step + 1);
                       const amount = getValues("amount");

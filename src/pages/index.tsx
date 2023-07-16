@@ -14,6 +14,7 @@ import Contacts from "~/components/Contacts";
 import { PreviousSends } from "~/components/Transactions";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
+import { api } from "~/utils/api";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -49,8 +50,6 @@ const Balances = () => {
       balance: 800,
     },
   ];
-
-  console.log(userBalances);
 
   if (ethBalanceLoading) return <p>Loading...</p>;
   if (ethBalanceError) {
@@ -145,13 +144,22 @@ const Main = () => {
 
 export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   const { setCryptoPrices } = useContext(CryptoPricesContext);
-  const { isConnected } = useAccount();
-
+  const { isConnected, address } = useAccount();
   const { data: session } = useSession();
+  const { data: userData } = api.user.getUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
 
   useEffect(() => {
     setCryptoPrices(coinsData);
   }, [coinsData]);
+
+  useEffect(() => {
+    if (userData?.address !== address) {
+      //TO-DO: This should be an alert first
+      void signOut({ redirect: false });
+    }
+  }, [address, session]);
 
   useEffect(() => {
     if (!isConnected && session) {

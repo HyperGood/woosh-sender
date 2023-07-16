@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import type { Transaction } from "@prisma/client";
 import { useEffect } from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import Button from "../Button";
 
 export const CancelDepositButton = ({
   transaction,
@@ -49,8 +50,15 @@ export const CancelDepositButton = ({
   } = useContractWrite({
     ...contractWriteConfig,
     onError(error) {
-      console.log(error);
-      toast.error(`Deposit error: ${error.message}`);
+      if (error.message.includes("User rejected the request")) {
+        toast.error("Don't worry no funds were sent.");
+        toast.error(
+          "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+        );
+      } else {
+        console.log("There was an error depositing the funds ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
     },
   });
 
@@ -82,7 +90,7 @@ export const CancelDepositButton = ({
           </AlertDialog.Trigger>
           <AlertDialog.Portal>
             <AlertDialog.Overlay className="fixed inset-0 bg-black/50" />
-            <AlertDialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
+            <AlertDialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:bottom-auto lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
               <AlertDialog.Title className="mb-4 font-polysans text-2xl">
                 Cancel Send
               </AlertDialog.Title>
@@ -91,7 +99,7 @@ export const CancelDepositButton = ({
               </AlertDialog.Description>
               <div className="flex w-full justify-between gap-4">
                 <AlertDialog.Cancel asChild>
-                  <button>Nevermind</button>
+                  <Button intent="primary">Nevermind</Button>
                 </AlertDialog.Cancel>
                 <AlertDialog.Action asChild>
                   <button

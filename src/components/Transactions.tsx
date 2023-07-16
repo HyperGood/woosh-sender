@@ -25,7 +25,7 @@ export const TransactionCard = ({
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-        <Dialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
+        <Dialog.Content className="fixed bottom-0 left-1/2 flex w-full -translate-x-1/2 flex-col gap-4 rounded-t-xl bg-brand-white px-4 py-8 shadow lg:bottom-auto lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
           <Dialog.Title className="text-2xl">Transaction Secret</Dialog.Title>
           <TransactionInfo
             label="Claim Link"
@@ -62,10 +62,12 @@ export const TransactionCard = ({
             }
           />
 
-          <Dialog.Close className="mt-8" asChild>
-            <Button fullWidth intent="secondary">
-              Close
-            </Button>
+          <Dialog.Close asChild>
+            <div className="mt-4">
+              <Button fullWidth intent="secondary">
+                Close
+              </Button>
+            </div>
           </Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>

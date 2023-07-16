@@ -31,7 +31,7 @@ export default function Claim({
     return <div>Transaction claimed</div>;
   }
   return (
-    <div>
+    <div className="flex h-screen w-full items-center justify-center">
       <div>
         <h1 className="mb-4 text-4xl font-bold">Claim your tokens</h1>
         {formattedTransaction.phone}

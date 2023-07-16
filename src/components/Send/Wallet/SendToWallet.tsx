@@ -77,7 +77,7 @@ export const SendToWallet = () => {
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
           <Dialog.Content
             className="fixed bottom-0 left-1/2 min-h-[700px] w-full -translate-x-1/2  rounded-t-xl bg-brand-white shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl"
-            style={{ height: step === 3 ? "100%" : "80%" }}
+            style={{ height: step === 3 ? "95%" : "80%" }}
           >
             <Dialog.Close
               onClick={() => {

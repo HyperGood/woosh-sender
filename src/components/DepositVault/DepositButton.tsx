@@ -2,7 +2,6 @@ import { abi } from "../../lib/contract-abi";
 import { parseEther } from "ethers";
 import useDebounce from "~/hooks/useDebounce";
 import {
-  useContractEvent,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -16,6 +15,7 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { PhoneTransactionForm } from "~/models/transactions";
 import { type Country } from "~/lib/countries";
 import { type UseFormSetValue } from "react-hook-form";
+import Button from "../Button";
 
 export const DepositButton = ({
   transaction,
@@ -39,7 +39,7 @@ export const DepositButton = ({
       void ctx.contact.getContacts.invalidate();
     },
     onError: (error) => {
-      console.log("There was an error saving the contact", error);
+      toast.error(`There was an error saving the contact ${error.message}`);
     },
   });
 
@@ -62,15 +62,24 @@ export const DepositButton = ({
   } = useContractWrite({
     ...contractWriteConfig,
     onError(error) {
-      console.log("There was an error depositing the funds ", error);
-      toast.error(`Deposit error: ${error.message}`);
+      if (error.message.includes("User rejected the request")) {
+        toast.error("Don't worry no funds were sent.");
+        toast.error(
+          "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+        );
+      } else {
+        console.log("There was an error depositing the funds ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
     },
   });
 
   const { isLoading: isDepositing } = useWaitForTransaction({
     hash: depositData?.hash,
     onSuccess(txData) {
-      console.log("txData: ", txData);
+      if (saveContact) {
+        saveContactFunction();
+      }
       setFormValue("txId", txData.transactionHash);
       setFormValue("nonce", Number(txData.logs[0]?.topics[2]));
       setFundsSent(true);
@@ -78,29 +87,9 @@ export const DepositButton = ({
     },
     onError(error) {
       console.log("Transaction error: ", error);
-      toast.error(`Transaction error: ${error.message}`);
+      toast.error(`The transaction failed: ${error.message}`);
     },
   });
-
-  // // Get the nonce from the contract
-  // const unwatch = useContractEvent({
-  //   address: despositValutAddressHH,
-  //   abi,
-  //   eventName: "DepositMade",
-  //   listener(log) {
-  //     console.log("Event triggered!");
-  //     console.log(log);
-  //     if (
-  //       log[0]?.args.depositIndex ||
-  //       log[0]?.args.depositIndex === BigInt(0)
-  //     ) {
-  //       console.log("Setting nonce...");
-  //       setFormValue("nonce", Number(log[0]?.args.depositIndex) + 1);
-  //       console.log("Nonce is set");
-  //       unwatch?.();
-  //     }
-  //   },
-  // });
 
   function saveContactFunction() {
     if (transaction.contact && transaction.phone) {
@@ -110,7 +99,7 @@ export const DepositButton = ({
         phone: countryCode.additionalProperties.code + transaction.phone,
       });
     } else {
-      console.log("Error saving contact");
+      toast.error("There was an error saving the contact.");
     }
   }
 
@@ -120,9 +109,6 @@ export const DepositButton = ({
     } else if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {
-      if (saveContact) {
-        saveContactFunction();
-      }
       deposit?.();
     }
   };
@@ -135,14 +121,13 @@ export const DepositButton = ({
         </div>
       ) : null}
 
-      <button
+      <Button
         onClick={() => void sendFunction()}
         disabled={isDepositLoading || isDepositing}
-        className="rounded-full bg-gray-100 px-12 py-4 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-        type="submit"
+        intent="secondary"
       >
         {isDepositLoading ? "Waiting for approval" : "Send"}
-      </button>
+      </Button>
     </>
   );
 };
