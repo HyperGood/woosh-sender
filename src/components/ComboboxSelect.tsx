@@ -33,9 +33,9 @@ const ComboboxSelect = ({
           <Combobox.Input
             displayValue={(item: Data) => item.displayValue}
             onChange={inputOnChange}
-            className="h-full w-full rounded-l-[0.5rem] bg-brand-gray-light px-2 focus:outline-none"
+            className="h-full w-full bg-transparent px-4 focus:outline-none"
           />
-          <div className="absolute right-1 -mt-1 flex h-8 w-8 items-center justify-center">
+          <div className="absolute right-1 -mt-1 flex h-6 w-6 items-center justify-center">
             <ChevronDownIcon />
           </div>
         </Combobox.Button>

@@ -10,13 +10,15 @@ export const buttonStyles = cva(
         secondary:
           "bg-brand-black text-brand-white focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
+        accent:
+          "bg-brand-accent text-brand-black hover:bg-brand-black hover:text-brand-accent",
         none: "px-0 py-0 hover:bg-brand-gray-light",
       },
       fullWidth: {
         true: "w-full",
       },
       disabled: {
-        true: "opacity-20 cursor-not-allowed",
+        true: "opacity-20 cursor-not-allowed bg-brand-black text-brand-gray-lighter",
       },
       hover: {
         true: "hover:bg-brand-accent hover:text-brand-black",

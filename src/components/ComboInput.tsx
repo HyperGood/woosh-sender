@@ -12,7 +12,6 @@ export interface ComboInputProps extends ComboboxProps {
 
 const ComboInput = ({
   label,
-  errorMesage,
   required = false,
   filteredData,
   selectedItem,
@@ -29,7 +28,7 @@ const ComboInput = ({
         </label>
       )}
       <div className="relative">
-        <div className="absolute h-full w-[8rem] p-[1px]">
+        <div className="absolute flex h-full w-[8rem] items-center p-[1px]">
           <ComboboxSelect
             filteredData={filteredData}
             selectedItem={selectedItem}
@@ -37,7 +36,9 @@ const ComboInput = ({
             inputOnChange={(e) => queryChange(e.target.value)}
             clickFunction={clickFunction}
           />
+          <div className="ml-1 h-[60%] w-[1px] bg-brand-black/20" />
         </div>
+
         {input}
       </div>
     </div>
