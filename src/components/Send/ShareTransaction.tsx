@@ -19,7 +19,7 @@ export const ShareTransaction = ({
   const { cryptoPrices } = useContext(CryptoPricesContext);
   const ethPrice = cryptoPrices?.ethereum.usd || 0;
   const amountInUSD = transaction.amount * ethPrice;
-  const url = `http://localhost:3000/claim/${transaction.id}`;
+  const url = `https://woosh-sender.vercel.app/claim/${transaction.id}`;
   const formattedPhone = makePhoneReadable(transaction.phone || "");
 
   return (
