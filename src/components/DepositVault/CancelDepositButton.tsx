@@ -1,4 +1,4 @@
-import { abi } from "../../lib/contract-abi";
+import { abi } from "../../lib/DepositVaultABI";
 import {
   useContractWrite,
   useNetwork,
@@ -6,9 +6,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { api } from "~/utils/api";
-import depositVaultAddresses, {
-  type Addresses,
-} from "~/lib/depositVaultAddresses";
+import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Transaction } from "@prisma/client";
 import { useEffect } from "react";
@@ -26,8 +24,8 @@ export const CancelDepositButton = ({
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const depositVaultAddress =
-    chainId && chainId in depositVaultAddresses
-      ? depositVaultAddresses[chainId as keyof Addresses][0]
+    chainId && chainId in contractAddress
+      ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
   const { mutate, isLoading: isRemoving } = api.transaction.remove.useMutation({
     onSuccess: () => {

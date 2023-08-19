@@ -1,4 +1,4 @@
-import { parseEther } from "ethers";
+import { parseEther } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import {
   usePrepareSendTransaction,

@@ -1,70 +1,168 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { type Transaction } from "@prisma/client";
-import { ConnectKitButton } from "connectkit";
 import { type InferGetStaticPropsType } from "next";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { useAccount, useDisconnect } from "wagmi";
-import Button from "~/components/Button";
-import WithdrawButton from "~/components/DepositVault/WithdrawButton";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { SiweMessage } from "siwe";
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
+import { Claim } from "~/components/Claim/Claim";
+import { EnterPhone } from "~/components/Claim/EnterPhone";
+import { Onboarding } from "~/components/Claim/Onboarding";
+import { type Data } from "~/components/ComboboxSelect";
+import { COUNTRIES, type Country } from "~/lib/countries";
+import { formatPhone } from "~/lib/formatPhone";
+import { UserSchema, type WooshUser } from "~/models/users";
 import {
   getTransactionById,
   getAllPhoneTransactions,
 } from "~/server/api/routers/transactions";
 import { prisma } from "~/server/db";
+import { api } from "~/utils/api";
+import { toast } from "react-hot-toast";
 
-export default function Claim({
+export default function ClaimPage({
   transaction,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const { isConnected, address } = useAccount();
   const router = useRouter();
-  const { disconnect } = useDisconnect({
+  const formattedTransaction = JSON.parse(transaction) as Transaction;
+  const [isValid, setIsValid] = useState<boolean>(false);
+  const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
+  const [claimed, setClaimed] = useState<boolean>(false);
+  const [formattedPhone, setFormattedPhone] = useState<string>("");
+  const { signMessageAsync } = useSignMessage();
+  const { chain } = useNetwork();
+  const { address, isConnected } = useAccount();
+  const { data: session } = useSession();
+  const { mutate } = api.user.updateUser.useMutation({
     onSuccess: () => {
-      setSecret("");
+      console.log("Successfully updated user");
       void router.push("/");
     },
+    onError: (error) => {
+      toast.error(`There was an error saving the user ${error.message}`);
+    },
   });
-  const [secret, setSecret] = useState<`0x${string}` | string>();
-  const formattedTransaction = JSON.parse(transaction) as Transaction;
+
+  const {
+    register,
+    formState: { errors },
+    trigger,
+    control,
+    watch,
+    getValues,
+  } = useForm<WooshUser>({
+    resolver: zodResolver(UserSchema),
+    mode: "all",
+    defaultValues: {
+      phone: "",
+      username: "",
+      address: "",
+      image: "",
+    },
+  });
+
+  const [selectedCountry, setSelectedCountry] = useState<Data>(
+    COUNTRIES[0] as Data
+  );
+
+  const validateField = async (input: "username" | "phone") => {
+    setIsValid(await trigger(input));
+  };
+
+  const phone = watch("phone");
+
+  //Find a transaction with that id (from the url)
+  //if phone === transaction.phone -> verify
+  useEffect(() => {
+    const countryCode = selectedCountry as Country;
+    setFormattedPhone(
+      formatPhone(`${countryCode.additionalProperties.code}${phone || ""}`)
+    );
+  }, [phone, selectedCountry, formattedPhone]);
+
+  //SIWE
+  useEffect(() => {
+    if (claimed && isConnected) {
+      console.log("Signing In...");
+      /**
+       * Attempts SIWE and establish session
+       */
+      async function siweSignIn() {
+        try {
+          const message = new SiweMessage({
+            domain: window.location.host,
+            address: address,
+            statement: "Sign in with Ethereum to the app.",
+            uri: window.location.origin,
+            version: "1",
+            chainId: chain?.id,
+            // nonce is used from CSRF token
+            nonce: await getCsrfToken(),
+          });
+          const signature = await signMessageAsync({
+            message: message.prepareMessage(),
+          });
+          void signIn("credentials", {
+            message: JSON.stringify(message),
+            redirect: false,
+            signature,
+          });
+          console.log("Signed In");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      void siweSignIn();
+    } else if (!isConnected) {
+      console.error("Not connected");
+    } else {
+      console.error("Error");
+    }
+  }, [claimed, address]);
+
+  useEffect(() => {
+    //Save user data to DB
+    if (session) {
+      console.log("Saving user data to DB...");
+      const userData = getValues();
+      mutate({
+        username: userData.username,
+        phone: userData.phone,
+      });
+    }
+  }, [session]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   if (formattedTransaction.claimed) {
     return <div>Transaction claimed</div>;
   }
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <div>
-        <h1 className="mb-4 text-4xl font-bold">Claim your tokens</h1>
-        {formattedTransaction.phone}
-        <div>Nonce: {formattedTransaction.nonce}</div>
-        {isConnected ? (
-          <div>
-            <div className="mb-4 flex flex-col gap-2 rounded-md bg-brand-gray-light p-4">
-              <span className="text-lg">Connected to {address}</span>
-              <Button onClick={() => disconnect()}>Disconnect</Button>
-            </div>
-            <div className="flex w-full flex-col gap-2">
-              <label className="text-sm opacity-80">Secret</label>
-              <input
-                type="text"
-                value={secret}
-                onChange={(e) => setSecret(e.target.value)}
-                className="rounded-lg border-[1px] border-brand-black bg-brand-white px-4 py-3 focus:border-2 focus:border-brand-black focus:outline-none "
-                placeholder="Enter the secret"
-              />
-            </div>
 
-            <WithdrawButton
-              secret={secret || ""}
-              transactionId={formattedTransaction.id}
-              amount={formattedTransaction.amount}
-              nonce={BigInt(formattedTransaction.nonce || 0)}
-            />
-          </div>
-        ) : (
-          <ConnectKitButton />
-        )}
-      </div>
-    </div>
+  return (
+    <>
+      {otpVerified && !onboardingComplete ? (
+        <Onboarding
+          register={register}
+          validateField={validateField}
+          setOnboardingComplete={setOnboardingComplete}
+        />
+      ) : onboardingComplete && otpVerified ? (
+        <Claim transaction={formattedTransaction} setClaimed={setClaimed} />
+      ) : (
+        <EnterPhone
+          control={control}
+          validateField={validateField}
+          phoneErrorMessage={errors.phone?.message}
+          selectedCountry={selectedCountry}
+          setSelectedCountry={setSelectedCountry}
+          setOtpVerified={setOtpVerified}
+          phoneValue={formattedPhone}
+        />
+      )}
+    </>
   );
 }
 
@@ -94,3 +192,5 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
     revalidate: 1,
   };
 }
+
+//0x8c434a68d6cbf046a76b91a16fca2c980351130c76c3ddd0198f91f599d57a3b367ea77cdfdbd8518cab8f93a13b60e27645c431aa74ebf3a09f4129a231e3111b

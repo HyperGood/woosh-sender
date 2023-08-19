@@ -1,5 +1,5 @@
-import { abi } from "../../lib/contract-abi";
-import { parseEther } from "ethers";
+import { abi } from "../../lib/DepositVaultABI";
+
 import useDebounce from "~/hooks/useDebounce";
 import {
   useAccount,
@@ -9,13 +9,11 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import depositVaultAddresses, {
-  type Addresses,
-} from "~/lib/depositVaultAddresses";
+import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { api } from "~/utils/api";
-import { isHex } from "viem";
+import { isHex, parseEther } from "viem";
 
 export const WithdrawButton = ({
   transactionId,
@@ -33,8 +31,8 @@ export const WithdrawButton = ({
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const depositVaultAddress =
-    chainId && chainId in depositVaultAddresses
-      ? depositVaultAddresses[chainId as keyof Addresses][0]
+    chainId && chainId in contractAddress
+      ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
   const debouncedAmount = useDebounce(amount, 500);
   const debouncedSecret = useDebounce(secret, 500);

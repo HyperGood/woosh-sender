@@ -1,5 +1,5 @@
-import { abi } from "../../lib/contract-abi";
-import { parseEther } from "ethers";
+import { abi } from "../../lib/DepositVaultABI";
+import { parseEther } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import {
   useContractWrite,
@@ -8,7 +8,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { api } from "~/utils/api";
-import depositVaultAddresses, { Addresses } from "~/lib/depositVaultAddresses";
+import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { type Dispatch, type SetStateAction } from "react";
@@ -36,8 +36,8 @@ export const DepositButton = ({
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const depositVaultAddress =
-    chainId && chainId in depositVaultAddresses
-      ? depositVaultAddresses[chainId as keyof Addresses][0]
+    chainId && chainId in contractAddress
+      ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
 
   const { mutate: mutateContact } = api.contact.add.useMutation({

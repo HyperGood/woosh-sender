@@ -69,7 +69,7 @@ export const StepIndicator = ({
             opacity: 1,
           },
         }}
-        className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 bg-transparent`}
+        className={`relative flex h-10 w-10 items-center justify-center rounded-full border bg-transparent`}
       >
         <motion.div
           animate={status}

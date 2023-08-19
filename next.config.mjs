@@ -10,6 +10,7 @@ const config = {
   // future: {
   //   webpack5: true,
   // },
+  transpilePackages: ["@zerodev", "@web3"],
   webpack(config) {
     config.resolve.fallback = {
       ...config.resolve.fallback,

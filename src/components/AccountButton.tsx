@@ -1,4 +1,4 @@
-import { ChainIcon, ConnectKitButton, useChains } from "connectkit";
+import { ChainIcon, ConnectKitButton } from "connectkit";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useDisconnect } from "wagmi";
@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export const AccountButton = () => {
   const onClickSignOut = () => {
@@ -71,6 +72,10 @@ export const AccountButton = () => {
     }
   }, [isConnected, sessionData]);
 
+  return <ConnectButton />;
+};
+
+/*
   return (
     <ConnectKitButton.Custom>
       {({
@@ -179,4 +184,4 @@ export const AccountButton = () => {
       }}
     </ConnectKitButton.Custom>
   );
-};
+  */
