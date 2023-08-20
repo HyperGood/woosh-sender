@@ -43,6 +43,7 @@ export default function ClaimPage({
     },
     onError: (error) => {
       toast.error(`There was an error saving the user ${error.message}`);
+      console.error("Error updating user: ", error);
     },
   });
 
@@ -112,15 +113,13 @@ export default function ClaimPage({
           });
           console.log("Signed In");
         } catch (error) {
-          console.log(error);
+          console.error("Sign in error: ", error);
         }
       }
 
       void siweSignIn();
-    } else if (!isConnected) {
+    } else if (claimed && !isConnected) {
       console.error("Not connected");
-    } else {
-      console.error("Error");
     }
   }, [claimed, address]);
 
@@ -192,5 +191,3 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
     revalidate: 1,
   };
 }
-
-//0x8c434a68d6cbf046a76b91a16fca2c980351130c76c3ddd0198f91f599d57a3b367ea77cdfdbd8518cab8f93a13b60e27645c431aa74ebf3a09f4129a231e3111b

@@ -43,7 +43,7 @@ export const Claim = ({
       setClaimed(true);
     },
     onError: (error) => {
-      console.log(error);
+      console.log("Error updating claim status", error);
     },
   });
 
@@ -64,7 +64,7 @@ export const Claim = ({
       }
     },
     onError: (error) => {
-      console.log(error);
+      console.log("Error withdrawing: ", error);
     },
   });
 
@@ -89,7 +89,10 @@ export const Claim = ({
         <Button
           intent="accent"
           fullWidth
-          onClick={() => withdraw?.()}
+          onClick={() => {
+            console.log("Withdrawing...");
+            withdraw?.();
+          }}
           disabled={secret ? false : true}
         >
           Claim

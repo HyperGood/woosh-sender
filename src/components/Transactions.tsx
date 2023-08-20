@@ -19,7 +19,7 @@ export const TransactionCard = ({
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
   const phone = makePhoneReadable(transaction.phone || "");
-  const url = `http://localhost:3000/claim/${transaction.id}`;
+  const url = `http://:3000/claim/${transaction.id}`;
   const [open, setOpen] = useState(false);
   const SecretDialog = () => (
     <Dialog.Root open={open} onOpenChange={setOpen}>
