@@ -170,9 +170,15 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
 
   useEffect(() => {
     if (!isConnected && session) {
-      console.log("Signing Out");
+      console.log("There is a session, but no wallet connected. Signing Out");
       void signOut({ redirect: false });
       console.log("Signed Out");
+    } else if (isConnected && !session) {
+      console.log("Wallet Connected. No session. Signing Out");
+      void signOut({ redirect: false });
+      console.log("Signed Out");
+    } else if (isConnected && session) {
+      console.log("Wallet Connected. Session exists. Signed In");
     }
   }, [isConnected, session]);
 
