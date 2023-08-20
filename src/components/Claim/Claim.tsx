@@ -47,7 +47,7 @@ export const Claim = ({
     },
   });
 
-  const { write: withdraw } = useContractWrite({
+  const { write: withdraw, isLoading } = useContractWrite({
     ...config,
     onSuccess: () => {
       console.log("Tx success");
@@ -93,7 +93,7 @@ export const Claim = ({
             console.log("Withdrawing...");
             withdraw?.();
           }}
-          disabled={secret ? false : true}
+          disabled={secret && !isLoading ? false : true}
         >
           Claim
         </Button>
