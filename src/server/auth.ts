@@ -150,6 +150,7 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
           placeholder: "0x0",
         },
       },
+
       authorize: async (credentials) => {
         try {
           const siwe = new SiweMessage(
@@ -157,12 +158,23 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
               (credentials?.message as string) ?? "{}"
             ) as Partial<SiweMessage>
           );
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL || "");
-
+          const nextAuthUrl =
+            process.env.NEXTAUTH_URL ||
+            (process.env.VERCEL_URL
+              ? `https://${process.env.VERCEL_URL}`
+              : null);
+          if (!nextAuthUrl) {
+            return null;
+          }
+          const nextAuthHost = new URL(nextAuthUrl).host;
+          if (siwe.domain !== nextAuthHost) {
+            return null;
+          }
+          if (siwe.nonce !== (await getCsrfToken({ req }))) {
+            return null;
+          }
           const result: SiweResponse = await siwe.verify({
             signature: credentials?.signature || "",
-            domain: nextAuthUrl.host,
-            nonce: await getCsrfToken({ req }),
           });
 
           if (result.success) {
@@ -214,6 +226,10 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
 });
 
 // Auth Session

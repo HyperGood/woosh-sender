@@ -9,7 +9,10 @@ import { useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import {
+  ConnectButton,
+  createAuthenticationAdapter,
+} from "@rainbow-me/rainbowkit";
 
 export const AccountButton = () => {
   const onClickSignOut = () => {
@@ -19,7 +22,6 @@ export const AccountButton = () => {
   // Hooks
   const { data: sessionData } = useSession();
   const { chain } = useNetwork();
-  console.log(chain);
   // Wagmi Hooks
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage({
@@ -41,36 +43,36 @@ export const AccountButton = () => {
   /**
    * Attempts SIWE and establish session
    */
-  async function onClickSignIn() {
-    try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in with Ethereum to the app.",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        // nonce is used from CSRF token
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      void signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async function onClickSignIn() {
+  //   try {
+  //     const message = new SiweMessage({
+  //       domain: window.location.host,
+  //       address: address,
+  //       statement: "Sign in with Ethereum to the app.",
+  //       uri: window.location.origin,
+  //       version: "1",
+  //       chainId: chain?.id,
+  //       // nonce is used from CSRF token
+  //       nonce: await getCsrfToken(),
+  //     });
+  //     const signature = await signMessageAsync({
+  //       message: message.prepareMessage(),
+  //     });
+  //     void signIn("credentials", {
+  //       message: JSON.stringify(message),
+  //       redirect: false,
+  //       signature,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
-  useEffect(() => {
-    if (isConnected && !sessionData) {
-      void onClickSignIn();
-    }
-  }, [isConnected, sessionData]);
+  // useEffect(() => {
+  //   if (isConnected && !sessionData) {
+  //     void onClickSignIn();
+  //   }
+  // }, [isConnected, sessionData]);
 
   return <ConnectButton />;
 };

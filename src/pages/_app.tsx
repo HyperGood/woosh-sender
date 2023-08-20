@@ -12,6 +12,10 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { env } from "~/env.mjs";
+import {
+  RainbowKitSiweNextAuthProvider,
+  type GetSiweMessageOptions,
+} from "@rainbow-me/rainbowkit-siwe-next-auth";
 
 // const chains = [optimismGoerli];
 
@@ -33,6 +37,9 @@ const wagmiConfig = createConfig({
   webSocketPublicClient,
 });
 
+const getSiweMessageOptions: GetSiweMessageOptions = () => ({
+  statement: "Sign in to the RainbowKit + SIWE example app",
+});
 // const config = createConfig(
 //   getDefaultConfig({
 //     chains,
@@ -53,16 +60,20 @@ const wagmiConfig = createConfig({
 
 const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <SessionProvider session={pageProps.session} refetchInterval={0}>
-        <RainbowKitProvider chains={chains}>
-          <CryptoPricesProvider>
-            <Component {...pageProps} />
-            <Toaster position="bottom-right" />
-          </CryptoPricesProvider>
-        </RainbowKitProvider>
-      </SessionProvider>
-    </WagmiConfig>
+    <SessionProvider session={pageProps.session} refetchInterval={0}>
+      <WagmiConfig config={wagmiConfig}>
+        <RainbowKitSiweNextAuthProvider
+          getSiweMessageOptions={getSiweMessageOptions}
+        >
+          <RainbowKitProvider chains={chains}>
+            <CryptoPricesProvider>
+              <Component {...pageProps} />
+              <Toaster position="bottom-right" />
+            </CryptoPricesProvider>
+          </RainbowKitProvider>
+        </RainbowKitSiweNextAuthProvider>
+      </WagmiConfig>
+    </SessionProvider>
   );
 };
 

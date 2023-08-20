@@ -9,6 +9,11 @@ import { authOptions } from "~/server/auth";
 const Auth = (req: NextApiRequest, res: NextApiResponse) => {
   const authOpts = authOptions({ req });
 
+  if (!Array.isArray(req.query.nextauth)) {
+    res.status(400).send("Bad request");
+    return;
+  }
+
   const isDefaultSigninPage =
     req.method === "GET" && req?.query?.nextauth?.includes("signin");
 
