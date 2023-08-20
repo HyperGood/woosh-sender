@@ -72,6 +72,19 @@ export const Claim = ({
     console.log("isConnected: ", isConnected);
   }, [isConnected]);
 
+  useEffect(() => {
+    if (address && debouncedSecret) {
+      console.log("Recipient: ", address);
+      console.log("Secret: ", debouncedSecret);
+    } else if (!address && debouncedSecret) {
+      console.log("No address");
+    } else if (address && !debouncedSecret) {
+      console.log("No secret");
+    } else {
+      console.log("No address or secret");
+    }
+  }, [address, debouncedSecret]);
+
   return (
     <div className="flex h-screen flex-col justify-between px-4 py-6">
       <div />
