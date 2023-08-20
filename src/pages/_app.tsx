@@ -16,6 +16,7 @@ import {
   RainbowKitSiweNextAuthProvider,
   type GetSiweMessageOptions,
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
+import "@rainbow-me/rainbowkit/styles.css";
 
 // const chains = [optimismGoerli];
 
@@ -38,7 +39,7 @@ const wagmiConfig = createConfig({
 });
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to the RainbowKit + SIWE example app",
+  statement: "Sign in to Woosh",
 });
 // const config = createConfig(
 //   getDefaultConfig({

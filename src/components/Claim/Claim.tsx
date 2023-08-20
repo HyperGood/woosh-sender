@@ -24,7 +24,7 @@ export const Claim = ({
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
 
-  const { config } = usePrepareContractWrite({
+  const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
     address: contractAddress[420][0],
     abi,
     functionName: "withdraw",
@@ -106,7 +106,9 @@ export const Claim = ({
             console.log("Withdrawing...");
             withdraw?.();
           }}
-          disabled={secret && !isLoading ? false : true}
+          disabled={
+            (secret && !isLoading) || !isPreparingWithdraw ? false : true
+          }
         >
           Claim
         </Button>

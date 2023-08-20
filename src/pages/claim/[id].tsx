@@ -21,7 +21,6 @@ import {
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
-import "@rainbow-me/rainbowkit/styles.css";
 
 export default function ClaimPage({
   transaction,

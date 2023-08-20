@@ -6,7 +6,6 @@ import { ZeroDevConnector } from "@zerodev/wagmi";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
-// import Link from "next/link";
 
 export const SignIn = () => {
   const { connect } = useConnect();
