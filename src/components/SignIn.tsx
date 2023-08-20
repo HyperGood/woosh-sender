@@ -11,6 +11,7 @@ import { chains } from "~/pages/_app";
 export const SignIn = () => {
   const { connect } = useConnect();
   const handleLogin = async () => {
+    console.log("logging in");
     connect({
       connector: new ZeroDevConnector({
         chains,
@@ -31,7 +32,7 @@ export const SignIn = () => {
           Send crypto to any phone number
         </h1>
         <AccountButton />
-        <Button onClick={() => void handleLogin}>Sign In</Button>
+        <Button onClick={() => void handleLogin()}>Sign In</Button>
         {/* <Link
           href="/claim"
           className="mt-8 block rounded-md bg-brand-gray-light p-2 text-center underline hover:bg-brand-accent"
