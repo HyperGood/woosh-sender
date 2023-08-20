@@ -1,6 +1,6 @@
 import { signOut, useSession } from "next-auth/react";
 import { useContext, useEffect } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useDisconnect } from "wagmi";
 import SignIn from "~/components/SignIn";
 import Image from "next/image";
 import type { GetServerSideProps } from "next";
@@ -152,6 +152,7 @@ const Main = () => {
 export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   const { setCryptoPrices } = useContext(CryptoPricesContext);
   const { isConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
@@ -176,6 +177,7 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
     } else if (isConnected && !session) {
       console.log("Wallet Connected. No session. Signing Out");
       void signOut({ redirect: false });
+      disconnect();
       console.log("Signed Out");
     } else if (isConnected && session) {
       console.log("Wallet Connected. Session exists. Signed In");

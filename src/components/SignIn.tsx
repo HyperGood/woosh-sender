@@ -11,7 +11,6 @@ import { chains } from "~/pages/_app";
 export const SignIn = () => {
   const { connect } = useConnect();
   const handleLogin = async () => {
-    console.log("logging in");
     connect({
       connector: new ZeroDevConnector({
         chains,
