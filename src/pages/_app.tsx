@@ -1,7 +1,6 @@
 import type { AppProps } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
-// import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { optimismGoerli } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
