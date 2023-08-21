@@ -170,9 +170,8 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
             return null;
           }
           const nextAuthHost = new URL(nextAuthUrl).host;
-          console.log("nextAuthHost: ", nextAuthHost);
+
           if (siwe.domain !== nextAuthHost) {
-            console.log("siwe.domain !== nextAuthHost");
             return null;
           }
           if (siwe.nonce !== (await getCsrfToken({ req }))) {

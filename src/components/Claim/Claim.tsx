@@ -24,7 +24,11 @@ export const Claim = ({
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
 
-  const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
+  const {
+    config,
+    isLoading: isPreparingWithdraw,
+    error: prepError,
+  } = usePrepareContractWrite({
     address: contractAddress[420][0],
     abi,
     functionName: "withdraw",
@@ -35,6 +39,9 @@ export const Claim = ({
       address || "0x0",
     ],
     enabled: address && debouncedSecret ? true : false,
+    onError: (error) => {
+      console.log("Error preparing withdraw: ", error);
+    },
   });
 
   const { mutate } = api.transaction.updateClaimedStatus.useMutation({
@@ -116,6 +123,7 @@ export const Claim = ({
       <button className="font-bold underline">
         I don&apos;t have a secret code
       </button>
+      {prepError && <div>{prepError.message}</div>}
     </div>
   );
 };
