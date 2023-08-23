@@ -13,7 +13,7 @@ import Divider from "~/components/Divider";
 import Contacts from "~/components/Contacts";
 import { PreviousSends } from "~/components/Transactions";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
-import Header from "~/components/Header";
+import Header from "~/components/header";
 import { api } from "~/utils/api";
 
 const Balances = () => {
