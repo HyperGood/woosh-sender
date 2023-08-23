@@ -5,7 +5,6 @@ import { type Control, Controller } from "react-hook-form";
 import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
 import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
 import { COUNTRIES } from "~/lib/countries";
-import Header from "../Header";
 import ComboInput from "../ComboInput";
 import { PatternFormat } from "react-number-format";
 import { Drawer } from "vaul";
@@ -92,9 +91,7 @@ export const EnterPhone = ({
 
   return (
     <div className="flex-items flex h-screen flex-col items-center justify-between px-4 py-10">
-      <div className="w-full">
-        <Header noAccountButton />
-      </div>
+      <div className="w-full"></div>
       <div className="-mt-10">
         <h1 className="mb-3 text-3xl">
           Looks like someone sent you crypto! 🤑
