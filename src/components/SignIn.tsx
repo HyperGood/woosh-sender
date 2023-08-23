@@ -7,7 +7,7 @@ import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
 import { SiweMessage } from "siwe";
-import { getCsrfToken, signIn } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 
 const PasskeySignIn = () => {
   const { connect } = useConnect({
@@ -67,6 +67,8 @@ const PasskeySignIn = () => {
 };
 
 export const SignIn = () => {
+  const { address, isConnected } = useAccount();
+  const { data: session } = useSession();
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center px-4 lg:px-0">
       <div className="w-full md:w-auto">
@@ -74,6 +76,10 @@ export const SignIn = () => {
         <h1 className="mb-16 mt-4 max-w-[10ch] text-4xl">
           Send crypto to any phone number
         </h1>
+        <div>
+          Address: {address} Session: {session ? "true" : "false"} isConnected:
+          {isConnected ? "true" : "false"}
+        </div>
         <AccountButton />
         <PasskeySignIn />
       </div>
