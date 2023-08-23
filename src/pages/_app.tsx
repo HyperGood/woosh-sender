@@ -6,7 +6,11 @@ import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { CryptoPricesProvider } from "~/context/TokenPricesContext";
 import { Toaster } from "react-hot-toast";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  getDefaultWallets,
+  lightTheme,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
@@ -46,7 +50,13 @@ const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
         <RainbowKitSiweNextAuthProvider
           getSiweMessageOptions={getSiweMessageOptions}
         >
-          <RainbowKitProvider chains={chains}>
+          <RainbowKitProvider
+            chains={chains}
+            theme={lightTheme({
+              accentColor: "#19181D",
+              accentColorForeground: "#C8FD6A",
+            })}
+          >
             <CryptoPricesProvider>
               <Component {...pageProps} />
               <Toaster position="bottom-right" />

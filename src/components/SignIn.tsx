@@ -1,5 +1,4 @@
 import Logo from "public/images/Logo";
-import { AccountButton } from "./AccountButton";
 import Button from "./Button";
 import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
 import { ZeroDevConnector } from "@zerodev/wagmi";
@@ -7,12 +6,12 @@ import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
 import { SiweMessage } from "siwe";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn } from "next-auth/react";
+import CustomConnectButton from "./CustomConnectButton";
 
 const PasskeySignIn = () => {
   const { connect } = useConnect({
     onSuccess: () => {
-      console.log("Successfully connected");
       void siweSignIn();
     },
   });
@@ -20,17 +19,21 @@ const PasskeySignIn = () => {
   const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage();
   const handleLogin = async () => {
-    connect({
-      connector: new ZeroDevConnector({
-        chains,
-        options: {
-          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          owner: await getPasskeyOwner({
+    try {
+      connect({
+        connector: new ZeroDevConnector({
+          chains,
+          options: {
             projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          }),
-        },
-      }),
-    });
+            owner: await getPasskeyOwner({
+              projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+            }),
+          },
+        }),
+      });
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   async function siweSignIn() {
@@ -67,8 +70,6 @@ const PasskeySignIn = () => {
 };
 
 export const SignIn = () => {
-  const { address, isConnected } = useAccount();
-  const { data: session } = useSession();
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center px-4 lg:px-0">
       <div className="w-full md:w-auto">
@@ -76,12 +77,10 @@ export const SignIn = () => {
         <h1 className="mb-16 mt-4 max-w-[10ch] text-4xl">
           Send crypto to any phone number
         </h1>
-        <div>
-          Address: {address} Session: {session ? "true" : "false"} isConnected:
-          {isConnected ? "true" : "false"}
+        <div className="flex w-full flex-col gap-4 lg:w-1/2">
+          <PasskeySignIn />
+          <CustomConnectButton />
         </div>
-        <AccountButton />
-        <PasskeySignIn />
       </div>
     </div>
   );

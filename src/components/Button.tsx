@@ -6,9 +6,9 @@ export const buttonStyles = cva(
   {
     variants: {
       intent: {
-        primary: "bg-brand-gray-light text-brand-black",
+        primary: "bg-brand-black text-brand-white",
         secondary:
-          "bg-brand-black text-brand-white focus:ring-brand-accent   transition-colors",
+          "bg-brand-gray-light text-brand-black focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
         accent:
           "bg-brand-accent text-brand-black hover:bg-brand-black hover:text-brand-accent",
@@ -17,11 +17,12 @@ export const buttonStyles = cva(
       fullWidth: {
         true: "w-full",
       },
+
       disabled: {
         true: "opacity-20 cursor-not-allowed bg-brand-black text-brand-gray-lighter",
       },
       hover: {
-        true: "hover:bg-brand-accent hover:text-brand-black",
+        true: "hover:scale-105 transition-transform duration-400",
         false: "hover:bg-brand-gray-dark",
       },
     },

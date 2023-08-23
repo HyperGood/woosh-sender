@@ -1,14 +1,8 @@
 import { contractAddress, abi } from "~/lib/DepositVaultABI";
-import { isHex, parseEther, parseGwei } from "viem";
+import { isHex, parseEther } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
-import {
-  useAccount,
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import Button from "../Button";
 import { type Transaction } from "@prisma/client";

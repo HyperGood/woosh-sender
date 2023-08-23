@@ -5,7 +5,7 @@ import { type Control, Controller } from "react-hook-form";
 import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
 import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
 import { COUNTRIES } from "~/lib/countries";
-import Header from "../header";
+import Header from "../Header";
 import ComboInput from "../ComboInput";
 import { PatternFormat } from "react-number-format";
 import { Drawer } from "vaul";
