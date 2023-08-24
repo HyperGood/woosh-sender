@@ -160,11 +160,7 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
               (credentials?.message as string) ?? "{}"
             ) as Partial<SiweMessage>
           );
-          const nextAuthUrl =
-            process.env.NEXTAUTH_URL ||
-            (process.env.VERCEL_URL
-              ? `https://${process.env.VERCEL_URL}`
-              : null);
+          const nextAuthUrl = process.env.NEXTAUTH_URL;
           const nodeProvider = new AlchemyProvider(
             optimismGoerli.id,
             env.NEXT_PUBLIC_ALCHEMY_ID
