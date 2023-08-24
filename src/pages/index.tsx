@@ -1,6 +1,6 @@
 import { signOut, useSession } from "next-auth/react";
 import { useContext, useEffect } from "react";
-import { useAccount, useBalance, useDisconnect } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import SignIn from "~/components/SignIn";
 import Image from "next/image";
 import type { GetServerSideProps } from "next";
@@ -108,8 +108,8 @@ const Balances = () => {
   };
 
   return (
-    <div>
-      <p className="mb-8 mt-4 text-4xl">
+    <div className="w-full">
+      <p className="mb-8 mt-4 text-center text-4xl">
         {totalBalance.toLocaleString("en-us", {
           style: "currency",
           currency: "USD",
@@ -130,18 +130,11 @@ const Balances = () => {
 };
 
 const Main = () => {
-  const { address } = useAccount();
-  let truncatedAddress;
-  if (address)
-    truncatedAddress = address?.slice(0, 4) + "..." + address?.slice(-4);
   return (
-    <div className="mt-20 px-4 lg:mt-0 lg:min-w-[500px] lg:max-w-[50vw] lg:px-0">
-      <span className="block font-polysans text-lg">welcome</span>
-      <span className="block break-all font-polysans text-xl">
-        {truncatedAddress}
-      </span>
+    <div className="mt-20 flex flex-col items-center  px-4 lg:mt-0 lg:min-w-[500px] lg:max-w-[50vw] lg:px-0">
+      <span className="block font-polysans text-lg">Balance</span>
       <Balances />
-      <div className="my-12 flex flex-col gap-8 lg:mb-0 lg:mt-14">
+      <div className="my-12 flex w-full flex-col gap-8 lg:mb-0 lg:mt-14">
         <SendToPhone />
         <SendToWallet />
       </div>
@@ -152,7 +145,7 @@ const Main = () => {
 export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   const { setCryptoPrices } = useContext(CryptoPricesContext);
   const { isConnected, address } = useAccount();
-  const { disconnect } = useDisconnect();
+  // const { disconnect } = useDisconnect();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
@@ -160,14 +153,14 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
 
   useEffect(() => {
     setCryptoPrices(coinsData);
-  }, [coinsData]);
+  }, [coinsData, setCryptoPrices]);
 
   useEffect(() => {
     if (userData?.address !== address) {
       //TO-DO: This should be an alert first
       void signOut({ redirect: false });
     }
-  }, [address, session]);
+  }, [address, session, userData?.address]);
 
   useEffect(() => {
     if (!isConnected && session) {
@@ -176,9 +169,6 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
       console.log("Signed Out");
     } else if (isConnected && !session) {
       console.log("Wallet Connected. No session.");
-      // void signOut({ redirect: false });
-      // disconnect();
-      // console.log("Signed Out");
     } else if (isConnected && session) {
       console.log("Wallet Connected. Session exists. Signed In");
     }

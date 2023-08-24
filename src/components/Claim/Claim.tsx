@@ -2,15 +2,14 @@ import { contractAddress, abi } from "~/lib/DepositVaultABI";
 import { isHex, parseEther } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
-import {
-  useAccount,
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-} from "wagmi";
+import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import Button from "../Button";
 import { type Transaction } from "@prisma/client";
+import {
+  useContractBatchWrite,
+  usePrepareContractBatchWrite,
+} from "@zerodev/wagmi";
 
 export const Claim = ({
   transaction,
@@ -24,18 +23,23 @@ export const Claim = ({
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
 
-  const { config } = usePrepareContractWrite({
-    address: contractAddress[420][0],
-    abi,
-    functionName: "withdraw",
-    args: [
-      parseEther(transaction.amount.toString() || "0"),
-      BigInt(transaction.nonce || 0),
-      isHex(debouncedSecret) ? debouncedSecret : "0x",
-      address || "0x0",
-    ],
-    enabled: address && debouncedSecret ? true : false,
-  });
+  const { config, isLoading: isPreparingWithdraw } =
+    usePrepareContractBatchWrite({
+      calls: [
+        {
+          address: contractAddress[420][0],
+          abi,
+          functionName: "withdraw",
+          args: [
+            parseEther(transaction.amount.toString() || "0"),
+            BigInt(transaction.nonce || 0),
+            isHex(debouncedSecret) ? debouncedSecret : "0x",
+            address || "0x0",
+          ],
+        },
+      ],
+      enabled: address && debouncedSecret ? true : false,
+    });
 
   const { mutate } = api.transaction.updateClaimedStatus.useMutation({
     onSuccess: () => {
@@ -47,10 +51,15 @@ export const Claim = ({
     },
   });
 
-  const { write: withdraw, isLoading } = useContractWrite({
+  const { sendUserOperation: withdraw, data } = useContractBatchWrite({
     ...config,
-    onSuccess: () => {
-      console.log("Tx success");
+  });
+
+  useWaitForTransaction({
+    hash: data?.hash,
+    enabled: !!data?.hash,
+    onSuccess() {
+      console.log("transaction successful");
       if (address) {
         mutate({
           id: transaction.id,
@@ -63,9 +72,6 @@ export const Claim = ({
         console.log("Claimer address: ", address);
       }
     },
-    onError: (error) => {
-      console.log("Error withdrawing: ", error);
-    },
   });
 
   useEffect(() => {
@@ -75,7 +81,7 @@ export const Claim = ({
   useEffect(() => {
     if (address && debouncedSecret) {
       console.log("Recipient: ", address);
-      console.log("Secret: ", debouncedSecret);
+      console.log("Secret");
     } else if (!address && debouncedSecret) {
       console.log("No address");
     } else if (address && !debouncedSecret) {
@@ -106,7 +112,7 @@ export const Claim = ({
             console.log("Withdrawing...");
             withdraw?.();
           }}
-          disabled={secret && !isLoading ? false : true}
+          disabled={secret || !isPreparingWithdraw ? false : true}
         >
           Claim
         </Button>

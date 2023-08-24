@@ -11,7 +11,9 @@ import type { CtxOrReq } from "next-auth/client/_utils";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SiweMessage, type SiweResponse } from "siwe";
 import { getCsrfToken } from "next-auth/react";
-
+import { env } from "~/env.mjs";
+import { AlchemyProvider } from "@ethersproject/providers";
+import { optimismGoerli } from "wagmi/chains";
 // Types
 // ========================================================
 /**
@@ -163,19 +165,31 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
             (process.env.VERCEL_URL
               ? `https://${process.env.VERCEL_URL}`
               : null);
+          const nodeProvider = new AlchemyProvider(
+            optimismGoerli.id,
+            env.NEXT_PUBLIC_ALCHEMY_ID
+          );
+
           if (!nextAuthUrl) {
             return null;
           }
           const nextAuthHost = new URL(nextAuthUrl).host;
+
           if (siwe.domain !== nextAuthHost) {
             return null;
           }
           if (siwe.nonce !== (await getCsrfToken({ req }))) {
             return null;
           }
-          const result: SiweResponse = await siwe.verify({
-            signature: credentials?.signature || "",
-          });
+
+          const result: SiweResponse = await siwe.verify(
+            {
+              signature: credentials?.signature || "",
+            },
+            {
+              provider: nodeProvider,
+            }
+          );
 
           if (result.success) {
             // Check if user exists

@@ -21,7 +21,6 @@ import {
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
-import "@rainbow-me/rainbowkit/styles.css";
 
 export default function ClaimPage({
   transaction,
@@ -97,7 +96,7 @@ export default function ClaimPage({
           const message = new SiweMessage({
             domain: window.location.host,
             address: address,
-            statement: "Sign in with Ethereum to the app.",
+            statement: "Sign in to Woosh",
             uri: window.location.origin,
             version: "1",
             chainId: chain?.id,
