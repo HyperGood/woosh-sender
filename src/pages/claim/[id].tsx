@@ -36,6 +36,9 @@ export default function ClaimPage({
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
   const { data: session } = useSession();
+  const { data: userData } = api.user.getUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
   const { mutate } = api.user.updateUser.useMutation({
     onSuccess: () => {
       console.log("Successfully updated user");
@@ -86,7 +89,7 @@ export default function ClaimPage({
 
   //SIWE
   useEffect(() => {
-    if (claimed && isConnected) {
+    if (claimed && isConnected && !session) {
       console.log("Signing In...");
       /**
        * Attempts SIWE and establish session
@@ -125,15 +128,17 @@ export default function ClaimPage({
 
   useEffect(() => {
     //Save user data to DB
-    if (session) {
+    if (claimed && session && !userData?.username) {
       console.log("Saving user data to DB...");
-      const userData = getValues();
+      const inputData = getValues();
       mutate({
-        username: userData.username,
-        phone: userData.phone,
+        username: inputData.username,
+        phone: inputData.phone,
       });
+    } else if (claimed && session && userData?.username) {
+      void router.push("/");
     }
-  }, [session]);
+  }, [session, userData?.username, claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   if (formattedTransaction.claimed) {

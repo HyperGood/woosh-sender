@@ -1,13 +1,15 @@
 import { useAccount, useConnect } from "wagmi";
 import { ZeroDevConnector } from "@zerodev/wagmi";
-import { createPasskeyOwner, getPasskeyOwner } from "@zerodev/sdk/passkey";
+import { createPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
 import StepIndicator from "~/components/Form/StepIndicator";
 import Button from "~/components/Button";
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import { type UseFormRegister } from "react-hook-form";
 import { type WooshUser } from "~/models/users";
+import PasskeySignIn from "../PasskeySignIn";
+import { useSession } from "next-auth/react";
 
 export const Onboarding = ({
   register,
@@ -18,9 +20,10 @@ export const Onboarding = ({
   register: UseFormRegister<WooshUser>;
   setOnboardingComplete: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(0);
   const { connect } = useConnect();
   const { isConnected } = useAccount({ onConnect: () => setStep(1) });
+  const { data: session } = useSession();
 
   const handleRegister = async () => {
     console.log("Creating account");
@@ -38,19 +41,12 @@ export const Onboarding = ({
     });
   };
 
-  const handleLogin = async () => {
-    connect({
-      connector: new ZeroDevConnector({
-        chains,
-        options: {
-          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          owner: await getPasskeyOwner({
-            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          }),
-        },
-      }),
-    });
-  };
+  useEffect(() => {
+    if (isConnected && session) {
+      setOnboardingComplete(true);
+    }
+  }, [isConnected, session]);
+
   return (
     <div className="flex h-screen flex-col justify-between px-4 py-6">
       <div className="flex justify-between">
@@ -123,13 +119,7 @@ export const Onboarding = ({
               >
                 Get Started
               </Button>
-              <Button
-                intent="primary"
-                fullWidth
-                onClick={() => void handleLogin()}
-              >
-                I already have an account
-              </Button>
+              <PasskeySignIn />
             </div>
           </div>
           <button className="font-bold underline">What is Woosh?</button>
