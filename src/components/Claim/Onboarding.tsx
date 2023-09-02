@@ -10,6 +10,7 @@ import { type UseFormRegister } from "react-hook-form";
 import { type WooshUser } from "~/models/users";
 import PasskeySignIn from "../PasskeySignIn";
 import { useSession } from "next-auth/react";
+import CustomConnectButton from "../CustomConnectButton";
 
 export const Onboarding = ({
   register,
@@ -120,6 +121,7 @@ export const Onboarding = ({
                 Get Started
               </Button>
               <PasskeySignIn />
+              <CustomConnectButton />
             </div>
           </div>
           <button className="font-bold underline">What is Woosh?</button>

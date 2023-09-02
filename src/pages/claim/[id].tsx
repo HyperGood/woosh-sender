@@ -28,7 +28,7 @@ export default function ClaimPage({
   const router = useRouter();
   const formattedTransaction = JSON.parse(transaction) as Transaction;
   const [isValid, setIsValid] = useState<boolean>(false);
-  const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [otpVerified, setOtpVerified] = useState<boolean>(true);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [formattedPhone, setFormattedPhone] = useState<string>("");
@@ -141,9 +141,9 @@ export default function ClaimPage({
   }, [session, userData?.username, claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
-  if (formattedTransaction.claimed) {
-    return <div>Transaction claimed</div>;
-  }
+  // if (formattedTransaction.claimed) {
+  //   return <div>Transaction claimed</div>;
+  // }
 
   return (
     <>

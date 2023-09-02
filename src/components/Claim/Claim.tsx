@@ -1,8 +1,14 @@
 import { contractAddress, abi } from "~/lib/DepositVaultABI";
-import { isHex, parseEther } from "viem";
+import { isHex, parseEther, parseUnits } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
-import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
+import {
+  useAccount,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import Button from "../Button";
 import { type Transaction } from "@prisma/client";
@@ -23,23 +29,18 @@ export const Claim = ({
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
 
-  const { config, isLoading: isPreparingWithdraw } =
-    usePrepareContractBatchWrite({
-      calls: [
-        {
-          address: contractAddress[420][0],
-          abi,
-          functionName: "withdraw",
-          args: [
-            parseEther(transaction.amount.toString() || "0"),
-            BigInt(transaction.nonce || 0),
-            isHex(debouncedSecret) ? debouncedSecret : "0x",
-            address || "0x0",
-          ],
-        },
-      ],
-      enabled: address && debouncedSecret ? true : false,
-    });
+  const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
+    address: contractAddress[420][0],
+    abi,
+    functionName: "withdraw",
+    args: [
+      parseEther(transaction.amount.toString() || "0"),
+      BigInt(transaction.nonce || 0),
+      isHex(debouncedSecret) ? debouncedSecret : "0x",
+      address || "0x0",
+    ],
+    enabled: address && debouncedSecret ? true : false,
+  });
 
   const { mutate } = api.transaction.updateClaimedStatus.useMutation({
     onSuccess: () => {
@@ -51,15 +52,16 @@ export const Claim = ({
     },
   });
 
-  const { sendUserOperation: withdraw, data } = useContractBatchWrite({
+  const { write: withdraw, data } = useContractWrite({
     ...config,
   });
 
   useWaitForTransaction({
     hash: data?.hash,
     enabled: !!data?.hash,
-    onSuccess() {
+    onSuccess(data) {
       console.log("transaction successful");
+      console.log("transaction data: ", data);
       if (address) {
         mutate({
           id: transaction.id,

@@ -1,7 +1,9 @@
 import { abi } from "../../lib/DepositVaultABI";
-import { parseEther } from "viem";
+import { parseEther, parseUnits, zeroAddress } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import {
+  useContractEvent,
+  useContractRead,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
@@ -17,6 +19,7 @@ import type { PhoneTransactionForm } from "~/models/transactions";
 import { type Country } from "~/lib/countries";
 import { type UseFormSetValue } from "react-hook-form";
 import Button from "../Button";
+import { tokenAbi } from "../../lib/OUT-ABI";
 
 export const DepositButton = ({
   transaction,
@@ -50,11 +53,42 @@ export const DepositButton = ({
     },
   });
 
+  // const { config: approveTokenConfig } = usePrepareContractWrite({
+  //   address: "0x32307adfFE088e383AFAa721b06436aDaBA47DBE",
+  //   functionName: "approve",
+  //   args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 18)],
+  //   abi: tokenAbi,
+  // });
+
+  // const {
+  //   data: approvalData,
+  //   write: approveTokens,
+  //   isLoading: isApproving,
+  // } = useContractWrite({
+  //   ...approveTokenConfig,
+  //   onError(error) {
+  //     if (error.message.includes("User rejected the request")) {
+  //       toast.error("Don't worry no funds were sent.");
+  //       toast.error(
+  //         "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+  //       );
+  //     } else {
+  //       console.log("There was an approving the token spend ", error);
+  //       toast.error(`Deposit error: ${error.message}`);
+  //     }
+  //   },
+  //   onSuccess() {
+  //     console.log("Approved! Depositing tokens");
+  //     deposit?.();
+  //   },
+  // });
+
   const { config: contractWriteConfig } = usePrepareContractWrite({
     address: depositVaultAddress,
     abi,
     functionName: "deposit",
     value: parseEther(debouncedAmount.toString()),
+    args: [parseUnits("0", 18), zeroAddress],
     enabled: Boolean(debouncedAmount),
     onError(error) {
       console.log(error);
@@ -81,6 +115,17 @@ export const DepositButton = ({
     },
   });
 
+  const unwatch = useContractEvent({
+    address: depositVaultAddress,
+    abi,
+    eventName: "DepositMade",
+    listener(log) {
+      console.log("Event: ", log);
+      setFormValue("nonce", Number(log[0]?.args.depositIndex));
+      setFundsSent(true);
+    },
+  });
+
   const { isLoading: isDepositing } = useWaitForTransaction({
     hash: depositData?.hash,
     onSuccess(txData) {
@@ -88,8 +133,7 @@ export const DepositButton = ({
         saveContactFunction();
       }
       setFormValue("txId", txData.transactionHash);
-      setFormValue("nonce", Number(txData.logs[0]?.topics[2]));
-      setFundsSent(true);
+
       toast.success(`Funds sent!`);
     },
     onError(error) {

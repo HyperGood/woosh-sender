@@ -1,10 +1,13 @@
 export const contractAddress = {
-  420: ["0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81"],
+  420: ["0xC938Ef9CCc23a8aDBbBd4CcAFD6faea022e858FC"],
   31337: ["0x5FbDB2315678afecb367f032d93F642f64180aa3"],
 } as const;
 
-//updated contract
+//pre audit contract
 //0xED082e987588125BEA1cBAe6F9380f37eC15D1B3 = 420
+
+//og contract
+//0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81 = 420
 
 export type Addresses = typeof contractAddress;
 
@@ -46,6 +49,12 @@ export const abi = [
         name: "amount",
         type: "uint256",
       },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "tokenAddress",
+        type: "address",
+      },
     ],
     name: "DepositMade",
     type: "event",
@@ -70,7 +79,18 @@ export const abi = [
     type: "event",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "tokenAddress",
+        type: "address",
+      },
+    ],
     name: "deposit",
     outputs: [],
     stateMutability: "payable",
@@ -96,30 +116,10 @@ export const abi = [
         name: "amount",
         type: "uint256",
       },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getDeposits",
-    outputs: [
       {
-        components: [
-          {
-            internalType: "address payable",
-            name: "depositor",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "amount",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct DepositVault.Deposit[]",
-        name: "",
-        type: "tuple[]",
+        internalType: "address",
+        name: "tokenAddress",
+        type: "address",
       },
     ],
     stateMutability: "view",

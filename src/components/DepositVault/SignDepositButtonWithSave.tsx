@@ -65,7 +65,8 @@ export const SignDepositButton = ({
     amount: parseEther(transaction.amount.toString()),
     nonce: BigInt(transaction.nonce || 0),
   } as const;
-
+  console.log("nonce: ", transaction.nonce);
+  console.log("amount: ", transaction.amount);
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
     message,

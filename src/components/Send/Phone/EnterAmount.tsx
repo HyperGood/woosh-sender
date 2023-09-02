@@ -1,10 +1,10 @@
 import { TOKENS } from "~/lib/tokens";
-import { useState } from "react";
-import type { Data } from "../../ComboboxSelect";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import ComboInput from "../../ComboInput";
 import TransactionInfo from "../TransactionInfo";
 import { type UseFormRegister } from "react-hook-form";
 import { type PhoneTransaction } from "~/models/transactions";
+import { type Data } from "~/components/ComboboxSelect";
 
 export const EnterAmount = ({
   register,
@@ -13,6 +13,8 @@ export const EnterAmount = ({
   validateField,
   amountErrorMessage,
   countryCode,
+  setSelectedToken,
+  selectedToken,
 }: {
   register: UseFormRegister<PhoneTransaction>;
   phone: string;
@@ -20,8 +22,9 @@ export const EnterAmount = ({
   validateField: (args0: "amount") => Promise<void>;
   amountErrorMessage?: string;
   countryCode: string;
+  setSelectedToken: Dispatch<SetStateAction<Data>>;
+  selectedToken: Data;
 }) => {
-  const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
   const [touched, setTouched] = useState<boolean>(false);
 
   const [tokenQuery, setTokenQuery] = useState("");
