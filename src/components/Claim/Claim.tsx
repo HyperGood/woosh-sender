@@ -30,8 +30,7 @@ export const Claim = ({
     abi,
     functionName: "withdraw",
     args: [
-      parseEther(transaction.amount.toString() || "0"),
-      BigInt(transaction.nonce || 0),
+      BigInt(transaction.depositIndex || 0),
       isHex(debouncedSecret) ? debouncedSecret : "0x",
       address || "0x0",
     ],
@@ -60,7 +59,7 @@ export const Claim = ({
       console.log("transaction data: ", data);
       if (address) {
         mutate({
-          id: transaction.txId,
+          id: transaction.id,
           claimed: true,
           claimedAt: new Date(),
           claimedBy: address,
@@ -92,11 +91,12 @@ export const Claim = ({
   return (
     <div className="flex h-screen flex-col justify-between px-4 py-6">
       <div />
-      <div>Connected to: {chain?.name}</div>
-      <div>User Address: {address}</div>
       <div>
-        <h2 className="mb-1 text-3xl">Claim your $50 that John sent you!</h2>
-        <p>Enter the secret John sent you</p>
+        <h2 className="mb-1 text-3xl">
+          Claim your ${transaction.amountInUSD.toFixed(2)} that someone sent
+          you!
+        </h2>
+        <p>Enter the secret the sender sent you</p>
         <textarea
           onChange={(e) => setSecret(e.target.value)}
           value={secret}

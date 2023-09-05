@@ -121,7 +121,7 @@ export const DepositButton = ({
     eventName: "DepositMade",
     listener(log) {
       console.log("Event: ", log);
-      setFormValue("nonce", Number(log[0]?.args.depositIndex));
+      setFormValue("depositIndex", Number(log[0]?.args.depositIndex));
       setFundsSent(true);
     },
   });

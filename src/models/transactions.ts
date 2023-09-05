@@ -37,14 +37,15 @@ export const PhoneTransactionFormSchema = TransactionSchema.extend({
     },
     { message: "Please enter a phone number that is 10 digits long" }
   ),
-  nonce: z.number().min(0),
+  depositIndex: z.number().min(0),
 });
 
 //Phone Transaction Schema for saving to database
 export const PhoneTransactionSchema = TransactionSchema.extend({
   type: z.literal("phone"),
   phone: z.string(),
-  nonce: z.number().min(0),
+  depositIndex: z.number().min(0),
+  id: z.string(),
 });
 
 export type PhoneTransactionForm = z.infer<typeof PhoneTransactionFormSchema>;

@@ -3,7 +3,7 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import ComboInput from "../../ComboInput";
 import TransactionInfo from "../TransactionInfo";
 import { type UseFormRegister } from "react-hook-form";
-import { type PhoneTransaction } from "~/models/transactions";
+import { type PhoneTransactionForm } from "~/models/transactions";
 import { type Data } from "~/components/ComboboxSelect";
 
 export const EnterAmount = ({
@@ -16,7 +16,7 @@ export const EnterAmount = ({
   setSelectedToken,
   selectedToken,
 }: {
-  register: UseFormRegister<PhoneTransaction>;
+  register: UseFormRegister<PhoneTransactionForm>;
   phone: string;
   contact?: string;
   validateField: (args0: "amount") => Promise<void>;

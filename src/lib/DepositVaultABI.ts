@@ -1,10 +1,10 @@
 export const contractAddress = {
-  420: ["0x55263267d825726F54ade3a921B123b41a7edD3B"],
+  420: ["0xBb6FC4030D202627592C75A5C4C98Db083bcC4f7"],
   31337: ["0x5FbDB2315678afecb367f032d93F642f64180aa3"],
 } as const;
 
 //audit 2 contract
-//0x55263267d825726F54ade3a921B123b41a7edD3B
+//0xBb6FC4030D202627592C75A5C4C98Db083bcC4f7
 
 //contract using call
 //0xC938Ef9CCc23a8aDBbBd4CcAFD6faea022e858FC
@@ -35,6 +35,46 @@ export const abi = [
     type: "constructor",
   },
   {
+    inputs: [],
+    name: "DepositVault__DepositAmountMustBeGreaterThanZero",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__InvalidDepositIndex",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__InvalidSignature",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__IsNotZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__IsZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__OnlyDepositor",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__TransferFailed",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "DepositVault__WithdrawalHasAlreadyBeenExecuted",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -52,7 +92,7 @@ export const abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "amount",
+        name: "balance",
         type: "uint256",
       },
       {
@@ -118,14 +158,14 @@ export const abi = [
         type: "address",
       },
       {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
         internalType: "address",
         name: "tokenAddress",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "balance",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -142,7 +182,7 @@ export const abi = [
           },
           {
             internalType: "uint256",
-            name: "nonce",
+            name: "depositIndex",
             type: "uint256",
           },
         ],
@@ -185,12 +225,7 @@ export const abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "nonce",
+        name: "depositIndex",
         type: "uint256",
       },
       {

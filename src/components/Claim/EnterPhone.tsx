@@ -29,7 +29,7 @@ export const EnterPhone = ({
   otpSent,
 }: {
   control: Control<WooshUser>;
-  validateField: (args0: "username" | "phone") => Promise<void>;
+  validateField: (args0: "name" | "phone") => Promise<void>;
   phoneErrorMessage?: string;
   selectedCountry: Data;
   setSelectedCountry: Dispatch<SetStateAction<Data>>;

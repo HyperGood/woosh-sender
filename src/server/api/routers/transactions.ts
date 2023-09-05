@@ -6,7 +6,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import {
-  PhoneTransactionSchema,
+  PhoneTransactionFormSchema,
   WalletTransactionSchema,
 } from "~/models/transactions";
 
@@ -51,7 +51,7 @@ export const transactionsRouter = createTRPCRouter({
 
   //Add a new transaction
   addPhoneTransaction: protectedProcedure
-    .input(PhoneTransactionSchema)
+    .input(PhoneTransactionFormSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const transaction = await ctx.prisma.transaction.create({
@@ -63,7 +63,7 @@ export const transactionsRouter = createTRPCRouter({
           userId: userId,
           txId: input.txId,
           contact: input.contact,
-          nonce: input.nonce,
+          depositIndex: input.depositIndex,
           type: input.type,
         },
       });

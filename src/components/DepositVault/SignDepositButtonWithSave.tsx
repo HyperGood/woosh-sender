@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { useContext } from "react";
 import { parseEther } from "viem";
-import type { PhoneTransaction } from "~/models/transactions";
+import type { PhoneTransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 import Button from "../Button";
 import { api } from "~/utils/api";
@@ -20,7 +20,7 @@ export const SignDepositButton = ({
   setSavedTransaction,
   countryCode,
 }: {
-  transaction: PhoneTransaction;
+  transaction: PhoneTransactionForm;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   secret?: string;
@@ -57,16 +57,15 @@ export const SignDepositButton = ({
   const types = {
     Withdrawal: [
       { name: "amount", type: "uint256" },
-      { name: "nonce", type: "uint256" },
+      { name: "depositIndex", type: "uint256" },
     ],
   } as const;
 
   const message = {
     amount: parseEther(transaction.amount.toString()),
-    nonce: BigInt(transaction.nonce || 0),
+    depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
-  console.log("nonce: ", transaction.nonce);
-  console.log("amount: ", transaction.amount);
+
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
     message,

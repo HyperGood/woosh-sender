@@ -68,9 +68,8 @@ export default function ClaimPage({
     mode: "all",
     defaultValues: {
       phone: "",
-      username: "",
+      name: "",
       address: "",
-      image: "",
     },
   });
 
@@ -78,7 +77,7 @@ export default function ClaimPage({
     COUNTRIES[0] as Data
   );
 
-  const validateField = async (input: "username" | "phone") => {
+  const validateField = async (input: "name" | "phone") => {
     setIsValid(await trigger(input));
   };
 
@@ -134,17 +133,17 @@ export default function ClaimPage({
 
   useEffect(() => {
     //Save user data to DB
-    if (claimed && session && !userData?.username) {
+    if (claimed && session && !userData?.name) {
       console.log("Saving user data to DB...");
       const inputData = getValues();
       mutate({
-        username: inputData.username,
+        name: inputData.name,
         phone: inputData.phone,
       });
     } else if (claimed && session && userData?.username) {
       void router.push("/");
     }
-  }, [session, userData?.username, claimed]);
+  }, [session, userData?.name, claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   // if (formattedTransaction.claimed) {

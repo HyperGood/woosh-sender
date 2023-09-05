@@ -50,7 +50,7 @@ export const SendToPhone = () => {
       token: "ETH",
       phone: "",
       type: "phone",
-      nonce: 0,
+      depositIndex: 0,
     },
   });
 
