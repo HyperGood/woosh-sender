@@ -1,4 +1,11 @@
-import { type Dispatch, type SetStateAction, useState } from "react";
+import React, {
+  type Dispatch,
+  type SetStateAction,
+  useState,
+  Fragment,
+  useRef,
+  useEffect,
+} from "react";
 import { type Data } from "../ComboboxSelect";
 import { type WooshUser } from "~/models/users";
 import { type Control, Controller } from "react-hook-form";
@@ -8,6 +15,8 @@ import ComboInput from "../ComboInput";
 import { PatternFormat } from "react-number-format";
 import { Drawer } from "vaul";
 import Button from "../Button";
+
+let currentOTPIndex = 0;
 
 export const EnterPhone = ({
   control,
@@ -33,33 +42,46 @@ export const EnterPhone = ({
   const [submitClicked, setSubmitClicked] = useState<boolean>(false);
 
   const [otp, setOtp] = useState<string>("");
+  const [otpFields, setOtpFields] = useState<string[]>(new Array(6).fill(""));
+  const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   async function verifyOTP() {
-    const res = await fetch("/api/sms/verifyOTP", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ otpCode: otp }),
-    });
-    if (!res.ok) {
-      throw new Error("Error in API call");
+    if (otp) {
+      const res = await fetch("/api/sms/verifyOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otpCode: otp }),
+      });
+      if (!res.ok) {
+        throw new Error("Error in API call");
+      } else {
+        await res
+          .json()
+          .then((data: { verification_check?: VerificationCheckInstance }) => {
+            if (
+              data.verification_check &&
+              data.verification_check.status === "approved"
+            ) {
+              setOtpVerified(true);
+            } else {
+              console.error("Wrong code");
+              //shake input fields as color red
+              //clear inputs
+              setOtp("");
+              setOtpFields(new Array(6).fill(""));
+              setActiveOTPIndex(0);
+              currentOTPIndex = 0;
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     } else {
-      await res
-        .json()
-        .then((data: { verification_check?: VerificationCheckInstance }) => {
-          if (
-            data.verification_check &&
-            data.verification_check.status === "approved"
-          ) {
-            setOtpVerified(true);
-          } else {
-            console.error("Wrong code");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      console.error("No OTP set");
     }
   }
 
@@ -78,6 +100,42 @@ export const EnterPhone = ({
           );
         });
 
+  const handleOnChange = ({
+    target,
+  }: React.ChangeEvent<HTMLInputElement>): void => {
+    const { value } = target;
+    const newOTP: string[] = [...otpFields];
+    newOTP[currentOTPIndex] = value.substring(value.length - 1);
+    if (!value) setActiveOTPIndex(currentOTPIndex - 1);
+    else setActiveOTPIndex(currentOTPIndex + 1);
+    setOtpFields(newOTP);
+  };
+
+  const handleOnKeyDown = (
+    { key }: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    currentOTPIndex = index;
+    if (key === "Backspace") {
+      setActiveOTPIndex(currentOTPIndex - 1);
+    }
+  };
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [activeOTPIndex]);
+
+  useEffect(() => {
+    let otpString = "";
+    otpFields.map((_) => {
+      if (otpString === "") {
+        otpString = _;
+      } else {
+        otpString = otpString + _;
+      }
+    });
+    setOtp(otpString);
+  }, [otpFields]);
   return (
     <div className="flex-items flex h-screen flex-col items-center justify-between px-4 py-10">
       <div className="w-full"></div>
@@ -139,30 +197,38 @@ export const EnterPhone = ({
           </Drawer.Trigger>
           <Drawer.Overlay className="fixed inset-0 bg-black/40" />
           <Drawer.Portal>
-            <Drawer.Content className="fixed bottom-0 left-0 right-0 mt-24 flex h-full max-h-[96%] flex-col items-center justify-center rounded-t-[10px] bg-gray-100 p-4">
-              <div className="flex w-full flex-col gap-8">
-                <div className="mb-2 flex flex-col gap-2">
+            <Drawer.Content className="fixed bottom-0 left-0 right-0 flex h-full max-h-[92%] flex-col items-center justify-center rounded-t-[10px] bg-gray-100 p-4">
+              <div className="flex h-full w-full flex-col items-center justify-end gap-8">
+                <div />
+                <div className="mb-[22vh] flex  flex-col gap-8 md:mb-0">
                   <h2 className="text-4xl font-bold">
                     Enter the code you received
                   </h2>
+                  <div className="flex items-center justify-center gap-4">
+                    {otpFields.map((_, index) => {
+                      return (
+                        <Fragment key={index}>
+                          <input
+                            type="number"
+                            ref={index === activeOTPIndex ? inputRef : null}
+                            className="h-12 w-12 rounded border-2 border-brand-black/20 bg-transparent p-2 text-center text-xl  outline-none transition focus:border-brand-black/80 focus:text-brand-black"
+                            onChange={handleOnChange}
+                            onKeyDown={(e) => handleOnKeyDown(e, index)}
+                            value={otpFields[index]}
+                          />
+                        </Fragment>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <input
-                    onChange={(e) => setOtp(e.target.value)}
-                    type="number"
-                    maxLength={6}
-                    className="rounded-full border border-brand-black/20 bg-transparent p-4"
-                    placeholder="Enter code"
-                  />
-                  <Button
-                    disabled={otp.length === 6 ? false : true}
-                    onClick={() => void verifyOTP()}
-                    intent="accent"
-                    fullWidth
-                  >
-                    Verify
-                  </Button>
-                </div>
+                <Button
+                  disabled={otp.length === 6 ? false : true}
+                  onClick={() => void verifyOTP()}
+                  intent="accent"
+                  fullWidth
+                >
+                  Verify
+                </Button>
               </div>
             </Drawer.Content>
           </Drawer.Portal>
