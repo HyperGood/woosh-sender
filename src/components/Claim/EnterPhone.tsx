@@ -2,7 +2,6 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { type Data } from "../ComboboxSelect";
 import { type WooshUser } from "~/models/users";
 import { type Control, Controller } from "react-hook-form";
-import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
 import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
 import { COUNTRIES } from "~/lib/countries";
 import ComboInput from "../ComboInput";
@@ -17,45 +16,23 @@ export const EnterPhone = ({
   setSelectedCountry,
   phoneErrorMessage,
   setOtpVerified,
-  phoneValue,
+  sendOTP,
+  otpSent,
 }: {
-  phoneValue: string;
   control: Control<WooshUser>;
   validateField: (args0: "username" | "phone") => Promise<void>;
   phoneErrorMessage?: string;
   selectedCountry: Data;
   setSelectedCountry: Dispatch<SetStateAction<Data>>;
   setOtpVerified: Dispatch<SetStateAction<boolean>>;
+  sendOTP: () => Promise<void>;
+  otpSent: boolean;
 }) => {
   const [countryQuery, setCountryQuery] = useState("");
   const [touched, setTouched] = useState<boolean>(false);
-  const [otpSent, setOtpSent] = useState<boolean>(false);
+  const [submitClicked, setSubmitClicked] = useState<boolean>(false);
 
   const [otp, setOtp] = useState<string>("");
-
-  async function sendOTP() {
-    if (phoneValue) {
-      const res = await fetch("/api/sms/sendOTP", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ phone: phoneValue }),
-      });
-      await res.json().then((data: { verification: VerificationInstance }) => {
-        if (data.verification.status === "pending") {
-          setOtpSent(true);
-        } else if (data.verification.status === "approved") {
-          setOtpVerified(true);
-        } else {
-          setOtpSent(false);
-          setOtpVerified(false);
-        }
-      });
-    } else {
-      console.error("No phone number provided");
-    }
-  }
 
   async function verifyOTP() {
     const res = await fetch("/api/sms/verifyOTP", {
@@ -65,13 +42,25 @@ export const EnterPhone = ({
       },
       body: JSON.stringify({ otpCode: otp }),
     });
-    await res
-      .json()
-      .then((data: { verification_check: VerificationCheckInstance }) => {
-        if (data.verification_check.status === "approved") {
-          setOtpVerified(true);
-        }
-      });
+    if (!res.ok) {
+      throw new Error("Error in API call");
+    } else {
+      await res
+        .json()
+        .then((data: { verification_check?: VerificationCheckInstance }) => {
+          if (
+            data.verification_check &&
+            data.verification_check.status === "approved"
+          ) {
+            setOtpVerified(true);
+          } else {
+            console.error("Wrong code");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   const filteredCountries =
@@ -113,6 +102,12 @@ export const EnterPhone = ({
                     mask="_"
                     placeholder={`(000)-000-0000`}
                     className="w-full rounded-full border-[1px] border-brand-black/20 bg-transparent py-4 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
+                    style={{
+                      borderColor:
+                        phoneErrorMessage && submitClicked
+                          ? "red"
+                          : "rgb(25 24 29 / 0.2)",
+                    }}
                     onChange={(e) => {
                       onChange(e.target.value);
                       void validateField("phone");
@@ -124,10 +119,9 @@ export const EnterPhone = ({
               />
             }
           />
-
-          <span className="text-sm">
-            We&apos;ll send a code to verify via SMS
-          </span>
+          {phoneErrorMessage && submitClicked ? (
+            <span className="text-sm text-red-500">{phoneErrorMessage}</span>
+          ) : null}
         </div>
         <Drawer.Root shouldScaleBackground open={otpSent}>
           <Drawer.Trigger asChild>
@@ -135,7 +129,10 @@ export const EnterPhone = ({
               intent="accent"
               fullWidth
               disabled={phoneErrorMessage || !touched ? true : false}
-              onClick={() => void sendOTP()}
+              onClick={() => {
+                void sendOTP();
+                setSubmitClicked(true);
+              }}
             >
               Continue
             </Button>
@@ -157,16 +154,16 @@ export const EnterPhone = ({
                     className="rounded-full border border-brand-black/20 bg-transparent p-4"
                     placeholder="Enter code"
                   />
+                  <Button
+                    disabled={otp.length === 6 ? false : true}
+                    onClick={() => void verifyOTP()}
+                    intent="accent"
+                    fullWidth
+                  >
+                    Verify
+                  </Button>
                 </div>
               </div>
-              <Button
-                disabled={otp.length === 6 ? false : true}
-                onClick={() => void verifyOTP()}
-                intent="accent"
-                fullWidth
-              >
-                Verify
-              </Button>
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>

@@ -21,14 +21,17 @@ import {
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
+import { type PhoneTransaction } from "~/models/transactions";
+import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
 
 export default function ClaimPage({
   transaction,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
-  const formattedTransaction = JSON.parse(transaction) as Transaction;
+  const formattedTransaction = JSON.parse(transaction) as PhoneTransaction;
   const [isValid, setIsValid] = useState<boolean>(false);
-  const [otpVerified, setOtpVerified] = useState<boolean>(true);
+  const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [otpSent, setOtpSent] = useState<boolean>(false);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [formattedPhone, setFormattedPhone] = useState<string>("");
@@ -39,6 +42,8 @@ export default function ClaimPage({
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
   });
+
+  //Update the user
   const { mutate } = api.user.updateUser.useMutation({
     onSuccess: () => {
       console.log("Successfully updated user");
@@ -57,6 +62,7 @@ export default function ClaimPage({
     control,
     watch,
     getValues,
+    setError,
   } = useForm<WooshUser>({
     resolver: zodResolver(UserSchema),
     mode: "all",
@@ -145,6 +151,42 @@ export default function ClaimPage({
   //   return <div>Transaction claimed</div>;
   // }
 
+  async function sendOTP() {
+    if (formattedPhone && formattedPhone === formattedTransaction.phone) {
+      const res = await fetch("/api/sms/sendOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phone: formattedPhone }),
+      });
+      await res.json().then((data: { verification: VerificationInstance }) => {
+        if (data.verification.status === "pending") {
+          setOtpSent(true);
+        } else if (data.verification.status === "approved") {
+          setOtpVerified(true);
+        } else {
+          setOtpSent(false);
+          setOtpVerified(false);
+          toast.error(
+            `There was an error verifying your phone number. Try refreshing the page and try again.`
+          );
+        }
+      });
+    } else if (
+      formattedPhone &&
+      formattedPhone !== formattedTransaction.phone
+    ) {
+      //can we save an intent?
+      setError("phone", { type: "custom", message: "Incorrect phone number" });
+    } else {
+      toast.error(
+        `There was an error. Looks like no phone number was provided.`
+      );
+      //same here
+    }
+  }
+
   return (
     <>
       {otpVerified && !onboardingComplete ? (
@@ -163,7 +205,8 @@ export default function ClaimPage({
           selectedCountry={selectedCountry}
           setSelectedCountry={setSelectedCountry}
           setOtpVerified={setOtpVerified}
-          phoneValue={formattedPhone}
+          otpSent={otpSent}
+          sendOTP={sendOTP}
         />
       )}
     </>

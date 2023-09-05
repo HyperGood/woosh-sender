@@ -133,7 +133,6 @@ export const DepositButton = ({
         saveContactFunction();
       }
       setFormValue("txId", txData.transactionHash);
-
       toast.success(`Funds sent!`);
     },
     onError(error) {

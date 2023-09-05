@@ -11,17 +11,13 @@ import {
 } from "wagmi";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import Button from "../Button";
-import { type Transaction } from "@prisma/client";
-import {
-  useContractBatchWrite,
-  usePrepareContractBatchWrite,
-} from "@zerodev/wagmi";
+import { type PhoneTransaction } from "~/models/transactions";
 
 export const Claim = ({
   transaction,
   setClaimed,
 }: {
-  transaction: Transaction;
+  transaction: PhoneTransaction;
   setClaimed: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [secret, setSecret] = useState<string>();
@@ -64,7 +60,7 @@ export const Claim = ({
       console.log("transaction data: ", data);
       if (address) {
         mutate({
-          id: transaction.id,
+          id: transaction.txId,
           claimed: true,
           claimedAt: new Date(),
           claimedBy: address,
