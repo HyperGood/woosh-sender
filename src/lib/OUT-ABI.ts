@@ -1,3 +1,5 @@
+export const outAddress = "0x32307adfFE088e383AFAa721b06436aDaBA47DBE";
+
 export const tokenAbi = [
   {
     inputs: [

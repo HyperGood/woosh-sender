@@ -14,8 +14,11 @@ export const ConfirmTransaction = ({
   countryCode?: string;
 }) => {
   const { cryptoPrices } = useTokenPrices();
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
-  const amountInUSD = transactionData.amount * ethPrice;
+  const tokenPrice =
+    transactionData.token === "ETH"
+      ? cryptoPrices?.["ethereum"].usd
+      : cryptoPrices?.["usd-coin"].usd;
+  const amountInUSD = transactionData.amount * (tokenPrice || 0);
 
   return (
     <div className="flex flex-col">

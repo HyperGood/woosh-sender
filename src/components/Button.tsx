@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 export const buttonStyles = cva(
-  "flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-colors",
+  "flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-all duration-400",
   {
     variants: {
       intent: {
@@ -19,11 +19,14 @@ export const buttonStyles = cva(
       },
 
       disabled: {
-        true: "opacity-20 cursor-not-allowed bg-brand-black text-brand-gray-lighter",
+        true: "cursor-not-allowed bg-[#DFE0DF]",
       },
       hover: {
         true: "hover:scale-105 transition-transform duration-400",
         false: "hover:bg-brand-gray-dark",
+      },
+      loading: {
+        true: "cursor-not-allowed bg-brand-black text-brand-white w-12 h-12 rounded-full flex items-center justify-center",
       },
     },
     defaultVariants: {
@@ -33,7 +36,7 @@ export const buttonStyles = cva(
 );
 
 interface Props extends VariantProps<typeof buttonStyles> {
-  children: string;
+  children: string | JSX.Element;
   onClick?: () => void;
   disabled?: boolean;
   hover?: boolean;
@@ -48,12 +51,19 @@ const Button = ({
   onClick,
   disabledMessage,
   hover = true,
+  loading = false,
 }: Props) => {
   return (
     <>
       {" "}
       <button
-        className={buttonStyles({ intent, fullWidth, disabled, hover })}
+        className={buttonStyles({
+          intent,
+          fullWidth,
+          disabled,
+          hover,
+          loading,
+        })}
         onClick={onClick}
         disabled={disabled}
         type="button"
