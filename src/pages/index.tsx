@@ -15,6 +15,7 @@ import { PreviousSends } from "~/components/Transactions";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import { api } from "~/utils/api";
+import { outAddress } from "~/lib/OUT-ABI";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -25,6 +26,14 @@ const Balances = () => {
     isLoading: ethBalanceLoading,
   } = useBalance({
     address: address,
+  });
+  const {
+    data: usdcBalance,
+    isError: usdcBalanceError,
+    isLoading: usdcBalanceLoading,
+  } = useBalance({
+    address: address,
+    token: outAddress,
   });
 
   interface UserBalance {
@@ -44,16 +53,22 @@ const Balances = () => {
     //   tokenName: "dai",
     //   balance: 200,
     // },
-    // {
-    //   token: "USDC",
-    //   tokenName: "usd-coin",
-    //   balance: 800,
-    // },
+    {
+      token: "USDC",
+      tokenName: "usd-coin",
+      balance: Number(usdcBalance?.formatted) || 0,
+    },
   ];
 
-  if (ethBalanceLoading) return <p>Loading...</p>;
+  if (ethBalanceLoading || usdcBalanceLoading)
+    return (
+      <span
+        className="inline-block h-5 w-full animate-pulse rounded-sm bg-brand-gray-medium "
+        style={{ animationDelay: "0.05s", animationDuration: "1s" }}
+      />
+    );
   if (ethBalanceError) {
-    console.log("balanceError: ", ethBalanceError);
+    console.log("ETH balanceError: ", ethBalanceError);
   }
 
   let totalBalance = 0;
@@ -116,15 +131,17 @@ const Balances = () => {
         })}
       </p>{" "}
       <Divider />
-      <Balance
-        token="ETH"
-        tokenName="ethereum"
-        balance={Number(ethBalance?.formatted) || 0}
-      />
-      <Divider />
-      {/* <Balance token="USDC" tokenName="usd-coin" balance={800} />
-      <Divider />
-      <Balance token="DAI" tokenName="dai" balance={200} /> */}
+      {userBalances.map((userBalance) => (
+        <>
+          <Balance
+            key={userBalance.token}
+            token={userBalance.token}
+            tokenName={userBalance.tokenName}
+            balance={userBalance.balance}
+          />
+          <Divider />
+        </>
+      ))}
     </div>
   );
 };
