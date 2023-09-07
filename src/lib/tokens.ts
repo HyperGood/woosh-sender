@@ -1,3 +1,11 @@
+import type { Data } from "~/components/ComboboxSelect";
+export interface Token extends Data {
+  additionalProperties: {
+    address: `0x${string}`;
+    tokenName: string;
+  };
+}
+
 export const TOKENS = [
   {
     id: 1,
@@ -15,36 +23,36 @@ export const TOKENS = [
       tokenName: "usd-coin",
     },
   },
-  {
-    id: 3,
-    displayValue: "DAI",
-    additionalProperties: {
-      address: "0x123",
-      tokenName: "dai",
-    },
-  },
-  {
-    id: 4,
-    displayValue: "lUSD",
-    additionalProperties: {
-      address: "0x123",
-      tokenName: "dai",
-    },
-  },
-  {
-    id: 5,
-    displayValue: "USDt",
-    additionalProperties: {
-      address: "0x123",
-      tokenName: "dai",
-    },
-  },
-  {
-    id: 6,
-    displayValue: "RAI",
-    additionalProperties: {
-      address: "0x123",
-      tokenName: "dai",
-    },
-  },
+  // {
+  //   id: 3,
+  //   displayValue: "DAI",
+  //   additionalProperties: {
+  //     address: "0x123",
+  //     tokenName: "dai",
+  //   },
+  // },
+  // {
+  //   id: 4,
+  //   displayValue: "lUSD",
+  //   additionalProperties: {
+  //     address: "0x123",
+  //     tokenName: "dai",
+  //   },
+  // },
+  // {
+  //   id: 5,
+  //   displayValue: "USDt",
+  //   additionalProperties: {
+  //     address: "0x123",
+  //     tokenName: "dai",
+  //   },
+  // },
+  // {
+  //   id: 6,
+  //   displayValue: "RAI",
+  //   additionalProperties: {
+  //     address: "0x123",
+  //     tokenName: "dai",
+  //   },
+  // },
 ];

@@ -209,6 +209,7 @@ export const SendToPhone = () => {
                     contact={getValues("contact")}
                     setSelectedToken={setSelectedToken}
                     selectedToken={selectedToken}
+                    setValue={setValue}
                   />
                 ) : step === 2 ? (
                   <ConfirmTransaction
@@ -243,12 +244,9 @@ export const SendToPhone = () => {
                   />
                 )
               ) : step === 3 && savedTransaction ? (
-                <Button intent="secondary" fullWidth>
-                  Share
-                </Button>
+                <Button fullWidth>Share</Button>
               ) : (
                 <Button
-                  intent="secondary"
                   fullWidth
                   disabled={
                     !isValid ||
