@@ -1,5 +1,5 @@
 import { signOut, useSession } from "next-auth/react";
-import { useContext, useEffect } from "react";
+import { Fragment, useContext, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import SignIn from "~/components/SignIn";
 import Image from "next/image";
@@ -135,15 +135,14 @@ const Balances = () => {
       </p>{" "}
       <Divider />
       {userBalances.map((userBalance) => (
-        <>
+        <Fragment key={userBalance.token}>
           <Balance
-            key={userBalance.token}
             token={userBalance.token}
             tokenName={userBalance.tokenName}
             balance={userBalance.balance}
           />
           <Divider />
-        </>
+        </Fragment>
       ))}
     </div>
   );
@@ -185,8 +184,8 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
   useEffect(() => {
     if (!isConnected && session) {
       console.log("There is a session, but no wallet connected. Signing Out");
-      void signOut({ redirect: false });
-      console.log("Signed Out");
+      // void signOut({ redirect: false });
+      // console.log("Signed Out");
     } else if (isConnected && !session) {
       console.log("Wallet Connected. No session.");
     } else if (isConnected && session) {

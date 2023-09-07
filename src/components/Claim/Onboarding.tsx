@@ -99,8 +99,9 @@ export const Onboarding = ({
   }
 
   useEffect(() => {
-    if (isConnected && session && (userData?.name !== null || undefined)) {
-      setOnboardingComplete(true);
+    if (isConnected && session && userData?.name) {
+      // setOnboardingComplete(true);
+      setStep(1);
     } else {
       setStep(1);
     }
