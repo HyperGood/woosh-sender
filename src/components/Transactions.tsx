@@ -21,9 +21,7 @@ export const TransactionCard = ({
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
   const phone = makePhoneReadable(transaction.phone || "");
-  const url = `${env.NODE_ENV === "development" ? "http" : "https"}://${
-    env.NEXTAUTH_URL
-  }/claim/${transaction.id}`;
+  const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
   const [open, setOpen] = useState(false);
   const SecretDialog = () => (
     <Dialog.Root open={open} onOpenChange={setOpen}>

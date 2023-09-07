@@ -34,6 +34,7 @@ export const env = createEnv({
     NEXT_PUBLIC_TWILIO_AUTH_TOKEN: z.string().min(1),
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_ZERODEV_ID: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().min(1),
   },
 
   /**
@@ -51,6 +52,7 @@ export const env = createEnv({
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     NEXT_PUBLIC_ZERODEV_ID: process.env.NEXT_PUBLIC_ZERODEV_ID,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

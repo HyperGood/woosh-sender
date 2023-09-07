@@ -19,7 +19,7 @@ export const buttonStyles = cva(
       },
 
       disabled: {
-        true: "cursor-not-allowed bg-[#DFE0DF]",
+        true: "cursor-not-allowed bg-brand-gray-dark text-brand-gray-light",
       },
       hover: {
         true: "hover:scale-105 transition-transform duration-400",

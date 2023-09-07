@@ -2,15 +2,14 @@ import { useNetwork, useSignTypedData } from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
-import { useContext } from "react";
 import { parseEther } from "viem";
 import type { PhoneTransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 import Button from "../Button";
 import { api } from "~/utils/api";
 import { formatPhone } from "~/lib/formatPhone";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import { type Country } from "~/lib/countries";
+import useTokenPrices from "~/hooks/useTokenPrices";
 
 export const SignDepositButton = ({
   transaction,
@@ -33,8 +32,11 @@ export const SignDepositButton = ({
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
-  const { cryptoPrices } = useContext(CryptoPricesContext);
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
+  const { cryptoPrices } = useTokenPrices();
+  const tokenPrice =
+    transaction.token === "ETH"
+      ? cryptoPrices?.["ethereum"].usd
+      : cryptoPrices?.["usd-coin"].usd;
   const ctx = api.useContext();
   const { mutate } = api.transaction.addPhoneTransaction.useMutation({
     onSuccess: (data) => {
@@ -84,7 +86,7 @@ export const SignDepositButton = ({
 
   const saveTransaction = () => {
     if (transaction.amount !== 0 && transaction.phone !== "") {
-      const amountInUSD = transaction.amount * ethPrice;
+      const amountInUSD = transaction.amount * (tokenPrice || 1);
       console.log(
         "Saving transaction to database with this data...",
         transaction
