@@ -1,4 +1,5 @@
 // import QrIcon from "public/images/icons/QrIcon";
+import { signOut } from "next-auth/react";
 import SettingsIcon from "public/images/icons/SettingsIcon";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
 
@@ -14,7 +15,10 @@ export function Header({ username }: { username?: string }) {
         </div>
         <span>{username ? username : "Cool User"}</span>
       </div>
-      <div>
+      <div
+        onClick={() => void signOut()}
+        className="h-6 w-6 cursor-pointer text-brand-black lg:text-brand-white"
+      >
         <SettingsIcon />
       </div>
     </div>

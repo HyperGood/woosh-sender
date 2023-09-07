@@ -174,12 +174,12 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
     setCryptoPrices(coinsData);
   }, [coinsData, setCryptoPrices]);
 
-  useEffect(() => {
-    if (userData?.address !== address) {
-      //TO-DO: This should be an alert first
-      void signOut({ redirect: false });
-    }
-  }, [address, session, userData?.address]);
+  // useEffect(() => {
+  //   if (userData?.address !== address) {
+  //     //TO-DO: This should be an alert first
+  //     void signOut({ redirect: false });
+  //   }
+  // }, [address, session, userData?.address]);
 
   useEffect(() => {
     if (!isConnected && session) {
