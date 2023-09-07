@@ -110,7 +110,6 @@ export const SignDepositButton = ({
           }
         }}
         disabled={isLoading}
-        intent="secondary"
       >
         {isLoading ? "Waiting for Signature" : "Generate Secret"}
       </Button>
