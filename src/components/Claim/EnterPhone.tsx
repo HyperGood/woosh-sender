@@ -9,7 +9,7 @@ import React, {
 import { type Data } from "../ComboboxSelect";
 import { type WooshUser } from "~/models/users";
 import { type Control, Controller } from "react-hook-form";
-import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
+
 import { COUNTRIES } from "~/lib/countries";
 import ComboInput from "../ComboInput";
 import { PatternFormat } from "react-number-format";
@@ -23,17 +23,19 @@ export const EnterPhone = ({
   selectedCountry,
   setSelectedCountry,
   phoneErrorMessage,
-  setOtpVerified,
   sendOTP,
   otpSent,
+  verifyOTP,
+  wrongCode,
 }: {
   control: Control<WooshUser>;
   phoneErrorMessage?: string;
   selectedCountry: Data;
   setSelectedCountry: Dispatch<SetStateAction<Data>>;
-  setOtpVerified: Dispatch<SetStateAction<boolean>>;
   sendOTP: () => Promise<void>;
   otpSent: boolean;
+  verifyOTP: (args0: string) => Promise<void>;
+  wrongCode: boolean;
 }) => {
   const [countryQuery, setCountryQuery] = useState("");
   const [touched, setTouched] = useState<boolean>(false);
@@ -43,45 +45,6 @@ export const EnterPhone = ({
   const [otpFields, setOtpFields] = useState<string[]>(new Array(6).fill(""));
   const [activeOTPIndex, setActiveOTPIndex] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  async function verifyOTP() {
-    if (otp) {
-      const res = await fetch("/api/sms/verifyOTP", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ otpCode: otp }),
-      });
-      if (!res.ok) {
-        throw new Error("Error in API call");
-      } else {
-        await res
-          .json()
-          .then((data: { verification_check?: VerificationCheckInstance }) => {
-            if (
-              data.verification_check &&
-              data.verification_check.status === "approved"
-            ) {
-              setOtpVerified(true);
-            } else {
-              console.error("Wrong code");
-              //shake input fields as color red
-              //clear inputs
-              setOtp("");
-              setOtpFields(new Array(6).fill(""));
-              setActiveOTPIndex(0);
-              currentOTPIndex = 0;
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    } else {
-      console.error("No OTP set");
-    }
-  }
 
   const filteredCountries =
     countryQuery === ""
@@ -122,6 +85,15 @@ export const EnterPhone = ({
   useEffect(() => {
     inputRef.current?.focus();
   }, [activeOTPIndex]);
+
+  useEffect(() => {
+    if (wrongCode) {
+      setOtp("");
+      setOtpFields(new Array(6).fill(""));
+      setActiveOTPIndex(0);
+      currentOTPIndex = 0;
+    }
+  }, [wrongCode]);
 
   useEffect(() => {
     let otpString = "";
@@ -217,10 +189,13 @@ export const EnterPhone = ({
                       );
                     })}
                   </div>
+                  {wrongCode ? (
+                    <span className="text-error">Wrong code</span>
+                  ) : null}
                 </div>
                 <Button
                   disabled={otp.length === 6 ? false : true}
-                  onClick={() => void verifyOTP()}
+                  onClick={() => void verifyOTP(otp)}
                   intent="accent"
                   fullWidth
                 >

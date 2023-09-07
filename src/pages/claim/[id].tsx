@@ -23,6 +23,7 @@ import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
 import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
 import { getUserById } from "~/server/api/routers/users";
+import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
 
 export default function ClaimPage({
   transaction,
@@ -43,6 +44,7 @@ export default function ClaimPage({
     enabled: !!session,
   });
   const senderData = JSON.parse(sender) as WooshUser;
+  const [wrongCode, setWrongCode] = useState<boolean>(false);
 
   //Update the user
   const { mutate } = api.user.updateUser.useMutation({
@@ -194,6 +196,41 @@ export default function ClaimPage({
     }
   }
 
+  async function verifyOTP(otp: string) {
+    if (otp && formattedPhone) {
+      setWrongCode(false);
+      const res = await fetch("/api/sms/verifyOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otpCode: otp, phone: formattedPhone }),
+      });
+      if (!res.ok) {
+        throw new Error("Error in API call");
+      } else {
+        await res
+          .json()
+          .then((data: { verification_check?: VerificationCheckInstance }) => {
+            if (
+              data.verification_check &&
+              data.verification_check.status === "approved"
+            ) {
+              setOtpVerified(true);
+            } else {
+              console.error("Wrong code");
+              setWrongCode(true);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } else {
+      console.error("No OTP set");
+    }
+  }
+
   return (
     <>
       {otpVerified && !onboardingComplete ? (
@@ -213,9 +250,10 @@ export default function ClaimPage({
           phoneErrorMessage={errors.phone?.message}
           selectedCountry={selectedCountry}
           setSelectedCountry={setSelectedCountry}
-          setOtpVerified={setOtpVerified}
           otpSent={otpSent}
           sendOTP={sendOTP}
+          verifyOTP={verifyOTP}
+          wrongCode={wrongCode}
         />
       )}
     </>

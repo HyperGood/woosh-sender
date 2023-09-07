@@ -7,11 +7,11 @@ export default function verifyOTP(req: NextApiRequest, res: NextApiResponse) {
   const token = env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN;
   const verifySid = "VA0119e70fd4af9ec3b0a8bc4903868f4d";
   const client = twilio(accountSid, token);
-  const { otpCode } = req.body as { otpCode: string };
+  const { otpCode, phone } = req.body as { otpCode: string; phone: string };
 
   client.verify.v2
     .services(verifySid)
-    .verificationChecks.create({ to: "+523111095816", code: otpCode })
+    .verificationChecks.create({ to: phone, code: otpCode })
     .then((verification_check) => {
       res.json({ verification_check });
     })
