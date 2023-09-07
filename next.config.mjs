@@ -1,3 +1,6 @@
+import withPWA from "next-pwa";
+import { env } from "./src/env.mjs";
+
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
@@ -34,4 +37,10 @@ const config = {
   },
 };
 
-export default config;
+const nextConfig = withPWA({
+  dest: "public",
+  register: true,
+  disable: env.NODE_ENV === "development",
+})(config);
+
+export default nextConfig;
