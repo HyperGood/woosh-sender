@@ -2,7 +2,7 @@ import Image from "next/image";
 import TransactionInfo from "./TransactionInfo";
 import useTokenPrices from "~/hooks/useTokenPrices";
 import type {
-  PhoneTransaction,
+  PhoneTransactionForm,
   WalletTransaction,
 } from "~/models/transactions";
 
@@ -10,12 +10,15 @@ export const ConfirmTransaction = ({
   transactionData,
   countryCode,
 }: {
-  transactionData: PhoneTransaction | WalletTransaction;
+  transactionData: PhoneTransactionForm | WalletTransaction;
   countryCode?: string;
 }) => {
   const { cryptoPrices } = useTokenPrices();
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
-  const amountInUSD = transactionData.amount * ethPrice;
+  const tokenPrice =
+    transactionData.token === "ETH"
+      ? cryptoPrices?.["ethereum"].usd
+      : cryptoPrices?.["usd-coin"].usd;
+  const amountInUSD = transactionData.amount * (tokenPrice || 0);
 
   return (
     <div className="flex flex-col">

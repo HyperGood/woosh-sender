@@ -2,15 +2,14 @@ import { useNetwork, useSignTypedData } from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
-import { useContext } from "react";
 import { parseEther } from "viem";
-import type { PhoneTransaction } from "~/models/transactions";
+import type { PhoneTransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 import Button from "../Button";
 import { api } from "~/utils/api";
 import { formatPhone } from "~/lib/formatPhone";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import { type Country } from "~/lib/countries";
+import useTokenPrices from "~/hooks/useTokenPrices";
 
 export const SignDepositButton = ({
   transaction,
@@ -20,7 +19,7 @@ export const SignDepositButton = ({
   setSavedTransaction,
   countryCode,
 }: {
-  transaction: PhoneTransaction;
+  transaction: PhoneTransactionForm;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   secret?: string;
@@ -33,8 +32,11 @@ export const SignDepositButton = ({
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
-  const { cryptoPrices } = useContext(CryptoPricesContext);
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
+  const { cryptoPrices } = useTokenPrices();
+  const tokenPrice =
+    transaction.token === "ETH"
+      ? cryptoPrices?.["ethereum"].usd
+      : cryptoPrices?.["usd-coin"].usd;
   const ctx = api.useContext();
   const { mutate } = api.transaction.addPhoneTransaction.useMutation({
     onSuccess: (data) => {
@@ -57,13 +59,13 @@ export const SignDepositButton = ({
   const types = {
     Withdrawal: [
       { name: "amount", type: "uint256" },
-      { name: "nonce", type: "uint256" },
+      { name: "depositIndex", type: "uint256" },
     ],
   } as const;
 
   const message = {
     amount: parseEther(transaction.amount.toString()),
-    nonce: BigInt(transaction.nonce || 0),
+    depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
 
   const { isLoading, signTypedData } = useSignTypedData({
@@ -84,7 +86,7 @@ export const SignDepositButton = ({
 
   const saveTransaction = () => {
     if (transaction.amount !== 0 && transaction.phone !== "") {
-      const amountInUSD = transaction.amount * ethPrice;
+      const amountInUSD = transaction.amount * (tokenPrice || 1);
       console.log(
         "Saving transaction to database with this data...",
         transaction
@@ -110,7 +112,6 @@ export const SignDepositButton = ({
           }
         }}
         disabled={isLoading}
-        intent="secondary"
       >
         {isLoading ? "Waiting for Signature" : "Generate Secret"}
       </Button>

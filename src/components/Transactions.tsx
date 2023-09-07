@@ -10,6 +10,8 @@ import { api } from "~/utils/api";
 import type { Transaction } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { type PhoneTransaction } from "~/models/transactions";
+import { env } from "~/env.mjs";
 
 export const TransactionCard = ({
   transaction,
@@ -19,7 +21,7 @@ export const TransactionCard = ({
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
   const phone = makePhoneReadable(transaction.phone || "");
-  const url = `http://:3000/claim/${transaction.id}`;
+  const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
   const [open, setOpen] = useState(false);
   const SecretDialog = () => (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -125,7 +127,7 @@ export const TransactionCard = ({
               }}
             >
               <CancelDepositButton
-                transaction={transaction}
+                transaction={transaction as PhoneTransaction}
                 clicked={clicked}
               />
             </div>
@@ -138,7 +140,7 @@ export const TransactionCard = ({
               className="opacity-80 hover:opacity-100"
             >
               <SignDepositButton
-                transaction={transaction}
+                transaction={transaction as PhoneTransaction}
                 setSecret={setSecret}
                 secret={secret}
                 card

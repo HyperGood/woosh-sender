@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TOKENS } from "~/lib/tokens";
 import * as Dialog from "@radix-ui/react-dialog";
 import Button from "../../Button";
 import StepIndicator from "../../Form/StepIndicator";
@@ -49,7 +50,7 @@ export const SendToPhone = () => {
       token: "ETH",
       phone: "",
       type: "phone",
-      nonce: 0,
+      depositIndex: 0,
     },
   });
 
@@ -59,7 +60,7 @@ export const SendToPhone = () => {
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
   const [isValid, setIsValid] = useState<boolean>(false);
-
+  const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
   );
@@ -88,6 +89,12 @@ export const SendToPhone = () => {
       setStep(3);
     }
   }, [depositSigned]);
+
+  useEffect(() => {
+    if (selectedToken) {
+      setValue("token", selectedToken.displayValue);
+    }
+  }, [setValue, selectedToken]);
 
   return (
     <>
@@ -200,6 +207,9 @@ export const SendToPhone = () => {
                     amountErrorMessage={errors.amount?.message}
                     countryCode={selectedCountry.displayValue}
                     contact={getValues("contact")}
+                    setSelectedToken={setSelectedToken}
+                    selectedToken={selectedToken}
+                    setValue={setValue}
                   />
                 ) : step === 2 ? (
                   <ConfirmTransaction
@@ -234,12 +244,9 @@ export const SendToPhone = () => {
                   />
                 )
               ) : step === 3 && savedTransaction ? (
-                <Button intent="secondary" fullWidth>
-                  Share
-                </Button>
+                <Button fullWidth>Share</Button>
               ) : (
                 <Button
-                  intent="secondary"
                   fullWidth
                   disabled={
                     !isValid ||

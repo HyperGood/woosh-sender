@@ -69,7 +69,7 @@ model Transaction {
   userId      String
   amount      Float
   token       String
-  nonce       Int?
+  depositIndex       Int?
   contact   String?
   amountInUSD Float
   claimed     Boolean  @default(false)

@@ -1,5 +1,21 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
+import { type PrismaClient } from "@prisma/client";
+
+export async function getUserById({
+  prisma,
+  input,
+}: {
+  prisma: PrismaClient;
+  input: { id: string };
+}) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: input.id,
+    },
+  });
+  return user;
+}
 
 export const userRouter = createTRPCRouter({
   getUserData: protectedProcedure.query(async ({ ctx }) => {
@@ -13,8 +29,8 @@ export const userRouter = createTRPCRouter({
   updateUser: protectedProcedure
     .input(
       z.object({
-        name: z.string().optional(),
-        username: z.string(),
+        name: z.string(),
+        username: z.string().optional(),
         phone: z.string().optional(),
         image: z.string().optional(),
       })

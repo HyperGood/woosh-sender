@@ -7,7 +7,7 @@ export const TransactionSchema = z.object({
     .number({ invalid_type_error: "Please enter a number " })
     .min(0.000001, { message: "The amount must be at least 0.000001" })
     .max(1000000),
-  token: z.string().min(1).max(5),
+  token: z.string().min(1).max(20),
   amountInUSD: z.number().min(0),
   txId: z.string(),
   contact: z
@@ -37,14 +37,15 @@ export const PhoneTransactionFormSchema = TransactionSchema.extend({
     },
     { message: "Please enter a phone number that is 10 digits long" }
   ),
-  nonce: z.number().min(0),
+  depositIndex: z.number().min(0),
 });
 
 //Phone Transaction Schema for saving to database
 export const PhoneTransactionSchema = TransactionSchema.extend({
   type: z.literal("phone"),
   phone: z.string(),
-  nonce: z.number().min(0),
+  depositIndex: z.number().min(0),
+  id: z.string(),
 });
 
 export type PhoneTransactionForm = z.infer<typeof PhoneTransactionFormSchema>;

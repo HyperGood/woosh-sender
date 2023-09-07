@@ -8,16 +8,16 @@ import {
 import { api } from "~/utils/api";
 import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
-import type { Transaction } from "@prisma/client";
 import { useEffect } from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import Button from "../Button";
+import type { PhoneTransaction } from "~/models/transactions";
 
 export const CancelDepositButton = ({
   transaction,
   clicked,
 }: {
-  transaction: Transaction;
+  transaction: PhoneTransaction;
   clicked: boolean;
 }) => {
   const ctx = api.useContext();
@@ -41,7 +41,7 @@ export const CancelDepositButton = ({
     address: depositVaultAddress,
     abi,
     functionName: "withdrawDeposit",
-    args: [BigInt(transaction.nonce ? transaction.nonce : 0)],
+    args: [BigInt(transaction.depositIndex ? transaction.depositIndex : 0)],
     enabled: clicked && transaction.type === "phone",
     onError(error) {
       console.log(error);
@@ -84,7 +84,7 @@ export const CancelDepositButton = ({
     if (isCancelling) {
       void mutate({ id: transaction.id });
     }
-  }, [isCancelling]);
+  }, [isCancelling, mutate, transaction.id]);
   return (
     <>
       {isRemoving ? (

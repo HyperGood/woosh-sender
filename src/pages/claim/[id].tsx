@@ -21,14 +21,18 @@ import {
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
+import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
+import { getUserById } from "~/server/api/routers/users";
+import { type VerificationCheckInstance } from "twilio/lib/rest/verify/v2/service/verificationCheck";
 
 export default function ClaimPage({
   transaction,
+  sender,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
   const formattedTransaction = JSON.parse(transaction) as Transaction;
-  const [isValid, setIsValid] = useState<boolean>(false);
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [otpSent, setOtpSent] = useState<boolean>(false);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [formattedPhone, setFormattedPhone] = useState<string>("");
@@ -36,6 +40,13 @@ export default function ClaimPage({
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
   const { data: session } = useSession();
+  const { data: userData } = api.user.getUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
+  const senderData = JSON.parse(sender) as WooshUser;
+  const [wrongCode, setWrongCode] = useState<boolean>(false);
+
+  //Update the user
   const { mutate } = api.user.updateUser.useMutation({
     onSuccess: () => {
       console.log("Successfully updated user");
@@ -50,28 +61,23 @@ export default function ClaimPage({
   const {
     register,
     formState: { errors },
-    trigger,
     control,
     watch,
     getValues,
+    setError,
   } = useForm<WooshUser>({
     resolver: zodResolver(UserSchema),
     mode: "all",
     defaultValues: {
       phone: "",
-      username: "",
+      name: "",
       address: "",
-      image: "",
     },
   });
 
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
   );
-
-  const validateField = async (input: "username" | "phone") => {
-    setIsValid(await trigger(input));
-  };
 
   const phone = watch("phone");
 
@@ -86,7 +92,7 @@ export default function ClaimPage({
 
   //SIWE
   useEffect(() => {
-    if (claimed && isConnected) {
+    if (claimed && isConnected && !session) {
       console.log("Signing In...");
       /**
        * Attempts SIWE and establish session
@@ -125,19 +131,104 @@ export default function ClaimPage({
 
   useEffect(() => {
     //Save user data to DB
-    if (session) {
+    if (claimed && session && !userData?.name) {
       console.log("Saving user data to DB...");
-      const userData = getValues();
+      const inputData = getValues();
       mutate({
-        username: userData.username,
-        phone: userData.phone,
+        name: inputData.name,
+        phone: inputData.phone,
       });
+    } else if ((claimed && session && userData?.name !== null) || undefined) {
+      void router.push("/");
+    } else {
+      console.log("Claimed Status: ", claimed);
+      console.log("Session Status: ", session);
+      console.log("User Name: ", userData?.name);
     }
-  }, [session]);
+  }, [session, userData?.name, claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   if (formattedTransaction.claimed) {
     return <div>Transaction claimed</div>;
+  }
+
+  if (claimed) {
+    return (
+      <div className="flex h-screen w-full animate-pulse items-center justify-center bg-brand-black text-brand-white">
+        Signing In...
+      </div>
+    );
+  }
+
+  async function sendOTP() {
+    if (formattedPhone && formattedPhone === formattedTransaction.phone) {
+      const res = await fetch("/api/sms/sendOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phone: formattedPhone }),
+      });
+      await res.json().then((data: { verification: VerificationInstance }) => {
+        if (data.verification.status === "pending") {
+          setOtpSent(true);
+        } else if (data.verification.status === "approved") {
+          setOtpVerified(true);
+        } else {
+          setOtpSent(false);
+          setOtpVerified(false);
+          toast.error(
+            `There was an error verifying your phone number. Try refreshing the page and try again.`
+          );
+        }
+      });
+    } else if (
+      formattedPhone &&
+      formattedPhone !== formattedTransaction.phone
+    ) {
+      //can we save an intent?
+      setError("phone", { type: "custom", message: "Incorrect phone number" });
+    } else {
+      toast.error(
+        `There was an error. Looks like no phone number was provided.`
+      );
+      //same here
+    }
+  }
+
+  async function verifyOTP(otp: string) {
+    if (otp && formattedPhone) {
+      setWrongCode(false);
+      const res = await fetch("/api/sms/verifyOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otpCode: otp, phone: formattedPhone }),
+      });
+      if (!res.ok) {
+        throw new Error("Error in API call");
+      } else {
+        await res
+          .json()
+          .then((data: { verification_check?: VerificationCheckInstance }) => {
+            if (
+              data.verification_check &&
+              data.verification_check.status === "approved"
+            ) {
+              setOtpVerified(true);
+            } else {
+              console.error("Wrong code");
+              setWrongCode(true);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } else {
+      console.error("No OTP set");
+    }
   }
 
   return (
@@ -145,20 +236,24 @@ export default function ClaimPage({
       {otpVerified && !onboardingComplete ? (
         <Onboarding
           register={register}
-          validateField={validateField}
           setOnboardingComplete={setOnboardingComplete}
         />
       ) : onboardingComplete && otpVerified ? (
-        <Claim transaction={formattedTransaction} setClaimed={setClaimed} />
+        <Claim
+          transaction={formattedTransaction}
+          setClaimed={setClaimed}
+          sender={senderData.name ? senderData.name : "someone"}
+        />
       ) : (
         <EnterPhone
           control={control}
-          validateField={validateField}
           phoneErrorMessage={errors.phone?.message}
           selectedCountry={selectedCountry}
           setSelectedCountry={setSelectedCountry}
-          setOtpVerified={setOtpVerified}
-          phoneValue={formattedPhone}
+          otpSent={otpSent}
+          sendOTP={sendOTP}
+          verifyOTP={verifyOTP}
+          wrongCode={wrongCode}
         />
       )}
     </>
@@ -186,8 +281,16 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
     };
   }
 
+  const sender = await getUserById({
+    prisma,
+    input: { id: transaction.userId },
+  });
+
   return {
-    props: { transaction: JSON.stringify(transaction) },
+    props: {
+      transaction: JSON.stringify(transaction),
+      sender: JSON.stringify(sender),
+    },
     revalidate: 1,
   };
 }

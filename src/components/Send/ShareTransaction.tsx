@@ -2,10 +2,10 @@ import Image from "next/image";
 import TransactionInfo from "./TransactionInfo";
 import CopyIcon from "public/images/icons/CopyIcon";
 import { toast } from "react-hot-toast";
-import { useContext } from "react";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
 import type { Transaction } from "@prisma/client";
 import { makePhoneReadable } from "~/lib/formatPhone";
+import useTokenPrices from "~/hooks/useTokenPrices";
+import { env } from "~/env.mjs";
 
 export const ShareTransaction = ({
   transaction,
@@ -16,10 +16,13 @@ export const ShareTransaction = ({
   secret?: string;
   countryCode?: string;
 }) => {
-  const { cryptoPrices } = useContext(CryptoPricesContext);
-  const ethPrice = cryptoPrices?.ethereum.usd || 0;
-  const amountInUSD = transaction.amount * ethPrice;
-  const url = `https://woosh-sender.vercel.app/claim/${transaction.id}`;
+  const { cryptoPrices } = useTokenPrices();
+  const tokenPrice =
+    transaction.token === "ETH"
+      ? cryptoPrices?.["ethereum"].usd
+      : cryptoPrices?.["usd-coin"].usd;
+  const amountInUSD = transaction.amount * (tokenPrice || 0);
+  const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
   const formattedPhone = makePhoneReadable(transaction.phone || "");
 
   return (
