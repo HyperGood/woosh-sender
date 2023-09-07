@@ -21,15 +21,15 @@ import {
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 import { toast } from "react-hot-toast";
-import { type PhoneTransaction } from "~/models/transactions";
 import { type VerificationInstance } from "twilio/lib/rest/verify/v2/service/verification";
+import { getUserById } from "~/server/api/routers/users";
 
 export default function ClaimPage({
   transaction,
+  sender,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
-  const formattedTransaction = JSON.parse(transaction) as PhoneTransaction;
-  const [isValid, setIsValid] = useState<boolean>(false);
+  const formattedTransaction = JSON.parse(transaction) as Transaction;
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
   const [otpSent, setOtpSent] = useState<boolean>(false);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
@@ -42,6 +42,7 @@ export default function ClaimPage({
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
   });
+  const senderData = JSON.parse(sender) as WooshUser;
 
   //Update the user
   const { mutate } = api.user.updateUser.useMutation({
@@ -58,7 +59,6 @@ export default function ClaimPage({
   const {
     register,
     formState: { errors },
-    trigger,
     control,
     watch,
     getValues,
@@ -76,10 +76,6 @@ export default function ClaimPage({
   const [selectedCountry, setSelectedCountry] = useState<Data>(
     COUNTRIES[0] as Data
   );
-
-  const validateField = async (input: "name" | "phone") => {
-    setIsValid(await trigger(input));
-  };
 
   const phone = watch("phone");
 
@@ -140,15 +136,27 @@ export default function ClaimPage({
         name: inputData.name,
         phone: inputData.phone,
       });
-    } else if (claimed && session && userData?.username) {
+    } else if ((claimed && session && userData?.name !== null) || undefined) {
       void router.push("/");
+    } else {
+      console.log("Claimed Status: ", claimed);
+      console.log("Session Status: ", session);
+      console.log("User Name: ", userData?.name);
     }
   }, [session, userData?.name, claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
-  // if (formattedTransaction.claimed) {
-  //   return <div>Transaction claimed</div>;
-  // }
+  if (formattedTransaction.claimed) {
+    return <div>Transaction claimed</div>;
+  }
+
+  if (claimed) {
+    return (
+      <div className="flex h-screen w-full animate-pulse items-center justify-center bg-brand-black text-brand-white">
+        Signing In...
+      </div>
+    );
+  }
 
   async function sendOTP() {
     if (formattedPhone && formattedPhone === formattedTransaction.phone) {
@@ -191,15 +199,17 @@ export default function ClaimPage({
       {otpVerified && !onboardingComplete ? (
         <Onboarding
           register={register}
-          validateField={validateField}
           setOnboardingComplete={setOnboardingComplete}
         />
       ) : onboardingComplete && otpVerified ? (
-        <Claim transaction={formattedTransaction} setClaimed={setClaimed} />
+        <Claim
+          transaction={formattedTransaction}
+          setClaimed={setClaimed}
+          sender={senderData.name ? senderData.name : "someone"}
+        />
       ) : (
         <EnterPhone
           control={control}
-          validateField={validateField}
           phoneErrorMessage={errors.phone?.message}
           selectedCountry={selectedCountry}
           setSelectedCountry={setSelectedCountry}
@@ -233,8 +243,16 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
     };
   }
 
+  const sender = await getUserById({
+    prisma,
+    input: { id: transaction.userId },
+  });
+
   return {
-    props: { transaction: JSON.stringify(transaction) },
+    props: {
+      transaction: JSON.stringify(transaction),
+      sender: JSON.stringify(sender),
+    },
     revalidate: 1,
   };
 }

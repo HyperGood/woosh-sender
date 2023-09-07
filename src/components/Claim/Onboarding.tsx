@@ -1,42 +1,62 @@
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
 import { ZeroDevConnector } from "@zerodev/wagmi";
 import { createPasskeyOwner, getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
-import StepIndicator from "~/components/Form/StepIndicator";
 import Button from "~/components/Button";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import { type UseFormRegister } from "react-hook-form";
 import { type WooshUser } from "~/models/users";
 // import PasskeySignIn from "../PasskeySignIn";
-import { useSession } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { api } from "~/utils/api";
+import { SiweMessage } from "siwe";
+import { LoadingSpinner } from "../Loading";
+import { toast } from "react-hot-toast";
 // import CustomConnectButton from "../CustomConnectButton";
 
 export const Onboarding = ({
   register,
-  validateField,
   setOnboardingComplete,
 }: {
-  validateField: (args0: "name" | "phone") => Promise<void>;
   register: UseFormRegister<WooshUser>;
   setOnboardingComplete: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [step, setStep] = useState<number>(0);
-  const { connect, isLoading } = useConnect();
-  const { isConnected } = useAccount({ onConnect: () => setStep(1) });
+  const { connect, isLoading } = useConnect({
+    onSuccess: () => {
+      void siweSignIn();
+    },
+    onError: () => {
+      setSigningIn(false);
+      toast.error("There was an error signing in");
+    },
+  });
+  const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { signMessageAsync } = useSignMessage();
   const { data: session } = useSession();
+  const { data: userData } = api.user.getUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
+  const [signingIn, setSigningIn] = useState<boolean>(false);
 
   const getOrCreateOwner = async () => {
+    setSigningIn(true);
     try {
       return getPasskeyOwner({
         projectId: env.NEXT_PUBLIC_ZERODEV_ID,
       });
     } catch (e) {
       console.log(e);
-      return await createPasskeyOwner({
-        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-        name: "Woosh",
-      });
+      try {
+        return await createPasskeyOwner({
+          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+          name: "Woosh",
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -52,20 +72,43 @@ export const Onboarding = ({
     });
   };
 
-  useEffect(() => {
-    if (isConnected && session) {
-      setOnboardingComplete(true);
+  async function siweSignIn() {
+    try {
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement: "Sign in to Woosh",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        // nonce is used from CSRF token
+        nonce: await getCsrfToken(),
+      });
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+      });
+      void signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+      });
+      console.log("Signed In");
+    } catch (error) {
+      console.error("Sign in error: ", error);
     }
-  }, [isConnected, session, setOnboardingComplete]);
+  }
+
+  useEffect(() => {
+    if (isConnected && session && (userData?.name !== null || undefined)) {
+      setOnboardingComplete(true);
+    } else {
+      setStep(1);
+    }
+  }, [isConnected, userData, session, setOnboardingComplete]);
 
   return (
     <div className="flex h-screen flex-col justify-between px-4 py-6">
-      <div className="flex justify-between">
-        <StepIndicator step={0} currentStep={step} name="" />
-        <div onClick={() => setStep(1)}>
-          <StepIndicator step={1} currentStep={step} name="" />
-        </div>
-      </div>
+      <div />
       {isConnected && step === 1 ? (
         <>
           <div>
@@ -78,11 +121,7 @@ export const Onboarding = ({
                 type="text"
                 className="w-full rounded-full border border-brand-black/20 bg-transparent p-4"
                 placeholder="Name"
-                {...register("name", {
-                  onChange: () => {
-                    void validateField("name");
-                  },
-                })}
+                {...register("name")}
               />
             </div>
             <div className="flex flex-col gap-4">
@@ -100,14 +139,23 @@ export const Onboarding = ({
       ) : (
         <>
           <div>
-            <span>Usually takes about 45 seconds</span>
+            <span>Takes about 20 seconds</span>
             <h2 className="my-1 text-3xl">Create an account</h2>
             <p className="mb-8 text-lg">
               This is where your funds will be stored!
             </p>
             <div className="flex flex-col gap-4">
-              <Button fullWidth onClick={() => void handleRegister()}>
-                Get Started
+              <Button
+                fullWidth
+                onClick={() => {
+                  void handleRegister();
+                }}
+                loading={signingIn}
+              >
+                <div className="flex items-center gap-4">
+                  {signingIn ? null : "Get Started"}
+                  {signingIn ? <LoadingSpinner /> : null}
+                </div>
               </Button>
               {/* <CustomConnectButton /> */}
             </div>

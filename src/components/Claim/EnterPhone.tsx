@@ -20,7 +20,6 @@ let currentOTPIndex = 0;
 
 export const EnterPhone = ({
   control,
-  validateField,
   selectedCountry,
   setSelectedCountry,
   phoneErrorMessage,
@@ -29,7 +28,6 @@ export const EnterPhone = ({
   otpSent,
 }: {
   control: Control<WooshUser>;
-  validateField: (args0: "name" | "phone") => Promise<void>;
   phoneErrorMessage?: string;
   selectedCountry: Data;
   setSelectedCountry: Dispatch<SetStateAction<Data>>;
@@ -168,7 +166,6 @@ export const EnterPhone = ({
                     }}
                     onChange={(e) => {
                       onChange(e.target.value);
-                      void validateField("phone");
                     }}
                     value={value}
                     onBlur={() => setTouched(true)}
