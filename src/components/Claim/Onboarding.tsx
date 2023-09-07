@@ -41,37 +41,52 @@ export const Onboarding = ({
   });
   const [signingIn, setSigningIn] = useState<boolean>(false);
 
-  const getOrCreateOwner = async () => {
-    setSigningIn(true);
-    try {
-      return getPasskeyOwner({
-        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      });
-    } catch (e) {
-      console.log(e);
-      try {
-        return await createPasskeyOwner({
-          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          name: "Woosh",
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
+  // const getOrCreateOwner = async () => {
+  //   setSigningIn(true);
+  //   try {
+  //     return getPasskeyOwner({
+  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //     try {
+  //       return await createPasskeyOwner({
+  //         projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //         name: "Woosh",
+  //       });
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   }
+  // };
 
+  const passkeySignIn = async () => {
+    connect({
+      connector: new ZeroDevConnector({
+        chains,
+        options: {
+          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+          owner: await getPasskeyOwner({
+            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+          }),
+        },
+      }),
+    });
+  };
   const handleRegister = async () => {
     connect({
       connector: new ZeroDevConnector({
         chains,
         options: {
           projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          owner: await getOrCreateOwner(),
+          owner: await createPasskeyOwner({
+            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+            name: "Woosh",
+          }),
         },
       }),
     });
   };
-
   async function siweSignIn() {
     try {
       const message = new SiweMessage({
@@ -154,7 +169,19 @@ export const Onboarding = ({
                 loading={signingIn}
               >
                 <div className="flex items-center gap-4">
-                  {signingIn ? null : "Get Started"}
+                  {signingIn ? null : "Sign Up"}
+                  {signingIn ? <LoadingSpinner /> : null}
+                </div>
+              </Button>
+              <Button
+                fullWidth
+                onClick={() => {
+                  void passkeySignIn();
+                }}
+                loading={signingIn}
+              >
+                <div className="flex items-center gap-4">
+                  {signingIn ? null : "Log In"}
                   {signingIn ? <LoadingSpinner /> : null}
                 </div>
               </Button>
