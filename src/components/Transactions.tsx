@@ -11,6 +11,7 @@ import type { Transaction } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { type PhoneTransaction } from "~/models/transactions";
+import { env } from "~/env.mjs";
 
 export const TransactionCard = ({
   transaction,
@@ -20,7 +21,9 @@ export const TransactionCard = ({
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
   const phone = makePhoneReadable(transaction.phone || "");
-  const url = `http://localhost:3000/claim/${transaction.id}`;
+  const url = `${env.NODE_ENV === "development" ? "http" : "https"}://${
+    env.NEXTAUTH_URL
+  }/claim/${transaction.id}`;
   const [open, setOpen] = useState(false);
   const SecretDialog = () => (
     <Dialog.Root open={open} onOpenChange={setOpen}>

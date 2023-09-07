@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import type { Transaction } from "@prisma/client";
 import { makePhoneReadable } from "~/lib/formatPhone";
 import useTokenPrices from "~/hooks/useTokenPrices";
+import { env } from "~/env.mjs";
 
 export const ShareTransaction = ({
   transaction,
@@ -21,7 +22,9 @@ export const ShareTransaction = ({
       ? cryptoPrices?.["ethereum"].usd
       : cryptoPrices?.["usd-coin"].usd;
   const amountInUSD = transaction.amount * (tokenPrice || 0);
-  const url = `https://woosh-sender.vercel.app/claim/${transaction.id}`;
+  const url = `${env.NODE_ENV === "development" ? "http" : "https"}://${
+    env.NEXTAUTH_URL
+  }/claim/${transaction.id}`;
   const formattedPhone = makePhoneReadable(transaction.phone || "");
 
   return (
