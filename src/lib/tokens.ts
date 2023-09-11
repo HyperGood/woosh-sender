@@ -20,7 +20,7 @@ export const TOKENS = [
   },
   {
     id: 2,
-    displayValue: "USDc/OUT",
+    displayValue: "USDc",
     additionalProperties: {
       address: env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress,
       tokenName: "usd-coin",
