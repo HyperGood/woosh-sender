@@ -50,7 +50,7 @@ export const ConfirmTransaction = ({
                       <span className="font-polysans text-lg">
                         {transactionData.contact}
                       </span>
-                      <span className="opacity-60">
+                      <span className="break-all opacity-60">
                         {transactionData.address}
                       </span>
                     </>
@@ -63,7 +63,7 @@ export const ConfirmTransaction = ({
                       {countryCode}-{transactionData.phone}
                     </span>
                   ) : (
-                    <span className="font-polysans text-lg">
+                    <span className="break-all font-polysans text-lg">
                       {transactionData.address}
                     </span>
                   )}

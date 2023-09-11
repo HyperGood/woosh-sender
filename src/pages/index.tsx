@@ -15,7 +15,9 @@ import { PreviousSends } from "~/components/Transactions";
 import SendToWallet from "~/components/Send/Wallet/SendToWallet";
 import Header from "~/components/header";
 import { api } from "~/utils/api";
-import { outAddress } from "~/lib/OUT-ABI";
+import { outAddress } from "~/lib/erc-20/opg-out";
+import { env } from "~/env.mjs";
+import { usdcAddress } from "~/lib/erc-20/op-usdc";
 
 const Balances = () => {
   const { cryptoPrices } = useContext(CryptoPricesContext);
@@ -33,7 +35,7 @@ const Balances = () => {
     isLoading: usdcBalanceLoading,
   } = useBalance({
     address: address,
-    token: outAddress,
+    token: env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress,
   });
 
   interface UserBalance {

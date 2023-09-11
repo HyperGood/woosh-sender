@@ -2,6 +2,7 @@ import { parseEther, parseUnits } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import {
   useAccount,
+  useContractWrite,
   usePrepareContractWrite,
   usePrepareSendTransaction,
   useSendTransaction,
@@ -63,7 +64,8 @@ export const SendButton = ({
   });
 
   //Send USDC
-  const { config: sendTokens } = usePrepareContractWrite({
+
+  const { config: sendTokensConfig } = usePrepareContractWrite({
     address: tokenAddress,
     abi: [
       {
@@ -84,6 +86,92 @@ export const SendButton = ({
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
+  const { data: sendTokensHash, write: sendTokens } = useContractWrite({
+    ...sendTokensConfig,
+    onError(error) {
+      if (error.message.includes("User rejected the request")) {
+        toast.error(
+          "It looks like you rejected the transaction in your wallet. Try again and accept the transaction."
+        );
+        toast.error("Don't worry no funds were sent.");
+      } else {
+        console.log("There was an approving the token spend ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
+    },
+    onSuccess() {
+      console.log("Transaction Executed!");
+    },
+  });
+
+  const { data: sendTokensData, isLoading: isSending } = useWaitForTransaction({
+    hash: sendTokensHash?.hash,
+    onSuccess(txData) {
+      console.log("Approved! Approval Data: ", txData);
+      toast.success("Funds sent");
+      saveTransaction({ txId: txData.transactionHash });
+    },
+    onError(error) {
+      console.log("Transaction error: ", error);
+      toast.error(`The transaction failed: ${error.message}`);
+    },
+  });
+
+  const { config: approveTokenConfig } = usePrepareContractWrite({
+    address: tokenAddress,
+    abi: [
+      {
+        name: "approve",
+        type: "function",
+        stateMutability: "nonpayable",
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      },
+    ],
+    value: parseEther("0"),
+    functionName: "approve",
+    args: [address, parseUnits(debouncedAmount.toString(), 18)],
+    enabled: Boolean(transaction.token !== "ETH"),
+  });
+
+  const {
+    data: approvalData,
+    write: approveTokens,
+    isLoading: waitingForApproval,
+  } = useContractWrite({
+    ...approveTokenConfig,
+    onError(error) {
+      if (error.message.includes("User rejected the request")) {
+        toast.error(
+          "It looks like you rejected the approval in your wallet. Try again and accept the approval."
+        );
+      } else {
+        console.log("There was an error approving the error spend ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
+    },
+    onSuccess() {
+      console.log("Transaction Executed!");
+    },
+  });
+
+  const { data: tokenApprovalData, isLoading: isApproving } =
+    useWaitForTransaction({
+      hash: approvalData?.hash,
+      onSuccess(txData) {
+        console.log("Approved! Approval Data: ", txData);
+        console.log("Depositing funds...");
+        sendTokens?.();
+      },
+      onError(error) {
+        console.log("Transaction error: ", error);
+        toast.error(`The transaction failed: ${error.message}`);
+      },
+    });
+
   //Send ETH
   const { config } = usePrepareSendTransaction({
     to: debouncedTo,
@@ -94,7 +182,7 @@ export const SendButton = ({
   const {
     data: sendData,
     sendTransaction: sendETH,
-    isSuccess: waitingForApproval,
+    isSuccess: waitingForETHApproval,
   } = useSendTransaction({
     ...config,
     onError(error) {
@@ -110,7 +198,7 @@ export const SendButton = ({
     },
   });
 
-  const { isLoading: isSending } = useWaitForTransaction({
+  const { isLoading: isSendingETH } = useWaitForTransaction({
     hash: sendData?.hash,
     onSuccess(txData) {
       console.log("txData: ", txData);
@@ -142,6 +230,7 @@ export const SendButton = ({
       alert("Please enter an amount greater than 0");
     } else {
       if (transaction.token === "ETH") {
+        console.log(transaction);
         sendETH?.();
       } else {
         approveTokens?.();
@@ -173,14 +262,16 @@ export const SendButton = ({
 
       <Button
         onClick={() => void sendFunction()}
-        disabled={waitingForApproval || isSending}
-        intent="secondary"
+        disabled={waitingForApproval || isSending || isApproving}
       >
-        {waitingForApproval
-          ? "Waiting for approval"
-          : isSending
-          ? "Sending Funds"
-          : "Send"}
+        <div className="flex items-center gap-2">
+          {waitingForApproval
+            ? "Waiting for approval"
+            : isSending
+            ? "Sending Funds"
+            : "Send"}
+          {isSending || isApproving ? <LoadingSpinner /> : null}
+        </div>
       </Button>
     </>
   );

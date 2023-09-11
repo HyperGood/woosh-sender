@@ -16,6 +16,8 @@ import {
   type WalletTransaction,
   WalletTransactionSchema,
 } from "~/models/transactions";
+import { TOKENS } from "~/lib/tokens";
+import { Data } from "~/components/ComboboxSelect";
 
 export const SendToWallet = () => {
   const [step, setStep] = useState<number>(0);
@@ -26,6 +28,7 @@ export const SendToWallet = () => {
     reset,
     trigger,
     resetField,
+    setValue,
   } = useForm<WalletTransaction>({
     resolver: zodResolver(WalletTransactionSchema),
     mode: "all",
@@ -39,6 +42,7 @@ export const SendToWallet = () => {
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
+  const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const validateField = async (input: "address" | "contact" | "amount") => {
@@ -66,6 +70,12 @@ export const SendToWallet = () => {
       setStep(3);
     }
   }, [fundsSent]);
+
+  useEffect(() => {
+    if (selectedToken) {
+      setValue("token", selectedToken.displayValue);
+    }
+  }, [setValue, selectedToken]);
 
   return (
     <>
@@ -170,7 +180,10 @@ export const SendToWallet = () => {
                     register={register}
                     validateField={validateField}
                     amountErrorMessage={errors.amount?.message}
-                    address={getValues("address")}
+                    recipient={getValues("address")}
+                    setSelectedToken={setSelectedToken}
+                    selectedToken={selectedToken}
+                    setValue={setValue}
                   />
                 ) : step === 2 ? (
                   <ConfirmTransaction transactionData={getValues()} />

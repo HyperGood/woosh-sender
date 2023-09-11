@@ -9,7 +9,6 @@ import { ZeroDevEthersProvider } from "@zerodev/sdk";
 import { env } from "~/env.mjs";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { verifyMessage } from "@ambire/signature-validator";
-import { SignTypedDataVersion, TypedDataUtils } from "@metamask/eth-sig-util";
 
 export const SignDepositButton = ({
   transaction,

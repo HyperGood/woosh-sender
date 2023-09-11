@@ -56,7 +56,9 @@ export const ShareTransaction = ({
                       <span className="font-polysans text-lg">
                         {transaction.contact}
                       </span>
-                      <span className="opacity-60">{transaction.address}</span>
+                      <span className="break-all opacity-60">
+                        {transaction.address}
+                      </span>
                     </>
                   )}
                 </>
@@ -68,7 +70,7 @@ export const ShareTransaction = ({
                       {formattedPhone}
                     </span>
                   ) : (
-                    <span className="font-polysans text-lg">
+                    <span className="break-all font-polysans text-lg">
                       {transaction.address}
                     </span>
                   )}
