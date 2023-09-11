@@ -35,6 +35,7 @@ export const env = createEnv({
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_ZERODEV_ID: z.string().min(1),
     NEXT_PUBLIC_APP_URL: z.string().min(1),
+    NEXT_PUBLIC_TESTNET: z.string().min(1),
   },
 
   /**
@@ -53,6 +54,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     NEXT_PUBLIC_ZERODEV_ID: process.env.NEXT_PUBLIC_ZERODEV_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_TESTNET: process.env.NEXT_PUBLIC_TESTNET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

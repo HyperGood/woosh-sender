@@ -1,6 +1,8 @@
-import { parseEther } from "viem";
+import { parseEther, parseUnits } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import {
+  useAccount,
+  usePrepareContractWrite,
   usePrepareSendTransaction,
   useSendTransaction,
   useWaitForTransaction,
@@ -14,6 +16,9 @@ import { LoadingSpinner } from "~/components/Loading";
 import type { Transaction } from "@prisma/client";
 import { type WalletTransaction } from "~/models/transactions";
 import Button from "~/components/Button";
+import { env } from "~/env.mjs";
+import { outAddress } from "~/lib/erc-20/opg-out";
+import { usdcAddress } from "~/lib/erc-20/op-usdc";
 
 export const SendButton = ({
   transaction,
@@ -31,6 +36,9 @@ export const SendButton = ({
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const debouncedTo = useDebounce(transaction.address, 500);
   const ctx = api.useContext();
+  const tokenAddress =
+    env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress;
+  const { address } = useAccount();
 
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
@@ -54,6 +62,29 @@ export const SendButton = ({
     },
   });
 
+  //Send USDC
+  const { config: sendTokens } = usePrepareContractWrite({
+    address: tokenAddress,
+    abi: [
+      {
+        inputs: [
+          { internalType: "address", name: "sender", type: "address" },
+          { internalType: "address", name: "recipient", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "transferFrom",
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+    ],
+    value: parseEther("0"),
+    functionName: "transferFrom",
+    args: [address, debouncedTo, parseUnits(debouncedAmount.toString(), 18)],
+    enabled: Boolean(transaction.token !== "ETH"),
+  });
+
+  //Send ETH
   const { config } = usePrepareSendTransaction({
     to: debouncedTo,
     value: debouncedAmount ? parseEther(debouncedAmount.toString()) : undefined,
@@ -62,7 +93,7 @@ export const SendButton = ({
 
   const {
     data: sendData,
-    sendTransaction,
+    sendTransaction: sendETH,
     isSuccess: waitingForApproval,
   } = useSendTransaction({
     ...config,
@@ -84,6 +115,7 @@ export const SendButton = ({
     onSuccess(txData) {
       console.log("txData: ", txData);
       saveTransaction({ txId: txData.transactionHash });
+      if (saveContact) saveContactFunction();
       toast.success(`Funds sent!`);
     },
     onError(error) {
@@ -109,10 +141,11 @@ export const SendButton = ({
     } else if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {
-      if (saveContact) {
-        saveContactFunction();
+      if (transaction.token === "ETH") {
+        sendETH?.();
+      } else {
+        approveTokens?.();
       }
-      sendTransaction?.();
     }
   };
 

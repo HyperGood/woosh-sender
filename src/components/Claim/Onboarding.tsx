@@ -25,7 +25,7 @@ export const Onboarding = ({
   const [step, setStep] = useState<number>(0);
   const { connect, isLoading } = useConnect({
     onSuccess: () => {
-      void siweSignIn();
+      //void siweSignIn();
     },
     onError: () => {
       setSigningIn(false);
@@ -33,70 +33,86 @@ export const Onboarding = ({
     },
   });
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
-  const { signMessageAsync } = useSignMessage();
+  //const { chain } = useNetwork();
+  //const { signMessageAsync } = useSignMessage();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
   });
   const [signingIn, setSigningIn] = useState<boolean>(false);
 
-  const getOrCreateOwner = async () => {
-    setSigningIn(true);
-    try {
-      return getPasskeyOwner({
-        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      });
-    } catch (e) {
-      console.log(e);
-      try {
-        return await createPasskeyOwner({
-          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          name: "Woosh",
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
+  // const getOrCreateOwner = async () => {
+  //   setSigningIn(true);
+  //   try {
+  //     return getPasskeyOwner({
+  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //     try {
+  //       return await createPasskeyOwner({
+  //         projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //         name: "Woosh",
+  //       });
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   }
+  // };
 
+  const passkeySignIn = async () => {
+    connect({
+      connector: new ZeroDevConnector({
+        chains,
+        options: {
+          projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+          owner: await getPasskeyOwner({
+            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+          }),
+        },
+      }),
+    });
+  };
   const handleRegister = async () => {
     connect({
       connector: new ZeroDevConnector({
         chains,
         options: {
           projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-          owner: await getOrCreateOwner(),
+          owner: await createPasskeyOwner({
+            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+            name: "Woosh",
+          }),
         },
       }),
     });
   };
 
-  async function siweSignIn() {
-    try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in to Woosh",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        // nonce is used from CSRF token
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      void signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-      });
-      console.log("Signed In");
-    } catch (error) {
-      console.error("Sign in error: ", error);
-    }
-  }
+  // async function siweSignIn() {
+  //   try {
+  //     const message = new SiweMessage({
+  //       domain: window.location.host,
+  //       address: address,
+  //       statement: "Sign in to Woosh",
+  //       uri: window.location.origin,
+  //       version: "1",
+  //       chainId: chain?.id,
+  //       // nonce is used from CSRF token
+  //       nonce: await getCsrfToken(),
+  //     });
+  //     const signature = await signMessageAsync({
+  //       message: message.prepareMessage(),
+  //     });
+  //     void signIn("credentials", {
+  //       message: JSON.stringify(message),
+  //       redirect: false,
+  //       signature,
+  //     });
+  //     console.log("Signed In");
+  //   } catch (error) {
+  //     console.error("Sign in error: ", error);
+  //   }
+  // }
 
   useEffect(() => {
     if (isConnected && session && userData?.name) {
@@ -154,7 +170,20 @@ export const Onboarding = ({
                 loading={signingIn}
               >
                 <div className="flex items-center gap-4">
-                  {signingIn ? null : "Get Started"}
+                  {signingIn ? null : "Create Account"}
+                  {signingIn ? <LoadingSpinner /> : null}
+                </div>
+              </Button>
+              <Button
+                fullWidth
+                onClick={() => {
+                  void passkeySignIn();
+                }}
+                loading={signingIn}
+                intent="secondary"
+              >
+                <div className="flex items-center gap-4">
+                  {signingIn ? null : "I already have an account"}
                   {signingIn ? <LoadingSpinner /> : null}
                 </div>
               </Button>

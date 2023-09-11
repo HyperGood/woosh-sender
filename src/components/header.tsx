@@ -1,8 +1,14 @@
 // import QrIcon from "public/images/icons/QrIcon";
-import SettingsIcon from "public/images/icons/SettingsIcon";
 import UserPlaceholder from "public/images/icons/UserPlaceholder";
+import UserMenu from "./UserMenu";
 
-export function Header({ username }: { username?: string }) {
+export function Header({
+  username,
+  address,
+}: {
+  username?: string;
+  address: `0x${string}`;
+}) {
   return (
     <div className="z-50 flex w-full items-center justify-between gap-4 px-4 py-4 lg:absolute lg:top-0 lg:px-10 lg:py-8">
       {/* <div>
@@ -14,9 +20,7 @@ export function Header({ username }: { username?: string }) {
         </div>
         <span>{username ? username : "Cool User"}</span>
       </div>
-      <div>
-        <SettingsIcon />
-      </div>
+      <UserMenu address={address} />
     </div>
   );
 }

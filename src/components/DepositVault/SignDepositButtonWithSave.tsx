@@ -1,4 +1,9 @@
-import { useNetwork, useSignTypedData } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useSignTypedData,
+  useWalletClient,
+} from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
@@ -10,6 +15,10 @@ import { api } from "~/utils/api";
 import { formatPhone } from "~/lib/formatPhone";
 import { type Country } from "~/lib/countries";
 import useTokenPrices from "~/hooks/useTokenPrices";
+import { ECDSAProvider, ZeroDevEthersProvider } from "@zerodev/sdk";
+import { env } from "~/env.mjs";
+import { getPasskeyOwner } from "@zerodev/sdk/passkey";
+import { verifyMessage } from "@ambire/signature-validator";
 
 export const SignDepositButton = ({
   transaction,
@@ -27,6 +36,8 @@ export const SignDepositButton = ({
   countryCode: Country;
 }) => {
   const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { data } = useWalletClient();
   const chainId = chain?.id;
   const depositVaultAddress =
     chainId && chainId in contractAddress
@@ -61,12 +72,49 @@ export const SignDepositButton = ({
       { name: "amount", type: "uint256" },
       { name: "depositIndex", type: "uint256" },
     ],
-  } as const;
+  };
 
   const message = {
     amount: parseEther(transaction.amount.toString()),
     depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
+
+  const signWithAA = async () => {
+    const provider = await ZeroDevEthersProvider.init("ECDSA", {
+      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      owner: await getPasskeyOwner({
+        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      }),
+    });
+    const signer = provider.getAccountSigner();
+
+    const typedData = {
+      domain,
+      types,
+      message,
+      primaryType: "Withdrawal",
+    };
+
+    const signature = await signer._signTypedData(
+      typedData.domain,
+      typedData.types,
+      {
+        amount: parseEther(transaction.amount.toString()),
+        depositIndex: BigInt(transaction.depositIndex || 0),
+      }
+    );
+
+    console.log(signature);
+
+    console.log(
+      await verifyMessage({
+        signer: address,
+        typedData,
+        signature: signature,
+        provider,
+      })
+    );
+  };
 
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
@@ -107,6 +155,7 @@ export const SignDepositButton = ({
       <Button
         onClick={() => {
           if (!secret) {
+            //signWithAA();
             signTypedData();
             saveTransaction();
           }

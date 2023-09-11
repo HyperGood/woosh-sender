@@ -36,8 +36,8 @@ export default function ClaimPage({
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [formattedPhone, setFormattedPhone] = useState<string>("");
-  const { signMessageAsync } = useSignMessage();
-  const { chain } = useNetwork();
+  //  const { signMessageAsync } = useSignMessage();
+  //  const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
@@ -94,36 +94,37 @@ export default function ClaimPage({
   useEffect(() => {
     if (claimed && isConnected && !session) {
       console.log("Signing In...");
+      void router.push("/");
       /**
        * Attempts SIWE and establish session
        */
-      async function siweSignIn() {
-        try {
-          const message = new SiweMessage({
-            domain: window.location.host,
-            address: address,
-            statement: "Sign in to Woosh",
-            uri: window.location.origin,
-            version: "1",
-            chainId: chain?.id,
-            // nonce is used from CSRF token
-            nonce: await getCsrfToken(),
-          });
-          const signature = await signMessageAsync({
-            message: message.prepareMessage(),
-          });
-          void signIn("credentials", {
-            message: JSON.stringify(message),
-            redirect: false,
-            signature,
-          });
-          console.log("Signed In");
-        } catch (error) {
-          console.error("Sign in error: ", error);
-        }
-      }
+      // async function siweSignIn() {
+      //   try {
+      //     const message = new SiweMessage({
+      //       domain: window.location.host,
+      //       address: address,
+      //       statement: "Sign in to Woosh",
+      //       uri: window.location.origin,
+      //       version: "1",
+      //       chainId: chain?.id,
+      //       // nonce is used from CSRF token
+      //       nonce: await getCsrfToken(),
+      //     });
+      //     const signature = await signMessageAsync({
+      //       message: message.prepareMessage(),
+      //     });
+      //     void signIn("credentials", {
+      //       message: JSON.stringify(message),
+      //       redirect: false,
+      //       signature,
+      //     });
+      //     console.log("Signed In");
+      //   } catch (error) {
+      //     console.error("Sign in error: ", error);
+      //   }
+      // }
 
-      void siweSignIn();
+      // void siweSignIn();
     } else if (claimed && !isConnected) {
       console.error("Not connected");
     }
@@ -138,6 +139,7 @@ export default function ClaimPage({
         name: inputData.name,
         phone: inputData.phone,
       });
+      void router.push("/");
     } else if ((claimed && session && userData?.name !== null) || undefined) {
       void router.push("/");
     } else {
@@ -258,6 +260,7 @@ export default function ClaimPage({
           sendOTP={sendOTP}
           verifyOTP={verifyOTP}
           wrongCode={wrongCode}
+          sender={senderData.name ? senderData.name : "someone"}
         />
       )}
     </>

@@ -18,7 +18,9 @@ import type { PhoneTransactionForm } from "~/models/transactions";
 import { type Country } from "~/lib/countries";
 import { type UseFormSetValue } from "react-hook-form";
 import Button from "../Button";
-import { tokenAbi, outAddress } from "../../lib/OUT-ABI";
+import { env } from "~/env.mjs";
+import { outAddress } from "../../lib/erc-20/opg-out";
+import { usdcAddress } from "~/lib/erc-20/op-usdc";
 
 export const DepositButton = ({
   transaction,
@@ -44,6 +46,9 @@ export const DepositButton = ({
       ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
 
+  const tokenAddress =
+    env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress;
+
   const { mutate: mutateContact } = api.contact.add.useMutation({
     onSuccess: () => {
       console.log("Successfully added contact");
@@ -55,16 +60,31 @@ export const DepositButton = ({
   });
 
   //Approve ERC-20 Tokens
-
   const { config: approveTokenConfig } = usePrepareContractWrite({
-    address: "0x32307adfFE088e383AFAa721b06436aDaBA47DBE",
+    address: tokenAddress,
+    abi: [
+      {
+        name: "approve",
+        type: "function",
+        stateMutability: "nonpayable",
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      },
+    ],
+    value: parseEther("0"),
     functionName: "approve",
     args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 18)],
-    abi: tokenAbi,
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
-  const { data: approvalData, write: approveTokens } = useContractWrite({
+  const {
+    data: approvalData,
+    write: approveTokens,
+    isLoading: waitingForApproval,
+  } = useContractWrite({
     ...approveTokenConfig,
     onError(error) {
       if (error.message.includes("User rejected the request")) {
@@ -124,7 +144,7 @@ export const DepositButton = ({
   const {
     data: depositData,
     write: deposit,
-    isLoading: isDepositLoading,
+    isLoading: waitingForDeposit,
   } = useContractWrite({
     ...contractWriteConfig,
     onError(error) {
@@ -203,7 +223,7 @@ export const DepositButton = ({
   const status = {
     isDepositting: "Sending funds",
     isApproving: "Allowing your account to send tokens",
-    isDepositLoading: "Confirm the transaction",
+    waitingForDeposit: "Confirm the transaction",
   };
 
   //Add a disclaimer saying that you can always cancel a transaction before someone claims the funds
@@ -211,17 +231,24 @@ export const DepositButton = ({
     <div className="flex flex-col items-center justify-center gap-4">
       <Button
         onClick={() => void sendFunction()}
-        disabled={isDepositLoading}
-        loading={isDepositing || isApproving}
+        disabled={waitingForDeposit}
+        loading={
+          isDepositing || isApproving || waitingForApproval || waitingForDeposit
+        }
         fullWidth
       >
         <div className="flex items-center gap-4">
-          {isDepositLoading
-            ? status.isDepositLoading
-            : isDepositing || isApproving
+          {waitingForDeposit
+            ? status.waitingForDeposit
+            : isDepositing || isApproving || waitingForApproval
             ? null
             : "Send funds"}
-          {isDepositing || isApproving ? <LoadingSpinner /> : null}
+          {isDepositing ||
+          isApproving ||
+          waitingForApproval ||
+          waitingForDeposit ? (
+            <LoadingSpinner />
+          ) : null}
         </div>
       </Button>
       <span>
@@ -236,3 +263,6 @@ export const DepositButton = ({
 };
 
 export default DepositButton;
+
+//0x8c42537dcf299be5616c04a9238f70f991806e8834280fba8dbcb6b5a5347f241dd40d8d617c69d1e8e0a4dfc71ecaead95e872a7f78b1f389dbfebc51bba43f1c
+//36

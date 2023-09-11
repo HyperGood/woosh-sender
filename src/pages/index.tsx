@@ -199,6 +199,7 @@ export default function Home({ coinsData }: { coinsData: CryptoPrices }) {
         <div className="relative h-full min-h-screen w-full lg:grid lg:h-screen lg:grid-cols-[1fr_44%] lg:items-center">
           <Header
             username={userData?.name === null ? undefined : userData?.name}
+            address={address || "0xnoaddress"}
           />
           <div className="lg:mx-auto">
             <Main />

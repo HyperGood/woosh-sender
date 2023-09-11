@@ -27,6 +27,7 @@ export const EnterPhone = ({
   otpSent,
   verifyOTP,
   wrongCode,
+  sender,
 }: {
   control: Control<WooshUser>;
   phoneErrorMessage?: string;
@@ -36,6 +37,7 @@ export const EnterPhone = ({
   otpSent: boolean;
   verifyOTP: (args0: string) => Promise<void>;
   wrongCode: boolean;
+  sender: string;
 }) => {
   const [countryQuery, setCountryQuery] = useState("");
   const [touched, setTouched] = useState<boolean>(false);
@@ -110,9 +112,7 @@ export const EnterPhone = ({
     <div className="flex-items flex h-screen flex-col items-center justify-between px-4 py-10">
       <div className="w-full"></div>
       <div className="-mt-10">
-        <h1 className="mb-3 text-3xl">
-          Looks like someone sent you crypto! 🤑
-        </h1>
+        <h1 className="mb-3 text-3xl">{sender} sent you money! 🤑</h1>
         <p className="text-lg">Enter your phone number to claim it!</p>
         <div className="mb-10 mt-6 flex flex-col items-center gap-2">
           <ComboInput
