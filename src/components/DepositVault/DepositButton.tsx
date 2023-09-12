@@ -74,7 +74,6 @@ export const DepositButton = ({
         outputs: [{ internalType: "bool", name: "", type: "bool" }],
       },
     ],
-    value: parseEther("0"),
     functionName: "approve",
     args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 18)],
     enabled: Boolean(transaction.token !== "ETH"),

@@ -79,42 +79,42 @@ export const SignDepositButton = ({
     depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
 
-  const signWithAA = async () => {
-    const provider = await ZeroDevEthersProvider.init("ECDSA", {
-      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      owner: await getPasskeyOwner({
-        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      }),
-    });
-    const signer = provider.getAccountSigner();
+  // const signWithAA = async () => {
+  //   const provider = await ZeroDevEthersProvider.init("ECDSA", {
+  //     projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     owner: await getPasskeyOwner({
+  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     }),
+  //   });
+  //   const signer = provider.getAccountSigner();
 
-    const typedData = {
-      domain,
-      types,
-      message,
-      primaryType: "Withdrawal",
-    };
+  //   const typedData = {
+  //     domain,
+  //     types,
+  //     message,
+  //     primaryType: "Withdrawal",
+  //   };
 
-    const signature = await signer._signTypedData(
-      typedData.domain,
-      typedData.types,
-      {
-        amount: parseEther(transaction.amount.toString()),
-        depositIndex: BigInt(transaction.depositIndex || 0),
-      }
-    );
+  //   const signature = await signer._signTypedData(
+  //     typedData.domain,
+  //     typedData.types,
+  //     {
+  //       amount: parseEther(transaction.amount.toString()),
+  //       depositIndex: BigInt(transaction.depositIndex || 0),
+  //     }
+  //   );
 
-    console.log(signature);
+  //   console.log(signature);
 
-    console.log(
-      await verifyMessage({
-        signer: address,
-        typedData,
-        signature: signature,
-        provider,
-      })
-    );
-  };
+  //   console.log(
+  //     await verifyMessage({
+  //       signer: address,
+  //       typedData,
+  //       signature: signature,
+  //       provider,
+  //     })
+  //   );
+  // };
 
   const { isLoading, signTypedData } = useSignTypedData({
     domain,

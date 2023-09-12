@@ -80,9 +80,12 @@ export const SendButton = ({
         type: "function",
       },
     ],
-    value: parseEther("0"),
     functionName: "transferFrom",
-    args: [address, debouncedTo, parseUnits(debouncedAmount.toString(), 18)],
+    args: [
+      address || "0x0",
+      debouncedTo as `0x${string}`,
+      parseUnits(debouncedAmount.toString(), 18),
+    ],
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
@@ -131,9 +134,8 @@ export const SendButton = ({
         outputs: [{ internalType: "bool", name: "", type: "bool" }],
       },
     ],
-    value: parseEther("0"),
     functionName: "approve",
-    args: [address, parseUnits(debouncedAmount.toString(), 18)],
+    args: [address || "0x0", parseUnits(debouncedAmount.toString(), 18)],
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
@@ -164,7 +166,7 @@ export const SendButton = ({
       onSuccess(txData) {
         console.log("Approved! Approval Data: ", txData);
         console.log("Depositing funds...");
-        sendTokens?.();
+        // sendTokens?.();
       },
       onError(error) {
         console.log("Transaction error: ", error);
@@ -260,19 +262,33 @@ export const SendButton = ({
         </div>
       )}
 
-      <Button
-        onClick={() => void sendFunction()}
-        disabled={waitingForApproval || isSending || isApproving}
-      >
-        <div className="flex items-center gap-2">
-          {waitingForApproval
-            ? "Waiting for approval"
-            : isSending
-            ? "Sending Funds"
-            : "Send"}
-          {isSending || isApproving ? <LoadingSpinner /> : null}
-        </div>
-      </Button>
+      {tokenApprovalData ? (
+        <Button
+          onClick={() => void sendFunction()}
+          disabled={waitingForApproval || isSending || isApproving}
+        >
+          <div className="flex items-center gap-2">
+            Send Funds
+            {isSending || isApproving ? <LoadingSpinner /> : null}
+          </div>
+        </Button>
+      ) : (
+        <Button
+          onClick={() => void sendFunction()}
+          disabled={waitingForApproval || isSending || isApproving}
+        >
+          <div className="flex items-center gap-2">
+            {waitingForApproval
+              ? "Waiting for approval"
+              : isSending
+              ? "Sending Funds"
+              : "Approve transaction"}
+            {isSending || isApproving || waitingForApproval ? (
+              <LoadingSpinner />
+            ) : null}
+          </div>
+        </Button>
+      )}
     </>
   );
 };

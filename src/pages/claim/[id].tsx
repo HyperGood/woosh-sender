@@ -156,8 +156,8 @@ export default function ClaimPage({
 
   if (claimed) {
     return (
-      <div className="flex h-screen w-full animate-pulse items-center justify-center bg-brand-black text-brand-white">
-        Signing In...
+      <div className="flex h-screen w-full animate-pulse items-center justify-center bg-brand-accent text-brand-black">
+        Success!
       </div>
     );
   }

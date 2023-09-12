@@ -22,9 +22,7 @@ export const ShareTransaction = ({
       ? cryptoPrices?.["ethereum"].usd
       : cryptoPrices?.["usd-coin"].usd;
   const amountInUSD = transaction.amount * (tokenPrice || 0);
-  const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}?=${
-    secret || ""
-  }`;
+  const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
   const formattedPhone = makePhoneReadable(transaction.phone || "");
 
   return (

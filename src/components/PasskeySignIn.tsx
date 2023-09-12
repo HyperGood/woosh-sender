@@ -8,7 +8,7 @@ import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
 
 export const PasskeySignIn = () => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage();
   const { connect } = useConnect({
@@ -18,20 +18,25 @@ export const PasskeySignIn = () => {
   });
 
   const handleLogin = async () => {
-    try {
-      connect({
-        connector: new ZeroDevConnector({
-          chains,
-          options: {
-            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-            owner: await getPasskeyOwner({
+    if (isConnected) {
+      console.log("siwe");
+      void siweSignIn();
+    } else {
+      try {
+        connect({
+          connector: new ZeroDevConnector({
+            chains,
+            options: {
               projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-            }),
-          },
-        }),
-      });
-    } catch (error) {
-      console.log("error: ", error);
+              owner: await getPasskeyOwner({
+                projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+              }),
+            },
+          }),
+        });
+      } catch (error) {
+        console.log("error: ", error);
+      }
     }
   };
 
