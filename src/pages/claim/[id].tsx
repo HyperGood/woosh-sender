@@ -31,7 +31,7 @@ export default function ClaimPage({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter();
   const formattedTransaction = JSON.parse(transaction) as Transaction;
-  const [otpVerified, setOtpVerified] = useState<boolean>(false);
+  const [otpVerified, setOtpVerified] = useState<boolean>(true);
   const [otpSent, setOtpSent] = useState<boolean>(false);
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
@@ -143,7 +143,7 @@ export default function ClaimPage({
       const inputData = getValues();
       mutate({
         name: inputData.name,
-        phone: inputData.phone,
+        // phone: inputData.phone,
       });
     }
   }, [claimed]);
@@ -242,6 +242,7 @@ export default function ClaimPage({
         <Onboarding
           register={register}
           setOnboardingComplete={setOnboardingComplete}
+          sender={senderData.name ? senderData.name : "someone"}
         />
       ) : onboardingComplete && otpVerified ? (
         <Claim

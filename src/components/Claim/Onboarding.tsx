@@ -18,9 +18,11 @@ import { toast } from "react-hot-toast";
 export const Onboarding = ({
   register,
   setOnboardingComplete,
+  sender,
 }: {
   register: UseFormRegister<WooshUser>;
   setOnboardingComplete: Dispatch<SetStateAction<boolean>>;
+  sender: string;
 }) => {
   const [step, setStep] = useState<number>(0);
   const { connect, isLoading } = useConnect({
@@ -157,7 +159,7 @@ export const Onboarding = ({
         <>
           <div>
             <span>Takes about 20 seconds</span>
-            <h2 className="my-1 text-3xl">Create an account</h2>
+            <h1 className="my-1 text-3xl">{sender} sent you money! 🤑</h1>
             <p className="mb-8 text-lg">
               This is where your funds will be stored!
             </p>

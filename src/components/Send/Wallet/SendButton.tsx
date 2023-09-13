@@ -86,7 +86,10 @@ export const SendButton = ({
       debouncedTo as `0x${string}`,
       parseUnits(debouncedAmount.toString(), 18),
     ],
-    enabled: Boolean(transaction.token !== "ETH"),
+    enabled: Boolean(approvalData) && Boolean(transaction.token !== "ETH"),
+    onError(err) {
+      toast.error(err.message);
+    },
   });
 
   const {
