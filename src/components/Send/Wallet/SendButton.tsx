@@ -65,6 +65,59 @@ export const SendButton = ({
 
   //Send USDC
 
+  const { config: approveTokenConfig } = usePrepareContractWrite({
+    address: tokenAddress,
+    abi: [
+      {
+        name: "approve",
+        type: "function",
+        stateMutability: "nonpayable",
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      },
+    ],
+    functionName: "approve",
+    args: [address || "0x0", parseUnits(debouncedAmount.toString(), 18)],
+    enabled: Boolean(transaction.token !== "ETH"),
+  });
+
+  const {
+    data: approvalData,
+    write: approveTokens,
+    isLoading: waitingForApproval,
+  } = useContractWrite({
+    ...approveTokenConfig,
+    onError(error) {
+      if (error.message.includes("User rejected the request")) {
+        toast.error(
+          "It looks like you rejected the approval in your wallet. Try again and accept the approval."
+        );
+      } else {
+        console.log("There was an error approving the spend ", error);
+        toast.error(`Deposit error: ${error.message}`);
+      }
+    },
+    onSuccess() {
+      console.log("Transaction Executed!");
+    },
+  });
+
+  const { isLoading: isApproving } = useWaitForTransaction({
+    hash: approvalData?.hash,
+    onSuccess(txData) {
+      console.log("Approved! Approval Data: ", txData);
+      console.log("Depositing funds...");
+      // sendTokens?.();
+    },
+    onError(error) {
+      console.log("Transaction error: ", error);
+      toast.error(`The transaction failed: ${error.message}`);
+    },
+  });
+
   const { config: sendTokensConfig } = usePrepareContractWrite({
     address: tokenAddress,
     abi: [
@@ -193,59 +246,6 @@ export const SendButton = ({
   });
 
   */
-
-  const { config: approveTokenConfig } = usePrepareContractWrite({
-    address: tokenAddress,
-    abi: [
-      {
-        name: "approve",
-        type: "function",
-        stateMutability: "nonpayable",
-        inputs: [
-          { internalType: "address", name: "spender", type: "address" },
-          { internalType: "uint256", name: "amount", type: "uint256" },
-        ],
-        outputs: [{ internalType: "bool", name: "", type: "bool" }],
-      },
-    ],
-    functionName: "approve",
-    args: [address || "0x0", parseUnits(debouncedAmount.toString(), 18)],
-    enabled: Boolean(transaction.token !== "ETH"),
-  });
-
-  const {
-    data: approvalData,
-    write: approveTokens,
-    isLoading: waitingForApproval,
-  } = useContractWrite({
-    ...approveTokenConfig,
-    onError(error) {
-      if (error.message.includes("User rejected the request")) {
-        toast.error(
-          "It looks like you rejected the approval in your wallet. Try again and accept the approval."
-        );
-      } else {
-        console.log("There was an error approving the spend ", error);
-        toast.error(`Deposit error: ${error.message}`);
-      }
-    },
-    onSuccess() {
-      console.log("Transaction Executed!");
-    },
-  });
-
-  const { isLoading: isApproving } = useWaitForTransaction({
-    hash: approvalData?.hash,
-    onSuccess(txData) {
-      console.log("Approved! Approval Data: ", txData);
-      console.log("Depositing funds...");
-      // sendTokens?.();
-    },
-    onError(error) {
-      console.log("Transaction error: ", error);
-      toast.error(`The transaction failed: ${error.message}`);
-    },
-  });
 
   /*Send ETH*/
   const { config } = usePrepareSendTransaction({
