@@ -1,8 +1,8 @@
 import { type Contact } from "@prisma/client";
 import { useSession } from "next-auth/react";
 // import Image from "next/image";
-import EditIcon from "public/images/icons/EditIcon";
-import UserPlaceholder from "public/images/icons/UserPlaceholder";
+import EditIcon from "public/static/images/icons/EditIcon";
+import UserPlaceholder from "public/static/images/icons/UserPlaceholder";
 import { api } from "~/utils/api";
 
 export const Contacts = () => {

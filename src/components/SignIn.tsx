@@ -1,4 +1,4 @@
-import Logo from "public/images/Logo";
+import Logo from "public/static/images/Logo";
 
 import CustomConnectButton from "./CustomConnectButton";
 import PasskeySignIn from "./PasskeySignIn";

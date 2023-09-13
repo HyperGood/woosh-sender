@@ -49,7 +49,6 @@ export const PasskeySignIn = () => {
         uri: window.location.origin,
         version: "1",
         chainId: chain?.id,
-        // nonce is used from CSRF token
         nonce: await getCsrfToken(),
       });
       const signature = await signMessageAsync({

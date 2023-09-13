@@ -2,8 +2,8 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import { useDisconnect } from "wagmi";
-import CopyIcon from "public/images/icons/CopyIcon";
-import SettingsIcon from "public/images/icons/SettingsIcon";
+import CopyIcon from "public/static/images/icons/CopyIcon";
+import SettingsIcon from "public/static/images/icons/SettingsIcon";
 
 export const UserMenu = ({ address }: { address: `0x${string}` }) => {
   const { disconnect } = useDisconnect();
@@ -36,7 +36,7 @@ export const UserMenu = ({ address }: { address: `0x${string}` }) => {
         </div>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="mt-2 flex w-[--radix-dropdown-menu-trigger-width] flex-col rounded-md bg-brand-white shadow">
+        <DropdownMenu.Content className="mt-2 flex flex-col rounded-md bg-brand-white shadow">
           <DropdownMenu.Item asChild>
             <button
               className=" w-full rounded-md bg-brand-white p-4 transition-colors hover:bg-brand-accent"

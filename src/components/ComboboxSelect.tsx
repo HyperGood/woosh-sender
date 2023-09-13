@@ -1,5 +1,5 @@
 import { Combobox } from "@headlessui/react";
-import ChevronDownIcon from "public/images/icons/chevron-down";
+import ChevronDownIcon from "public/static/images/icons/chevron-down";
 import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 export interface Data {
