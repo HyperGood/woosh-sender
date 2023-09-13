@@ -31,7 +31,7 @@ export const UserMenu = ({ address }: { address: `0x${string}` }) => {
             )} */}
         {/* </div>
         </div> */}
-        <div>
+        <div className="h-6 w-6">
           <SettingsIcon />
         </div>
       </DropdownMenu.Trigger>

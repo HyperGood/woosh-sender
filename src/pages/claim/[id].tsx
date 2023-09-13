@@ -138,19 +138,15 @@ export default function ClaimPage({
 
   useEffect(() => {
     //Save user data to DB
-    if (claimed && session) {
+    if (claimed) {
       console.log("Saving user data to DB...");
       const inputData = getValues();
       mutate({
         name: inputData.name,
         phone: inputData.phone,
       });
-    } else {
-      console.log("Claimed Status: ", claimed);
-      console.log("Session Status: ", session);
-      console.log("User Name: ", userData?.name);
     }
-  }, [session, userData?.name, claimed]);
+  }, [claimed]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   if (formattedTransaction.claimed) {
