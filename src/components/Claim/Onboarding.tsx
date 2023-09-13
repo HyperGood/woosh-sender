@@ -1,5 +1,5 @@
 import { useAccount, useConnect, useNetwork, useSignMessage } from "wagmi";
-import { ZeroDevConnector } from "@zerodev/wagmi";
+import { ZeroDevConnector, useSendUserOperation } from "@zerodev/wagmi";
 import { createPasskeyOwner, getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
@@ -10,7 +10,7 @@ import { type WooshUser } from "~/models/users";
 // import PasskeySignIn from "../PasskeySignIn";
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
-import { SiweMessage } from "siwe";
+//import { SiweMessage } from "siwe";
 import { LoadingSpinner } from "../Loading";
 import { toast } from "react-hot-toast";
 // import CustomConnectButton from "../CustomConnectButton";
@@ -25,9 +25,21 @@ export const Onboarding = ({
   sender: string;
 }) => {
   const [step, setStep] = useState<number>(0);
+  const { sendUserOperation } = useSendUserOperation({
+    to: "0x0000000000000000000000000000000000000000",
+    data: "0x",
+    value: BigInt("0"),
+    onSuccess(data) {
+      console.log(data);
+    },
+  });
   const { connect, isLoading } = useConnect({
     onSuccess: () => {
-      void siweSignIn();
+      //void siweSignIn();
+      if (shouldDeployAccount) {
+        //deployAccount
+        sendUserOperation?.();
+      }
     },
     onError: () => {
       setSigningIn(false);
@@ -35,13 +47,14 @@ export const Onboarding = ({
     },
   });
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
-  const { signMessageAsync } = useSignMessage();
+  //const { chain } = useNetwork();
+  //const { signMessageAsync } = useSignMessage();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
   });
   const [signingIn, setSigningIn] = useState<boolean>(false);
+  const [shouldDeployAccount, setShouldDeployAccount] = useState(false);
 
   // const getOrCreateOwner = async () => {
   //   setSigningIn(true);
@@ -76,6 +89,7 @@ export const Onboarding = ({
     });
   };
   const handleRegister = async () => {
+    setShouldDeployAccount(true);
     connect({
       connector: new ZeroDevConnector({
         chains,
@@ -90,31 +104,31 @@ export const Onboarding = ({
     });
   };
 
-  async function siweSignIn() {
-    try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in to Woosh",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        // nonce is used from CSRF token
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      void signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-      });
-      console.log("Signed In");
-    } catch (error) {
-      console.error("Sign in error: ", error);
-    }
-  }
+  // async function siweSignIn() {
+  //   try {
+  //     const message = new SiweMessage({
+  //       domain: window.location.host,
+  //       address: address,
+  //       statement: "Sign in to Woosh",
+  //       uri: window.location.origin,
+  //       version: "1",
+  //       chainId: chain?.id,
+  //       // nonce is used from CSRF token
+  //       nonce: await getCsrfToken(),
+  //     });
+  //     const signature = await signMessageAsync({
+  //       message: message.prepareMessage(),
+  //     });
+  //     void signIn("credentials", {
+  //       message: JSON.stringify(message),
+  //       redirect: false,
+  //       signature,
+  //     });
+  //     console.log("Signed In");
+  //   } catch (error) {
+  //     console.error("Sign in error: ", error);
+  //   }
+  // }
 
   useEffect(() => {
     if (isConnected && session && userData?.name) {
