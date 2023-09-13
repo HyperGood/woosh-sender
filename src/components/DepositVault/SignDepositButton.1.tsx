@@ -1,8 +1,13 @@
-import { useAccount, useNetwork, useSignTypedData } from "wagmi";
+import {
+  useAccount,
+  useNetwork,
+  useSignTypedData,
+  useWalletClient,
+} from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
-import { type Hex, parseEther } from "viem";
+import { parseEther } from "viem";
 import type { PhoneTransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 import Button from "../Button";
@@ -10,11 +15,6 @@ import { api } from "~/utils/api";
 import { formatPhone } from "~/lib/formatPhone";
 import { type Country } from "~/lib/countries";
 import useTokenPrices from "~/hooks/useTokenPrices";
-import { ECDSAProvider } from "@zerodev/sdk";
-import { env } from "~/env.mjs";
-import { getPasskeyOwner } from "@zerodev/sdk/passkey";
-import { verifyMessage } from "@ambire/signature-validator";
-import { ethers } from "ethers";
 
 export const SignDepositButton = ({
   transaction,
@@ -33,6 +33,7 @@ export const SignDepositButton = ({
 }) => {
   const { chain } = useNetwork();
   const { address } = useAccount();
+  const { data } = useWalletClient();
   const chainId = chain?.id;
   const depositVaultAddress =
     chainId && chainId in contractAddress
@@ -58,9 +59,9 @@ export const SignDepositButton = ({
   const domain = {
     name: "DepositVault",
     version: "1.0.0",
-    chainId: 420,
-    verifyingContract: "0xBb6FC4030D202627592C75A5C4C98Db083bcC4f7" as Hex,
-  };
+    chainId: chainId,
+    verifyingContract: depositVaultAddress,
+  } as const;
 
   const types = {
     Withdrawal: [
@@ -72,50 +73,40 @@ export const SignDepositButton = ({
   const message = {
     amount: parseEther(transaction.amount.toString()),
     depositIndex: BigInt(transaction.depositIndex || 0),
-  };
+  } as const;
 
-  const signWithAA = async () => {
-    const provider = await ECDSAProvider.init({
-      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      owner: await getPasskeyOwner({
-        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-      }),
-      opts: {
-        paymasterConfig: {
-          policy: "VERIFYING_PAYMASTER",
-        },
-      },
-    });
-
-    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-      `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
-    );
-    const signingAddress = await provider.getAddress();
-
-    const typedData = {
-      types,
-      message,
-      primaryType: "Withdrawal",
-      domain,
-    };
-
-    console.log(typedData);
-
-    const signature = await provider.signTypedData(typedData);
-
-    console.log("Signing address: ", signingAddress);
-    console.log(signature);
-
-    console.log(
-      await verifyMessage({
-        signer: signingAddress,
-        typedData,
-        signature,
-        provider: jsonRpcProvider,
-      })
-    );
-  };
-
+  // const signWithAA = async () => {
+  //   const provider = await ZeroDevEthersProvider.init("ECDSA", {
+  //     projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     owner: await getPasskeyOwner({
+  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+  //     }),
+  //   });
+  //   const signer = provider.getAccountSigner();
+  //   const typedData = {
+  //     domain,
+  //     types,
+  //     message,
+  //     primaryType: "Withdrawal",
+  //   };
+  //   const signature = await signer._signTypedData(
+  //     typedData.domain,
+  //     typedData.types,
+  //     {
+  //       amount: parseEther(transaction.amount.toString()),
+  //       depositIndex: BigInt(transaction.depositIndex || 0),
+  //     }
+  //   );
+  //   console.log(signature);
+  //   console.log(
+  //     await verifyMessage({
+  //       signer: address,
+  //       typedData,
+  //       signature: signature,
+  //       provider,
+  //     })
+  //   );
+  // };
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
     message,
@@ -157,7 +148,7 @@ export const SignDepositButton = ({
           if (!secret) {
             void signWithAA();
             //signTypedData();
-            //saveTransaction();
+            saveTransaction();
           }
         }}
         disabled={isLoading}
@@ -167,5 +158,3 @@ export const SignDepositButton = ({
     </>
   );
 };
-
-export default SignDepositButton;

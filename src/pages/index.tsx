@@ -1,4 +1,4 @@
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Fragment, useContext, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import SignIn from "~/components/SignIn";
