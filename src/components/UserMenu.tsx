@@ -2,8 +2,8 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import { useDisconnect } from "wagmi";
-import CopyIcon from "public/static/images/icons/CopyIcon";
-import SettingsIcon from "public/static/images/icons/SettingsIcon";
+import CopyIcon from "public/images/icons/CopyIcon";
+import SettingsIcon from "public/images/icons/SettingsIcon";
 
 export const UserMenu = ({ address }: { address: `0x${string}` }) => {
   const { disconnect } = useDisconnect();

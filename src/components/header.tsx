@@ -1,5 +1,5 @@
 // import QrIcon from "public/images/icons/QrIcon";
-import UserPlaceholder from "public/static/images/icons/UserPlaceholder";
+import UserPlaceholder from "public/images/icons/UserPlaceholder";
 import UserMenu from "./UserMenu";
 
 export function Header({

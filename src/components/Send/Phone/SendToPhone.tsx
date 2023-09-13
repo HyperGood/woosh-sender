@@ -9,7 +9,7 @@ import EnterAmount from "./EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
 import SignDepositButton from "~/components/DepositVault/SignDepositButtonWithSave";
-import CloseIcon from "public/static/images/icons/CloseIcon";
+import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
 import { useForm } from "react-hook-form";

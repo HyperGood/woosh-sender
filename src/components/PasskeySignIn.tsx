@@ -6,8 +6,11 @@ import { ZeroDevConnector } from "@zerodev/wagmi";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
+import { useState } from "react";
+import { LoadingSpinner } from "./Loading";
 
 export const PasskeySignIn = () => {
+  const [signingIn, setSigningIn] = useState(false);
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage();
@@ -18,6 +21,7 @@ export const PasskeySignIn = () => {
   });
 
   const handleLogin = async () => {
+    setSigningIn(true);
     if (isConnected) {
       console.log("siwe");
       void siweSignIn();
@@ -35,6 +39,7 @@ export const PasskeySignIn = () => {
           }),
         });
       } catch (error) {
+        setSigningIn(false);
         console.log("error: ", error);
       }
     }
@@ -59,15 +64,26 @@ export const PasskeySignIn = () => {
         redirect: false,
         signature,
       });
+      setSigningIn(false);
       console.log("Signed In");
     } catch (error) {
       console.error("Sign in error: ", error);
+      setSigningIn(false);
     }
   }
 
   return (
     <>
-      <Button onClick={() => void handleLogin()}>Sign In</Button>
+      <Button onClick={() => void handleLogin()}>
+        {signingIn ? (
+          <div className="flex items-center gap-2">
+            <span>Signing In</span>
+            <LoadingSpinner />
+          </div>
+        ) : (
+          "Sign In"
+        )}
+      </Button>
     </>
   );
 };

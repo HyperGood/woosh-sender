@@ -1,6 +1,6 @@
 import Image from "next/image";
 import TransactionInfo from "./TransactionInfo";
-import CopyIcon from "public/static/images/icons/CopyIcon";
+import CopyIcon from "public/images/icons/CopyIcon";
 import { toast } from "react-hot-toast";
 import type { Transaction } from "@prisma/client";
 import { makePhoneReadable } from "~/lib/formatPhone";

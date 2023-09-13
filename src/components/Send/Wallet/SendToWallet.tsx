@@ -6,7 +6,7 @@ import EnterAddress from "./EnterAddress";
 import EnterAmount from "../Wallet/EnterAmount";
 import ConfirmTransaction from "../ConfirmTransaction";
 import ShareTransaction from "../ShareTransaction";
-import CloseIcon from "public/static/images/icons/CloseIcon";
+import CloseIcon from "public/images/icons/CloseIcon";
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import SendButton from "./SendButton";
 import type { Transaction } from "@prisma/client";

@@ -3,7 +3,7 @@ import { makePhoneReadable } from "~/lib/formatPhone";
 import * as Dialog from "@radix-ui/react-dialog";
 import TransactionInfo from "~/components/Send/TransactionInfo";
 import { toast } from "react-hot-toast";
-import CopyIcon from "public/static/images/icons/CopyIcon";
+import CopyIcon from "public/images/icons/CopyIcon";
 import Button from "~/components/Button";
 import CancelDepositButton from "~/components/DepositVault/CancelDepositButton";
 import { api } from "~/utils/api";
