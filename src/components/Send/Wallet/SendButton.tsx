@@ -89,7 +89,11 @@ export const SendButton = ({
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
-  const { data: sendTokensHash, write: sendTokens } = useContractWrite({
+  const {
+    data: sendTokensHash,
+    write: sendTokens,
+    isLoading: isSending,
+  } = useContractWrite({
     ...sendTokensConfig,
     onError(error) {
       if (error.message.includes("User rejected the request")) {
@@ -107,7 +111,7 @@ export const SendButton = ({
     },
   });
 
-  const { data: sendTokensData, isLoading: isSending } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: sendTokensHash?.hash,
     onSuccess(txData) {
       console.log("Approved! Approval Data: ", txData);
@@ -119,6 +123,73 @@ export const SendButton = ({
       toast.error(`The transaction failed: ${error.message}`);
     },
   });
+
+  /* ERC-20 Send Batch
+  const { config: sendTokensBatchConfig } = usePrepareContractBatchWrite({
+    calls: [
+      {
+        address: tokenAddress,
+        abi: [
+          {
+            name: "approve",
+            type: "function",
+            stateMutability: "nonpayable",
+            inputs: [
+              { internalType: "address", name: "spender", type: "address" },
+              { internalType: "uint256", name: "amount", type: "uint256" },
+            ],
+            outputs: [{ internalType: "bool", name: "", type: "bool" }],
+          },
+        ],
+        functionName: "approve",
+        args: [address || "0x0", parseUnits(debouncedAmount.toString(), 18)],
+      },
+      {
+        address: tokenAddress,
+        abi: [
+          {
+            inputs: [
+              { internalType: "address", name: "sender", type: "address" },
+              { internalType: "address", name: "recipient", type: "address" },
+              { internalType: "uint256", name: "amount", type: "uint256" },
+            ],
+            name: "transferFrom",
+            outputs: [{ internalType: "bool", name: "", type: "bool" }],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        functionName: "transferFrom",
+        args: [
+          address || "0x0",
+          debouncedTo as `0x${string}`,
+          parseUnits(debouncedAmount.toString(), 18),
+        ],
+      },
+    ],
+    enabled: transaction.token !== "ETH",
+  });
+
+  const {
+    sendUserOperation: sendTokens,
+    isLoading,
+    data,
+  } = useContractBatchWrite(sendTokensBatchConfig);
+
+  useWaitForTransaction({
+    hash: data ? data.hash : undefined,
+    enabled: !!data,
+    onSuccess() {
+      console.log("Transaction was successful.");
+      console.log(data);
+      saveTransaction({ txId: data?.hash as Hex });
+    },
+    onError() {
+      console.error("Transaction failed.");
+    },
+  });
+
+  */
 
   const { config: approveTokenConfig } = usePrepareContractWrite({
     address: tokenAddress,
@@ -151,7 +222,7 @@ export const SendButton = ({
           "It looks like you rejected the approval in your wallet. Try again and accept the approval."
         );
       } else {
-        console.log("There was an error approving the error spend ", error);
+        console.log("There was an error approving the spend ", error);
         toast.error(`Deposit error: ${error.message}`);
       }
     },
@@ -160,25 +231,27 @@ export const SendButton = ({
     },
   });
 
-  const { data: tokenApprovalData, isLoading: isApproving } =
-    useWaitForTransaction({
-      hash: approvalData?.hash,
-      onSuccess(txData) {
-        console.log("Approved! Approval Data: ", txData);
-        console.log("Depositing funds...");
-        // sendTokens?.();
-      },
-      onError(error) {
-        console.log("Transaction error: ", error);
-        toast.error(`The transaction failed: ${error.message}`);
-      },
-    });
+  const { isLoading: isApproving } = useWaitForTransaction({
+    hash: approvalData?.hash,
+    onSuccess(txData) {
+      console.log("Approved! Approval Data: ", txData);
+      console.log("Depositing funds...");
+      // sendTokens?.();
+    },
+    onError(error) {
+      console.log("Transaction error: ", error);
+      toast.error(`The transaction failed: ${error.message}`);
+    },
+  });
 
-  //Send ETH
+  /*Send ETH*/
   const { config } = usePrepareSendTransaction({
     to: debouncedTo,
     value: debouncedAmount ? parseEther(debouncedAmount.toString()) : undefined,
-    enabled: debouncedAmount && debouncedTo ? true : false,
+    enabled:
+      transaction.token === "ETH" && debouncedAmount && debouncedTo
+        ? true
+        : false,
   });
 
   const {
@@ -256,20 +329,17 @@ export const SendButton = ({
 
   return (
     <>
-      {isSending && (
+      {/* {isSending && (
         <div className="flex items-center gap-4">
           <span>Sending funds</span> <LoadingSpinner />{" "}
         </div>
-      )}
+      )} */}
 
-      {tokenApprovalData ? (
-        <Button
-          onClick={() => void sendFunction()}
-          disabled={waitingForApproval || isSending || isApproving}
-        >
+      {approvalData ? (
+        <Button onClick={() => sendTokens?.()} disabled={isSending}>
           <div className="flex items-center gap-2">
             Send Funds
-            {isSending || isApproving ? <LoadingSpinner /> : null}
+            {isSending ? <LoadingSpinner /> : null}
           </div>
         </Button>
       ) : (
@@ -278,11 +348,7 @@ export const SendButton = ({
           disabled={waitingForApproval || isSending || isApproving}
         >
           <div className="flex items-center gap-2">
-            {waitingForApproval
-              ? "Waiting for approval"
-              : isSending
-              ? "Sending Funds"
-              : "Approve transaction"}
+            {waitingForApproval ? "Approving" : "Approve transaction"}
             {isSending || isApproving || waitingForApproval ? (
               <LoadingSpinner />
             ) : null}

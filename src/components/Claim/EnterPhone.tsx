@@ -28,6 +28,7 @@ export const EnterPhone = ({
   verifyOTP,
   wrongCode,
   sender,
+  validateField,
 }: {
   control: Control<WooshUser>;
   phoneErrorMessage?: string;
@@ -38,6 +39,7 @@ export const EnterPhone = ({
   verifyOTP: (args0: string) => Promise<void>;
   wrongCode: boolean;
   sender: string;
+  validateField: (args0: "phone") => Promise<void>;
 }) => {
   const [countryQuery, setCountryQuery] = useState("");
   const [touched, setTouched] = useState<boolean>(false);
@@ -138,6 +140,7 @@ export const EnterPhone = ({
                     }}
                     onChange={(e) => {
                       onChange(e.target.value);
+                      void validateField("phone");
                     }}
                     value={value}
                     onBlur={() => setTouched(true)}
@@ -150,10 +153,9 @@ export const EnterPhone = ({
             <span className="text-sm text-red-500">{phoneErrorMessage}</span>
           ) : null}
         </div>
-        <Drawer.Root shouldScaleBackground open={otpSent}>
+        <Drawer.Root open={otpSent}>
           <Drawer.Trigger asChild>
             <Button
-              intent="accent"
               fullWidth
               disabled={phoneErrorMessage || !touched ? true : false}
               onClick={() => {

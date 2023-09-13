@@ -8,8 +8,8 @@ import SettingsIcon from "public/images/icons/SettingsIcon";
 export const UserMenu = ({ address }: { address: `0x${string}` }) => {
   const { disconnect } = useDisconnect();
   const onClickSignOut = () => {
-    void signOut({ redirect: false });
     disconnect();
+    void signOut({ redirect: false });
   };
 
   let truncatedAddress;

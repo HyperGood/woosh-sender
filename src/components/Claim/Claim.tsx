@@ -25,9 +25,8 @@ export const Claim = ({
   const [secret, setSecret] = useState<string>();
   const debouncedSecret = useDebounce(secret, 500);
   const { address, isConnected } = useAccount();
-
   const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
-    address: contractAddress[420][0],
+    address: contractAddress[10][0],
     abi,
     functionName: "withdraw",
     args: [
@@ -36,6 +35,9 @@ export const Claim = ({
       address || "0x0",
     ],
     enabled: address && debouncedSecret ? true : false,
+    onError(error) {
+      console.error(error);
+    },
   });
 
   const { mutate } = api.transaction.updateClaimedStatus.useMutation({

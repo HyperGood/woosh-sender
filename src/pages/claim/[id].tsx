@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Transaction } from "@prisma/client";
 import { type InferGetStaticPropsType } from "next";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { SiweMessage } from "siwe";
-import { useAccount, useNetwork, useSignMessage } from "wagmi";
+//import { SiweMessage } from "siwe";
+import { useAccount } from "wagmi";
 import { Claim } from "~/components/Claim/Claim";
 import { EnterPhone } from "~/components/Claim/EnterPhone";
 import { Onboarding } from "~/components/Claim/Onboarding";
@@ -45,6 +45,7 @@ export default function ClaimPage({
   });
   const senderData = JSON.parse(sender) as WooshUser;
   const [wrongCode, setWrongCode] = useState<boolean>(false);
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   //Update the user
   const { mutate } = api.user.updateUser.useMutation({
@@ -63,6 +64,7 @@ export default function ClaimPage({
     formState: { errors },
     control,
     watch,
+    trigger,
     getValues,
     setError,
   } = useForm<WooshUser>({
@@ -80,6 +82,10 @@ export default function ClaimPage({
   );
 
   const phone = watch("phone");
+
+  const validateField = async (input: "phone") => {
+    setIsValid(await trigger(input));
+  };
 
   //Find a transaction with that id (from the url)
   //if phone === transaction.phone -> verify
@@ -132,16 +138,13 @@ export default function ClaimPage({
 
   useEffect(() => {
     //Save user data to DB
-    if (claimed && session && !userData?.name) {
+    if (claimed && session) {
       console.log("Saving user data to DB...");
       const inputData = getValues();
       mutate({
         name: inputData.name,
         phone: inputData.phone,
       });
-      void router.push("/");
-    } else if ((claimed && session && userData?.name !== null) || undefined) {
-      void router.push("/");
     } else {
       console.log("Claimed Status: ", claimed);
       console.log("Session Status: ", session);
@@ -261,6 +264,7 @@ export default function ClaimPage({
           verifyOTP={verifyOTP}
           wrongCode={wrongCode}
           sender={senderData.name ? senderData.name : "someone"}
+          validateField={validateField}
         />
       )}
     </>

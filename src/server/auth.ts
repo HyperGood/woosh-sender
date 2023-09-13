@@ -13,7 +13,7 @@ import { SiweMessage, type SiweResponse } from "siwe";
 import { getCsrfToken } from "next-auth/react";
 import { env } from "~/env.mjs";
 import { AlchemyProvider } from "@ethersproject/providers";
-import { optimismGoerli } from "wagmi/chains";
+import { optimism, optimismGoerli } from "wagmi/chains";
 // Types
 // ========================================================
 /**
@@ -166,7 +166,9 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
               ? `https://${process.env.VERCEL_URL}`
               : null);
           const nodeProvider = new AlchemyProvider(
-            optimismGoerli.id,
+            env.NEXT_PUBLIC_TESTNET === "true"
+              ? optimismGoerli.id
+              : optimism.id,
             env.NEXT_PUBLIC_ALCHEMY_ID
           );
 

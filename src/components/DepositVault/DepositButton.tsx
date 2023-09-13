@@ -75,7 +75,7 @@ export const DepositButton = ({
       },
     ],
     functionName: "approve",
-    args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 18)],
+    args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 6)],
     enabled: Boolean(transaction.token !== "ETH"),
   });
 
@@ -106,8 +106,6 @@ export const DepositButton = ({
       hash: approvalData?.hash,
       onSuccess(txData) {
         console.log("Approved! Approval Data: ", txData);
-        console.log("Depositing funds...");
-        deposit?.();
       },
       onError(error) {
         console.log("Transaction error: ", error);
@@ -126,7 +124,7 @@ export const DepositButton = ({
     args:
       transaction.token === "ETH"
         ? [parseUnits("0", 18), zeroAddress]
-        : [parseUnits(debouncedAmount.toString(), 18), outAddress],
+        : [parseUnits(debouncedAmount.toString(), 6), tokenAddress],
     enabled:
       transaction.token === "ETH"
         ? Boolean(debouncedAmount)
@@ -228,28 +226,59 @@ export const DepositButton = ({
   //Add a disclaimer saying that you can always cancel a transaction before someone claims the funds
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <Button
-        onClick={() => void sendFunction()}
-        disabled={waitingForDeposit}
-        loading={
-          isDepositing || isApproving || waitingForApproval || waitingForDeposit
-        }
-        fullWidth
-      >
-        <div className="flex items-center gap-4">
-          {waitingForDeposit
-            ? status.waitingForDeposit
-            : isDepositing || isApproving || waitingForApproval
-            ? null
-            : "Send funds"}
-          {isDepositing ||
-          isApproving ||
-          waitingForApproval ||
-          waitingForDeposit ? (
-            <LoadingSpinner />
-          ) : null}
-        </div>
-      </Button>
+      {tokenApprovalData ? (
+        <Button
+          onClick={() => void deposit?.()}
+          disabled={waitingForDeposit}
+          loading={
+            isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit
+          }
+          fullWidth
+        >
+          <div className="flex items-center gap-4">
+            {waitingForDeposit
+              ? status.waitingForDeposit
+              : isDepositing || isApproving || waitingForApproval
+              ? null
+              : "Send funds"}
+            {isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit ? (
+              <LoadingSpinner />
+            ) : null}
+          </div>
+        </Button>
+      ) : (
+        <Button
+          onClick={() => void sendFunction()}
+          disabled={waitingForDeposit}
+          loading={
+            isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit
+          }
+          fullWidth
+        >
+          <div className="flex items-center gap-4">
+            {waitingForDeposit
+              ? status.waitingForDeposit
+              : isDepositing || isApproving || waitingForApproval
+              ? null
+              : "Send funds"}
+            {isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit ? (
+              <LoadingSpinner />
+            ) : null}
+          </div>
+        </Button>
+      )}
       <span>
         {isDepositing
           ? status.isDepositting

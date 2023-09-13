@@ -91,8 +91,8 @@ export const EnterPhone = ({
                 <PatternFormat
                   format={`(###) ###-####`}
                   mask="_"
-                  placeholder={`(___) ___-____`}
-                  className="w-full rounded-[0.5rem] border-[1px] border-brand-black bg-transparent py-3 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
+                  placeholder={`(000)-000-0000`}
+                  className="w-full rounded-full border-[1px] border-brand-black/20 bg-transparent py-4 pl-[8.75rem] pr-2 focus:border-2 focus:outline-none"
                   onChange={(e) => {
                     onChange(e.target.value);
                     void validateField("phone");

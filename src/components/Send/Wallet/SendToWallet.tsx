@@ -17,7 +17,7 @@ import {
   WalletTransactionSchema,
 } from "~/models/transactions";
 import { TOKENS } from "~/lib/tokens";
-import { Data } from "~/components/ComboboxSelect";
+import { type Data } from "~/components/ComboboxSelect";
 
 export const SendToWallet = () => {
   const [step, setStep] = useState<number>(0);
@@ -200,12 +200,9 @@ export const SendToWallet = () => {
                   setSavedTransaction={setSavedTransaction}
                 />
               ) : step === 3 && savedTransaction ? (
-                <Button intent="secondary" fullWidth>
-                  Share
-                </Button>
+                <Button fullWidth>Share</Button>
               ) : (
                 <Button
-                  intent="secondary"
                   fullWidth
                   disabled={
                     !isValid ||
