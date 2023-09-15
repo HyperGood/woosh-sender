@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Transaction } from "@prisma/client";
 import { type InferGetStaticPropsType } from "next";
-import { useSession } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-//import { SiweMessage } from "siwe";
-import { useAccount } from "wagmi";
+import { SiweMessage } from "siwe";
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import { Claim } from "~/components/Claim/Claim";
 import { EnterPhone } from "~/components/Claim/EnterPhone";
 import { Onboarding } from "~/components/Claim/Onboarding";
@@ -36,8 +36,8 @@ export default function ClaimPage({
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(false);
   const [claimed, setClaimed] = useState<boolean>(false);
   const [formattedPhone, setFormattedPhone] = useState<string>("");
-  //  const { signMessageAsync } = useSignMessage();
-  //  const { chain } = useNetwork();
+  const { signMessageAsync } = useSignMessage();
+  const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
   const { data: session } = useSession();
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
@@ -98,55 +98,50 @@ export default function ClaimPage({
 
   //SIWE
   useEffect(() => {
-    if (claimed && isConnected && !session) {
+    if (claimed && isConnected) {
       console.log("Signing In...");
       void router.push("/");
       /**
        * Attempts SIWE and establish session
        */
-      // async function siweSignIn() {
-      //   try {
-      //     const message = new SiweMessage({
-      //       domain: window.location.host,
-      //       address: address,
-      //       statement: "Sign in to Woosh",
-      //       uri: window.location.origin,
-      //       version: "1",
-      //       chainId: chain?.id,
-      //       // nonce is used from CSRF token
-      //       nonce: await getCsrfToken(),
-      //     });
-      //     const signature = await signMessageAsync({
-      //       message: message.prepareMessage(),
-      //     });
-      //     void signIn("credentials", {
-      //       message: JSON.stringify(message),
-      //       redirect: false,
-      //       signature,
-      //     });
-      //     console.log("Signed In");
-      //   } catch (error) {
-      //     console.error("Sign in error: ", error);
-      //   }
-      // }
+      async function siweSignIn() {
+        try {
+          const message = new SiweMessage({
+            domain: window.location.host,
+            address: address,
+            statement: "Sign in to Woosh",
+            uri: window.location.origin,
+            version: "1",
+            chainId: chain?.id,
+            // nonce is used from CSRF token
+            nonce: await getCsrfToken(),
+          });
+          const signature = await signMessageAsync({
+            message: message.prepareMessage(),
+          });
+          void signIn("credentials", {
+            message: JSON.stringify(message),
+            redirect: false,
+            signature,
+          });
+          console.log("Signed In");
+        } catch (error) {
+          console.error("Sign in error: ", error);
+        }
+      }
 
-      // void siweSignIn();
-    } else if (claimed && !isConnected) {
-      console.error("Not connected");
-    }
-  }, [claimed, address]);
+      void siweSignIn();
 
-  useEffect(() => {
-    //Save user data to DB
-    if (claimed) {
       console.log("Saving user data to DB...");
       const inputData = getValues();
       mutate({
         name: inputData.name,
         // phone: inputData.phone,
       });
+    } else if (claimed && !isConnected) {
+      console.error("Not connected");
     }
-  }, [claimed]);
+  }, [claimed, address]);
 
   //If transaction is claimed, return claimed on [date and time] by [wallet]
   if (formattedTransaction.claimed) {
