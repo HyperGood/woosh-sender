@@ -13,9 +13,7 @@ import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { useEffect, type Dispatch, type SetStateAction, useState } from "react";
-import type { CheckedState } from "@radix-ui/react-checkbox";
-import type { PhoneTransactionForm } from "~/models/transactions";
-import { type Country } from "~/lib/countries";
+import type { TransactionForm } from "~/models/transactions";
 import { type UseFormSetValue } from "react-hook-form";
 import Button from "../Button";
 import { env } from "~/env.mjs";
@@ -25,15 +23,11 @@ import { usdcAddress } from "~/lib/erc-20/op-usdc";
 export const DepositButton = ({
   transaction,
   setFundsSent,
-  saveContact,
-  countryCode,
   setFormValue,
 }: {
-  transaction: PhoneTransactionForm;
+  transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
-  setFormValue: UseFormSetValue<PhoneTransactionForm>;
-  saveContact: CheckedState;
-  countryCode: Country;
+  setFormValue: UseFormSetValue<TransactionForm>;
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
   const ctx = api.useContext();
@@ -48,16 +42,6 @@ export const DepositButton = ({
 
   const tokenAddress =
     env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress;
-
-  const { mutate: mutateContact } = api.contact.add.useMutation({
-    onSuccess: () => {
-      console.log("Successfully added contact");
-      void ctx.contact.getContacts.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`There was an error saving the contact ${error.message}`);
-    },
-  });
 
   //Approve ERC-20 Tokens
   const { config: approveTokenConfig } = usePrepareContractWrite({
@@ -160,9 +144,6 @@ export const DepositButton = ({
   const { isLoading: isDepositing } = useWaitForTransaction({
     hash: depositData?.hash,
     onSuccess(txData) {
-      if (saveContact) {
-        saveContactFunction();
-      }
       setFormValue("txId", txData.transactionHash);
       setTxHashSet(true);
       toast.success(`Funds sent!`);
@@ -184,22 +165,8 @@ export const DepositButton = ({
     },
   });
 
-  function saveContactFunction() {
-    if (transaction.contact && transaction.phone) {
-      console.log("Saving contact...");
-      mutateContact({
-        name: transaction.contact,
-        phone: countryCode.additionalProperties.code + transaction.phone,
-      });
-    } else {
-      toast.error("There was an error saving the contact.");
-    }
-  }
-
   const sendFunction = () => {
-    if (transaction.phone === "") {
-      alert("Please enter a phone number");
-    } else if (transaction.amount === 0) {
+    if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {
       if (transaction.token === "ETH") {
@@ -236,7 +203,7 @@ export const DepositButton = ({
             waitingForApproval ||
             waitingForDeposit
           }
-          fullWidth
+          size="full"
         >
           <div className="flex items-center gap-4">
             {waitingForDeposit
@@ -262,7 +229,7 @@ export const DepositButton = ({
             waitingForApproval ||
             waitingForDeposit
           }
-          fullWidth
+          size="full"
         >
           <div className="flex items-center gap-4">
             {waitingForDeposit
@@ -291,6 +258,3 @@ export const DepositButton = ({
 };
 
 export default DepositButton;
-
-//0x8c42537dcf299be5616c04a9238f70f991806e8834280fba8dbcb6b5a5347f241dd40d8d617c69d1e8e0a4dfc71ecaead95e872a7f78b1f389dbfebc51bba43f1c
-//36

@@ -5,21 +5,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import {
-  PhoneTransactionFormSchema,
-  WalletTransactionSchema,
-} from "~/models/transactions";
+import { TransactionFormSchema } from "~/models/transactions";
 
-export async function getAllPhoneTransactions({
-  prisma,
-}: {
-  prisma: PrismaClient;
-}) {
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      type: "phone",
-    },
-  });
+export async function getAllTransactions({ prisma }: { prisma: PrismaClient }) {
+  const transactions = await prisma.transaction.findMany();
   return transactions;
 }
 
@@ -50,8 +39,8 @@ export const transactionsRouter = createTRPCRouter({
   }),
 
   //Add a new transaction
-  addPhoneTransaction: protectedProcedure
-    .input(PhoneTransactionFormSchema)
+  addTransaction: protectedProcedure
+    .input(TransactionFormSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const transaction = await ctx.prisma.transaction.create({
@@ -59,30 +48,10 @@ export const transactionsRouter = createTRPCRouter({
           amount: input.amount,
           token: input.token,
           amountInUSD: input.amountInUSD,
-          phone: input.phone,
           userId: userId,
           txId: input.txId,
-          contact: input.contact,
+          recipient: input.recipient,
           depositIndex: input.depositIndex,
-          type: input.type,
-        },
-      });
-      return transaction;
-    }),
-  addWalletTransaction: protectedProcedure
-    .input(WalletTransactionSchema)
-    .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      const transaction = await ctx.prisma.transaction.create({
-        data: {
-          amount: input.amount,
-          token: input.token,
-          amountInUSD: input.amountInUSD,
-          address: input.address,
-          userId: userId,
-          txId: input.txId,
-          contact: input.contact,
-          type: input.type,
         },
       });
       return transaction;

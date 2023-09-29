@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { CryptoPricesContext } from "~/context/TokenPricesContext";
+import { TokenPricesContext } from "~/context/TokenPricesContext";
 
 export const useTokenPrices = () => {
-  return useContext(CryptoPricesContext);
+  return useContext(TokenPricesContext);
 };
 
 export default useTokenPrices;

@@ -1,33 +1,29 @@
 import { TOKENS, type Token } from "~/lib/tokens";
 import { type Dispatch, type SetStateAction, useState } from "react";
-import ComboInput from "../../ComboInput";
-import TransactionInfo from "../TransactionInfo";
+import ComboInput from "../ComboInput";
+import TransactionInfo from "./TransactionInfo";
 import { type UseFormSetValue, type UseFormRegister } from "react-hook-form";
-import { type PhoneTransactionForm } from "~/models/transactions";
+import { type TransactionForm } from "~/models/transactions";
 import { type Data } from "~/components/ComboboxSelect";
 import { useAccount, useBalance } from "wagmi";
 import useTokenPrices from "~/hooks/useTokenPrices";
 
 export const EnterAmount = ({
   register,
-  phone,
-  contact,
+  recipient,
   validateField,
   amountErrorMessage,
-  countryCode,
   setSelectedToken,
   selectedToken,
   setValue,
 }: {
-  register: UseFormRegister<PhoneTransactionForm>;
-  phone: string;
-  contact?: string;
+  register: UseFormRegister<TransactionForm>;
+  recipient?: string;
   validateField: (args0: "amount") => Promise<void>;
   amountErrorMessage?: string;
-  countryCode: string;
   setSelectedToken: Dispatch<SetStateAction<Data>>;
   selectedToken: Data;
-  setValue: UseFormSetValue<PhoneTransactionForm>;
+  setValue: UseFormSetValue<TransactionForm>;
 }) => {
   const [touched, setTouched] = useState<boolean>(false);
   const [tokenQuery, setTokenQuery] = useState("");
@@ -45,11 +41,11 @@ export const EnterAmount = ({
         ? undefined
         : selectedTokenData.additionalProperties?.address,
   });
-  const { cryptoPrices } = useTokenPrices();
+  const { tokenPrices } = useTokenPrices();
   const tokenPrice =
     selectedToken.displayValue === "ETH"
-      ? cryptoPrices?.["ethereum"].usd
-      : cryptoPrices?.["usd-coin"].usd;
+      ? tokenPrices?.["ethereum"].usd
+      : tokenPrices?.["usd-coin"].usd;
 
   const filteredTokens =
     tokenQuery === ""
@@ -70,20 +66,7 @@ export const EnterAmount = ({
         label="Sending To"
         content={
           <div className="flex items-center gap-4">
-            {contact ? (
-              <>
-                <span className="font-polysans text-lg">{contact}</span>
-                <span className="opacity-60">
-                  {countryCode}-{phone}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="font-polysans text-lg">
-                  {countryCode}-{phone}
-                </span>
-              </>
-            )}
+            <span className="font-polysans text-lg">{recipient}</span>
           </div>
         }
       />

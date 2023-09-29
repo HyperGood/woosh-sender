@@ -3,9 +3,20 @@ import { toast } from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import { useDisconnect } from "wagmi";
 import CopyIcon from "public/images/icons/CopyIcon";
-import SettingsIcon from "public/images/icons/SettingsIcon";
+import PixelChevron from "public/images/icons/pixel-chevron";
 
-export const UserMenu = ({ address }: { address: `0x${string}` }) => {
+/*
+  TO-DO
+    - Chevron animation. Durn down on click
+*/
+
+export const UserMenu = ({
+  address,
+  username,
+}: {
+  address: `0x${string}`;
+  username?: string;
+}) => {
   const { disconnect } = useDisconnect();
   const onClickSignOut = () => {
     disconnect();
@@ -15,6 +26,7 @@ export const UserMenu = ({ address }: { address: `0x${string}` }) => {
   let truncatedAddress;
   if (address)
     truncatedAddress = address?.slice(0, 4) + "..." + address?.slice(-4);
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
@@ -31,8 +43,9 @@ export const UserMenu = ({ address }: { address: `0x${string}` }) => {
             )} */}
         {/* </div>
         </div> */}
-        <div className="h-6 w-6">
-          <SettingsIcon />
+        <div className="flex items-center gap-2">
+          <span>{username ? username : "User"}</span>
+          <PixelChevron />
         </div>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>

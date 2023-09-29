@@ -1,5 +1,5 @@
-// import QrIcon from "public/images/icons/QrIcon";
-import UserPlaceholder from "public/images/icons/UserPlaceholder";
+import PlusIcon from "public/images/icons/PlusIcon";
+import Button from "./Button";
 import UserMenu from "./UserMenu";
 
 export function Header({
@@ -11,16 +11,13 @@ export function Header({
 }) {
   return (
     <div className="z-50 flex w-full items-center justify-between gap-4 px-4 py-4 lg:absolute lg:top-0 lg:px-10 lg:py-8">
-      {/* <div>
-        <QrIcon />
-      </div> */}
-      <div className="flex items-center gap-2">
-        <div className="w-10">
-          <UserPlaceholder />
+      <UserMenu address={address} username={username} />
+      <Button size="small" intent="accent" disabled>
+        <div className="flex items-center gap-2">
+          <PlusIcon />
+          <span>Add Funds</span>
         </div>
-        <span>{username ? username : "Cool User"}</span>
-      </div>
-      <UserMenu address={address} />
+      </Button>
     </div>
   );
 }

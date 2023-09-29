@@ -3,12 +3,10 @@ import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { type Hex, parseEther, parseUnits } from "viem";
-import type { PhoneTransactionForm } from "~/models/transactions";
+import type { TransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
 import Button from "../Button";
 import { api } from "~/utils/api";
-import { formatPhone } from "~/lib/formatPhone";
-import { type Country } from "~/lib/countries";
 import useTokenPrices from "~/hooks/useTokenPrices";
 // import { ECDSAProvider } from "@zerodev/sdk";
 // import { env } from "~/env.mjs";
@@ -22,14 +20,12 @@ export const SignDepositButton = ({
   setDepositSigned,
   secret,
   setSavedTransaction,
-  countryCode,
 }: {
-  transaction: PhoneTransactionForm;
+  transaction: TransactionForm;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   secret?: string;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
-  countryCode: Country;
 }) => {
   const { chain } = useNetwork();
   const chainId = chain?.id;
@@ -37,13 +33,13 @@ export const SignDepositButton = ({
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
-  const { cryptoPrices } = useTokenPrices();
+  const { tokenPrices } = useTokenPrices();
   const tokenPrice =
     transaction.token === "ETH"
-      ? cryptoPrices?.["ethereum"].usd
-      : cryptoPrices?.["usd-coin"].usd;
+      ? tokenPrices?.["ethereum"].usd
+      : tokenPrices?.["usd-coin"].usd;
   const ctx = api.useContext();
-  const { mutate } = api.transaction.addPhoneTransaction.useMutation({
+  const { mutate } = api.transaction.addTransaction.useMutation({
     onSuccess: (data) => {
       console.log("Transaction saved to database! Here's the data: ", data);
       setSavedTransaction(data);
@@ -135,16 +131,14 @@ export const SignDepositButton = ({
   });
 
   const saveTransaction = () => {
-    if (transaction.amount !== 0 && transaction.phone !== "") {
+    if (transaction.amount !== 0) {
       const amountInUSD = transaction.amount * (tokenPrice || 1);
       console.log(
         "Saving transaction to database with this data...",
         transaction
       );
-      const formattedPhone = formatPhone(transaction.phone);
       mutate({
         ...transaction,
-        phone: countryCode.additionalProperties.code + formattedPhone,
         amountInUSD: amountInUSD,
       });
     } else {
