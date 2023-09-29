@@ -11,13 +11,13 @@ import { toast } from "react-hot-toast";
 import { useEffect } from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import Button from "../Button";
-import type { PhoneTransaction } from "~/models/transactions";
+import type { Transaction } from "~/models/transactions";
 
 export const CancelDepositButton = ({
   transaction,
   clicked,
 }: {
-  transaction: PhoneTransaction;
+  transaction: Transaction;
   clicked: boolean;
 }) => {
   const ctx = api.useContext();
@@ -42,7 +42,7 @@ export const CancelDepositButton = ({
     abi,
     functionName: "withdrawDeposit",
     args: [BigInt(transaction.depositIndex ? transaction.depositIndex : 0)],
-    enabled: clicked && transaction.type === "phone",
+    enabled: clicked,
     onError(error) {
       console.log(error);
       toast.error(error.message);

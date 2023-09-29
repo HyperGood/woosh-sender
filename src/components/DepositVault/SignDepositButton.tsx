@@ -3,12 +3,12 @@ import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
 import { parseEther } from "viem";
-import type { PhoneTransaction } from "~/models/transactions";
+import type { Transaction } from "~/models/transactions";
 import Button from "../Button";
 import { ZeroDevEthersProvider } from "@zerodev/sdk";
 import { env } from "~/env.mjs";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
-import { verifyMessage } from "@ambire/signature-validator";
+// import { verifyMessage } from "@ambire/signature-validator";
 
 export const SignDepositButton = ({
   transaction,
@@ -17,7 +17,7 @@ export const SignDepositButton = ({
   card,
   secret,
 }: {
-  transaction: PhoneTransaction;
+  transaction: Transaction;
   setSecret: Dispatch<SetStateAction<string>>;
   setDepositSigned?: Dispatch<SetStateAction<boolean>>;
   card?: boolean;

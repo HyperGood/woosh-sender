@@ -1,23 +1,18 @@
 import Image from "next/image";
 import TransactionInfo from "./TransactionInfo";
 import useTokenPrices from "~/hooks/useTokenPrices";
-import type {
-  PhoneTransactionForm,
-  WalletTransaction,
-} from "~/models/transactions";
+import type { TransactionForm, WalletTransaction } from "~/models/transactions";
 
 export const ConfirmTransaction = ({
   transactionData,
-  countryCode,
 }: {
-  transactionData: PhoneTransactionForm | WalletTransaction;
-  countryCode?: string;
+  transactionData: TransactionForm | WalletTransaction;
 }) => {
-  const { cryptoPrices } = useTokenPrices();
+  const { tokenPrices } = useTokenPrices();
   const tokenPrice =
     transactionData.token === "ETH"
-      ? cryptoPrices?.["ethereum"].usd
-      : cryptoPrices?.["usd-coin"].usd;
+      ? tokenPrices?.["ethereum"].usd
+      : tokenPrices?.["usd-coin"].usd;
   const amountInUSD = transactionData.amount * (tokenPrice || 0);
 
   return (
@@ -34,41 +29,9 @@ export const ConfirmTransaction = ({
           label="Sending To"
           content={
             <div className="flex items-center gap-4">
-              {transactionData.contact ? (
-                <>
-                  {"phone" in transactionData ? (
-                    <>
-                      <span className="font-polysans text-lg">
-                        {transactionData.contact}
-                      </span>
-                      <span className="opacity-60">
-                        {countryCode}-{transactionData.phone}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-polysans text-lg">
-                        {transactionData.contact}
-                      </span>
-                      <span className="break-all opacity-60">
-                        {transactionData.address}
-                      </span>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  {"phone" in transactionData ? (
-                    <span className="font-polysans text-lg">
-                      {countryCode}-{transactionData.phone}
-                    </span>
-                  ) : (
-                    <span className="break-all font-polysans text-lg">
-                      {transactionData.address}
-                    </span>
-                  )}
-                </>
-              )}
+              <span className="font-polysans text-lg">
+                {transactionData.recipient}
+              </span>
             </div>
           }
         />

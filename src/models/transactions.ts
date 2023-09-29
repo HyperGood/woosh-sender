@@ -13,7 +13,7 @@ export const TransactionSchema = z.object({
     .trim()
     .min(2, { message: "Recipient name must be 2 or more characters" })
     .max(100)
-    .optional(),
+    .nullish(),
 });
 
 export const WalletTransactionSchema = TransactionSchema.extend({
@@ -35,4 +35,4 @@ export const VaultTransactionSchema = TransactionSchema.extend({
 });
 
 export type TransactionForm = z.infer<typeof TransactionFormSchema>;
-//export type Transaction = z.infer<typeof VaultTransactionSchema>;
+export type Transaction = z.infer<typeof VaultTransactionSchema>;

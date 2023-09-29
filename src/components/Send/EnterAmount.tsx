@@ -18,7 +18,7 @@ export const EnterAmount = ({
   setValue,
 }: {
   register: UseFormRegister<TransactionForm>;
-  recipient?: string;
+  recipient?: string | null;
   validateField: (args0: "amount") => Promise<void>;
   amountErrorMessage?: string;
   setSelectedToken: Dispatch<SetStateAction<Data>>;
