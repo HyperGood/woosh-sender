@@ -26,7 +26,7 @@ export const Claim = ({
   const debouncedSecret = useDebounce(secret, 500);
   const { address, isConnected } = useAccount();
   const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
-    address: contractAddress[10][0],
+    address: contractAddress[420][0],
     abi,
     functionName: "withdraw",
     args: [
@@ -112,7 +112,7 @@ export const Claim = ({
         />
         <div className="flex flex-col items-center gap-4">
           <Button
-            fullWidth
+            size="full"
             onClick={() => {
               withdraw?.();
             }}

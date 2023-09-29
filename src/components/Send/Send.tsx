@@ -61,7 +61,7 @@ export const Send = () => {
     input: "recipient" | "amount",
     nextStep: number
   ) => {
-    if (step === 3) return;
+    if (step === 2) return;
     let validPrev = await trigger(input);
 
     void validateField("recipient");
@@ -74,7 +74,7 @@ export const Send = () => {
 
   useEffect(() => {
     if (depositSigned) {
-      setStep(3);
+      setStep(2);
     }
   }, [depositSigned]);
 
@@ -117,7 +117,7 @@ export const Send = () => {
             </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-4 lg:p-8">
               <div>
-                {step === 3 ? (
+                {step === 2 ? (
                   <button
                     className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
                     onClick={() => {
@@ -142,29 +142,27 @@ export const Send = () => {
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
-                      if (step !== 3) {
+                      if (step !== 2) {
                         setStep(0);
-
-                        void validateField("recipient");
                       }
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={1} name="Amount" currentStep={step} />
+                    <StepIndicator step={0} name="Amount" currentStep={step} />
                   </button>
                   <button
                     onClick={() => void handleStepIndicator("amount", 2)}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={2} name="Confirm" currentStep={step} />
+                    <StepIndicator step={1} name="Confirm" currentStep={step} />
                   </button>
                   <button
                     onClick={() => {
-                      if (depositSigned) setStep(3);
+                      if (depositSigned) setStep(2);
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={3} name="Share" currentStep={step} />
+                    <StepIndicator step={2} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>
@@ -189,7 +187,7 @@ export const Send = () => {
                 ) : null}
               </form>
 
-              {step === 2 ? (
+              {step === 1 ? (
                 fundsSent ? (
                   <SignDepositButton
                     setDepositSigned={setDepositSigned}
@@ -204,9 +202,7 @@ export const Send = () => {
                     setFormValue={setValue}
                   />
                 )
-              ) : step === 3 && savedTransaction ? (
-                <Button size="full">Share</Button>
-              ) : (
+              ) : step === 2 && savedTransaction ? null : (
                 <Button
                   size="full"
                   disabled={!isValid}

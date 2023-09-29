@@ -160,7 +160,7 @@ export const Onboarding = ({
             <div className="flex flex-col gap-4">
               <Button
                 disabled={isLoading}
-                fullWidth
+                size='full'
                 onClick={() => setOnboardingComplete(true)}
               >
                 Next
@@ -179,7 +179,7 @@ export const Onboarding = ({
             </p>
             <div className="flex flex-col gap-4">
               <Button
-                fullWidth
+            size='full'
                 onClick={() => {
                   void handleRegister();
                 }}
@@ -191,7 +191,7 @@ export const Onboarding = ({
                 </div>
               </Button>
               <Button
-                fullWidth
+              size='full'
                 onClick={() => {
                   void passkeySignIn();
                 }}

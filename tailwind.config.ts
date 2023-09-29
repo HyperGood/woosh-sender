@@ -25,7 +25,7 @@ export default {
             dark: "#383538",
           },
           black: "#19181D",
-          accent: "#1FAE47",
+          accent: "#C8FD6A",
         },
         warning: "#FA7C28",
         error: "#E73232",

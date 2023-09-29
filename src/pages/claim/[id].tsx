@@ -34,6 +34,8 @@ export default function ClaimPage({
   const { data: userData } = api.user.getUserData.useQuery(undefined, {
     enabled: !!session,
   });
+
+  //this is empty!!
   const senderData = JSON.parse(sender) as WooshUser;
 
   //Update the user
