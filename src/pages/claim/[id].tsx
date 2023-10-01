@@ -30,12 +30,11 @@ export default function ClaimPage({
   const { signMessageAsync } = useSignMessage();
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
-  const { data: session } = useSession();
-  const { data: userData } = api.user.getUserData.useQuery(undefined, {
-    enabled: !!session,
-  });
+  // const { data: session } = useSession();
+  // const { data: userData } = api.user.getUserData.useQuery(undefined, {
+  //   enabled: !!session,
+  // });
 
-  //this is empty!!
   const senderData = JSON.parse(sender) as WooshUser;
 
   //Update the user
@@ -63,7 +62,6 @@ export default function ClaimPage({
   useEffect(() => {
     if (claimed && isConnected) {
       console.log("Signing In...");
-      void router.push("/");
       /**
        * Attempts SIWE and establish session
        */
@@ -82,25 +80,23 @@ export default function ClaimPage({
           const signature = await signMessageAsync({
             message: message.prepareMessage(),
           });
-          void signIn("credentials", {
+          await signIn("credentials", {
             message: JSON.stringify(message),
             redirect: false,
             signature,
           });
           console.log("Signed In");
+          console.log("Saving user data to DB...");
+          const inputData = getValues();
+          mutate({
+            name: inputData.name,
+          });
         } catch (error) {
           console.error("Sign in error: ", error);
         }
       }
 
       void siweSignIn();
-
-      console.log("Saving user data to DB...");
-      const inputData = getValues();
-      mutate({
-        name: inputData.name,
-        // phone: inputData.phone,
-      });
     } else if (claimed && !isConnected) {
       console.error("Not connected");
     }

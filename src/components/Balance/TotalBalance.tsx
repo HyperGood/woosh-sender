@@ -4,7 +4,6 @@ import useUserBalance from "~/hooks/useUserBalance";
 const TotalBalance = () => {
   const { tokenPrices } = useTokenPrices();
   const { userBalances } = useUserBalance();
-  console.log(userBalances);
   let totalBalance = 0;
 
   if (userBalances && tokenPrices) {

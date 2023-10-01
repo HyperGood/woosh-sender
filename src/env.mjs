@@ -30,8 +30,6 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_ALCHEMY_ID: z.string().min(1),
-    NEXT_PUBLIC_TWILIO_ACCOUNT_SID: z.string().min(1),
-    NEXT_PUBLIC_TWILIO_AUTH_TOKEN: z.string().min(1),
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_ZERODEV_ID: z.string().min(1),
     NEXT_PUBLIC_APP_URL: z.string().min(1),
@@ -48,8 +46,6 @@ export const env = createEnv({
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXT_PUBLIC_ALCHEMY_ID: process.env.NEXT_PUBLIC_ALCHEMY_ID,
-    NEXT_PUBLIC_TWILIO_ACCOUNT_SID: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-    NEXT_PUBLIC_TWILIO_AUTH_TOKEN: process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN,
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     NEXT_PUBLIC_ZERODEV_ID: process.env.NEXT_PUBLIC_ZERODEV_ID,
