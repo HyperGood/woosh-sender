@@ -13,7 +13,7 @@ dependencies:
     version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
   '@hookform/resolvers':
     specifier: ^3.1.1
-    version: 3.3.1(react-hook-form@7.46.2)
+    version: 3.3.1(react-hook-form@7.47.0)
   '@next-auth/prisma-adapter':
     specifier: ^1.0.5
     version: 1.0.7(@prisma/client@5.3.1)(next-auth@4.20.1)
@@ -61,10 +61,10 @@ dependencies:
     version: 1.2.0
   '@zerodev/sdk':
     specifier: ^4.0.16
-    version: 4.0.22(typescript@5.2.2)(zod@3.22.2)
+    version: 4.0.24(typescript@5.2.2)(zod@3.22.2)
   '@zerodev/wagmi':
     specifier: ^4.1.9
-    version: 4.1.9(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@wagmi/core@1.4.2)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.14.0)(wagmi@1.4.2)(zod@3.22.2)
+    version: 4.1.10(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@wagmi/core@1.4.2)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.14.0)(wagmi@1.4.2)(zod@3.22.2)
   class-variance-authority:
     specifier: ^0.6.1
     version: 0.6.1
@@ -91,7 +91,7 @@ dependencies:
     version: 18.2.0(react@18.2.0)
   react-hook-form:
     specifier: ^7.45.1
-    version: 7.46.2(react@18.2.0)
+    version: 7.47.0(react@18.2.0)
   react-hot-toast:
     specifier: ^2.4.1
     version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
@@ -1366,8 +1366,8 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
-  /@eslint-community/regexpp@4.9.0:
-    resolution: {integrity: sha512-zJmuCWj2VLBt4c25CfBIbMZLGLyhkvs7LznyVX5HfpzeocThgIj5XQK4L+g3U36mMcx8bPMhGyPpwCATamC4jQ==}
+  /@eslint-community/regexpp@4.9.1:
+    resolution: {integrity: sha512-Y27x+MBLjXa+0JWDhykM3+JE+il3kHKAEqabfEWq3SDhZjLYb6/BHL/JKFnH3fe207JaXkyDo685Oc2Glt6ifA==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
     dev: true
 
@@ -1789,14 +1789,14 @@ packages:
   /@floating-ui/core@1.5.0:
     resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
-      '@floating-ui/utils': 0.1.4
+      '@floating-ui/utils': 0.1.6
     dev: false
 
   /@floating-ui/dom@1.5.3:
     resolution: {integrity: sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==}
     dependencies:
       '@floating-ui/core': 1.5.0
-      '@floating-ui/utils': 0.1.4
+      '@floating-ui/utils': 0.1.6
     dev: false
 
   /@floating-ui/react-dom@2.0.2(react-dom@18.2.0)(react@18.2.0):
@@ -1810,8 +1810,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@floating-ui/utils@0.1.4:
-    resolution: {integrity: sha512-qprfWkn82Iw821mcKofJ5Pk9wgioHicxcQMxx+5zt5GSKoqdWvgG5AxVmpmUUjzTLPVSH5auBrhI93Deayn/DA==}
+  /@floating-ui/utils@0.1.6:
+    resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
     dev: false
 
   /@headlessui/react@1.7.17(react-dom@18.2.0)(react@18.2.0):
@@ -1826,12 +1826,12 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@hookform/resolvers@3.3.1(react-hook-form@7.46.2):
+  /@hookform/resolvers@3.3.1(react-hook-form@7.47.0):
     resolution: {integrity: sha512-K7KCKRKjymxIB90nHDQ7b9nli474ru99ZbqxiqDAWYsYhOsU3/4qLxW91y+1n04ic13ajjZ66L3aXbNef8PELQ==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.46.2(react@18.2.0)
+      react-hook-form: 7.47.0(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.11:
@@ -3613,7 +3613,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@eslint-community/regexpp': 4.9.0
+      '@eslint-community/regexpp': 4.9.1
       '@typescript-eslint/parser': 5.62.0(eslint@8.50.0)(typescript@5.2.2)
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.50.0)(typescript@5.2.2)
@@ -3813,7 +3813,7 @@ packages:
       eventemitter3: 4.0.7
       typescript: 5.2.2
       viem: 1.14.0(typescript@5.2.2)(zod@3.22.2)
-      zustand: 4.4.1(@types/react@18.2.24)(react@18.2.0)
+      zustand: 4.4.2(@types/react@18.2.24)(react@18.2.0)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
       - '@types/react'
@@ -4251,26 +4251,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@web3auth/base-provider@7.0.2-beta.0(@babel/runtime@7.23.1):
-    resolution: {integrity: sha512-4CIysgZ3/SuOLDB5Z2itVioEO4iyMuI/UdKZhH/zq4OF6UGE+yCGTZcdBYgF5KxiY+zDwJBWW2Vl3oeGOaarIA==}
-    engines: {node: '>=18.x', npm: '>=9.x'}
-    peerDependencies:
-      '@babel/runtime': 7.x
-    dependencies:
-      '@babel/runtime': 7.23.1
-      '@metamask/rpc-errors': 6.0.0
-      '@toruslabs/base-controllers': 4.1.0(@babel/runtime@7.23.1)
-      '@toruslabs/openlogin-jrpc': 5.1.0(@babel/runtime@7.23.1)
-      '@web3auth/base': 7.0.1(@babel/runtime@7.23.1)
-      json-rpc-random-id: 1.0.1
-    transitivePeerDependencies:
-      - '@sentry/types'
-      - bufferutil
-      - c-kzg
-      - supports-color
-      - utf-8-validate
-    dev: false
-
   /@web3auth/base-solana-adapter@7.0.1(@babel/runtime@7.23.1):
     resolution: {integrity: sha512-afdeAz4G2WW4J2NTapOUJ37me9bgSoYKk4n8JVLrtkxwDJPZDCWY/6hMgJlX77gzZrr2D0G20M9AfQXGXyWV3A==}
     engines: {node: '>=18.x', npm: '>=9.x'}
@@ -4419,27 +4399,6 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@web3auth/no-modal@7.0.2-beta.0(@babel/runtime@7.23.1):
-    resolution: {integrity: sha512-B3IAogYeo1B/uR1P6Wd8bkYRwC3dXRcUOLqb/HouI8ewNRQkuI4AEQBezWH9y5dovFHdud99bDgNwacnqx9Ibg==}
-    engines: {node: '>=18.x', npm: '>=9.x'}
-    peerDependencies:
-      '@babel/runtime': ^7.x
-    dependencies:
-      '@babel/runtime': 7.23.1
-      '@toruslabs/openlogin': 5.1.1(@babel/runtime@7.23.1)
-      '@toruslabs/openlogin-jrpc': 5.1.0(@babel/runtime@7.23.1)
-      '@toruslabs/openlogin-utils': 5.1.0(@babel/runtime@7.23.1)
-      '@web3auth/base': 7.0.1(@babel/runtime@7.23.1)
-      '@web3auth/base-plugin': 7.0.1(@babel/runtime@7.23.1)
-      '@web3auth/base-provider': 7.0.2-beta.0(@babel/runtime@7.23.1)
-    transitivePeerDependencies:
-      - '@sentry/types'
-      - bufferutil
-      - c-kzg
-      - supports-color
-      - utf-8-validate
-    dev: false
-
   /@web3auth/openlogin-adapter@7.0.1(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5):
     resolution: {integrity: sha512-dameu4c762P+0MjNryBkrClbPDLxgU0N92iNtGbzHND3ZQILofDxqu6Gfopr915xpwbkk9OdLfx9Ib9ezc4o1A==}
     engines: {node: '>=18.x', npm: '>=9.x'}
@@ -4453,28 +4412,6 @@ packages:
       '@toruslabs/openlogin-utils': 5.1.0(@babel/runtime@7.23.1)
       '@web3auth/base': 7.0.1(@babel/runtime@7.23.1)
       '@web3auth/base-provider': 7.0.1(@babel/runtime@7.23.1)
-      lodash.merge: 4.6.2
-    transitivePeerDependencies:
-      - '@sentry/types'
-      - bufferutil
-      - c-kzg
-      - supports-color
-      - utf-8-validate
-    dev: false
-
-  /@web3auth/openlogin-adapter@7.0.2-beta.0(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5):
-    resolution: {integrity: sha512-8uF3YPGvB0QooQw9DQq8DMi5XLgSm0+/iQhsB8cc3AgAFXNQpn4f7jGfuIQF9vqqaAlEIHD8umYkOFx15Ver6Q==}
-    engines: {node: '>=18.x', npm: '>=9.x'}
-    peerDependencies:
-      '@babel/runtime': ^7.x
-      '@solana/web3.js': ^1.x
-    dependencies:
-      '@babel/runtime': 7.23.1
-      '@solana/web3.js': 1.78.5
-      '@toruslabs/openlogin': 5.1.1(@babel/runtime@7.23.1)
-      '@toruslabs/openlogin-utils': 5.1.0(@babel/runtime@7.23.1)
-      '@web3auth/base': 7.0.1(@babel/runtime@7.23.1)
-      '@web3auth/base-provider': 7.0.2-beta.0(@babel/runtime@7.23.1)
       lodash.merge: 4.6.2
     transitivePeerDependencies:
       - '@sentry/types'
@@ -4747,8 +4684,8 @@ packages:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
     dev: false
 
-  /@zerodev/sdk@4.0.20(typescript@5.2.2)(zod@3.22.2):
-    resolution: {integrity: sha512-LmaQOyeWu9aVAZTPq2bpU/TcirvZKbx9bJ+0j/ScmAg8KlA/SsNEvMK/TnRk7bXmfm2BQR93CMpzh1cSo2Dp/Q==}
+  /@zerodev/sdk@4.0.24(typescript@5.2.2)(zod@3.22.2):
+    resolution: {integrity: sha512-p/bR9THccwF2PPLaBTX3PFut1hF0BD9SmUWGbgMeLJB2ca+mAdtIuwjl/KbmsubbVZrHRl9HXMvCOfc2Eck3qQ==}
     dependencies:
       '@alchemy/aa-core': 0.1.0-alpha.23(typescript@5.2.2)(zod@3.22.2)
       '@alchemy/aa-ethers': 0.1.0-alpha.23(@alchemy/aa-core@0.1.0-alpha.23)(typescript@5.2.2)(zod@3.22.2)
@@ -4763,24 +4700,8 @@ packages:
       - zod
     dev: false
 
-  /@zerodev/sdk@4.0.22(typescript@5.2.2)(zod@3.22.2):
-    resolution: {integrity: sha512-orQOcDEuN8t8SpuSLCyjT4srQKKO2asufExOLx49H/TO495j4jkX8X6gi+gII7xgdG09n6u+BzshYgvqwD458Q==}
-    dependencies:
-      '@alchemy/aa-core': 0.1.0-alpha.23(typescript@5.2.2)(zod@3.22.2)
-      '@alchemy/aa-ethers': 0.1.0-alpha.23(@alchemy/aa-core@0.1.0-alpha.23)(typescript@5.2.2)(zod@3.22.2)
-      axios: 1.5.1
-      merkletreejs: 0.3.10
-      viem: 1.14.0(typescript@5.2.2)(zod@3.22.2)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - typescript
-      - utf-8-validate
-      - zod
-    dev: false
-
-  /@zerodev/wagmi@4.1.9(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@wagmi/core@1.4.2)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.14.0)(wagmi@1.4.2)(zod@3.22.2):
-    resolution: {integrity: sha512-3+9wOTKUxldA0ktcf6UdFfeXeHjXCwl9oahWG3ZKrque/aCw/NbtlLyHF8nmaU8EEz94+6PekOnVMYLVZvrw5A==}
+  /@zerodev/wagmi@4.1.10(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@wagmi/core@1.4.2)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.14.0)(wagmi@1.4.2)(zod@3.22.2):
+    resolution: {integrity: sha512-eSN3nu5cgOq5Emp5Ci9hkyUpJ0yG+3SniASzoItaKo2JRPBq6nai2z0kOEQPS24oRkGr+8MT78FsHCrgcee/Sg==}
     peerDependencies:
       '@wagmi/core': '>=1.3.x'
       react: '>=17'
@@ -4789,8 +4710,8 @@ packages:
       wagmi: '>=1.3.x'
     dependencies:
       '@wagmi/core': 1.4.2(@types/react@18.2.24)(react@18.2.0)(typescript@5.2.2)(viem@1.14.0)(zod@3.22.2)
-      '@zerodev/sdk': 4.0.20(typescript@5.2.2)(zod@3.22.2)
-      '@zerodev/web3auth': 4.1.7(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(zod@3.22.2)
+      '@zerodev/sdk': 4.0.24(typescript@5.2.2)(zod@3.22.2)
+      '@zerodev/web3auth': 4.1.8(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(zod@3.22.2)
       ethers: 5.7.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -4817,15 +4738,15 @@ packages:
       - zod
     dev: false
 
-  /@zerodev/web3auth@4.1.7(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(zod@3.22.2):
-    resolution: {integrity: sha512-dYKg+04JNgGtJlOj0sc5q0STPDwFdJMmNpR8lz16lwGBZYwA72CqL3oZUf1Dx38RERA3TdU7Cpqggv8hgTtI/g==}
+  /@zerodev/web3auth@4.1.8(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(zod@3.22.2):
+    resolution: {integrity: sha512-MnOLjGx284ViNjq2pQ/VL4aY+0wHDEgwYyDYCExj40Vy4Vx8BDb8qmQaQWY4QYFHnUwdbVvi2dVCeX+PPv5Trg==}
     dependencies:
       '@web3auth/base': 7.0.1(@babel/runtime@7.23.1)
       '@web3auth/ethereum-provider': 7.0.2(@babel/runtime@7.23.1)
       '@web3auth/modal': 7.0.3(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)(@walletconnect/sign-client@2.10.1)(@walletconnect/types@2.10.1)(@walletconnect/utils@2.10.1)(react-dom@18.2.0)(react@18.2.0)
-      '@web3auth/no-modal': 7.0.2-beta.0(@babel/runtime@7.23.1)
-      '@web3auth/openlogin-adapter': 7.0.2-beta.0(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)
-      '@zerodev/sdk': 4.0.20(typescript@5.2.2)(zod@3.22.2)
+      '@web3auth/no-modal': 7.0.1(@babel/runtime@7.23.1)
+      '@web3auth/openlogin-adapter': 7.0.1(@babel/runtime@7.23.1)(@solana/web3.js@1.78.5)
+      '@zerodev/sdk': 4.0.24(typescript@5.2.2)(zod@3.22.2)
     transitivePeerDependencies:
       - '@babel/runtime'
       - '@react-native-async-storage/async-storage'
@@ -5193,7 +5114,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.22.1
-      caniuse-lite: 1.0.30001541
+      caniuse-lite: 1.0.30001542
       fraction.js: 4.3.6
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -5389,7 +5310,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001541
+      caniuse-lite: 1.0.30001542
       electron-to-chromium: 1.4.537
       node-releases: 2.0.13
       update-browserslist-db: 1.0.13(browserslist@4.22.1)
@@ -5467,8 +5388,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /caniuse-lite@1.0.30001541:
-    resolution: {integrity: sha512-bLOsqxDgTqUBkzxbNlSBt8annkDpQB9NdzdTbO2ooJ+eC/IQcvDspDc058g84ejCelF7vHUx57KIOjEecOHXaw==}
+  /caniuse-lite@1.0.30001542:
+    resolution: {integrity: sha512-UrtAXVcj1mvPBFQ4sKd38daP8dEcXXr5sQe6QNNinaPd0iA/cxg9/l3VrSdL73jgw5sKyuQ6jNgiKO12W3SsVA==}
 
   /chalk@1.1.3:
     resolution: {integrity: sha512-U3lRVLMSlsCfjqYPbLyVv11M9CPW4I728d6TCKMAOJueEeB9/8o+eSsMnxPJD+Q+K909sdESg7C+tIkoH6on1A==}
@@ -6278,7 +6199,7 @@ packages:
     hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.50.0)
-      '@eslint-community/regexpp': 4.9.0
+      '@eslint-community/regexpp': 4.9.1
       '@eslint/eslintrc': 2.1.2
       '@eslint/js': 8.50.0
       '@humanwhocodes/config-array': 0.11.11
@@ -7278,8 +7199,8 @@ packages:
     hasBin: true
     dev: true
 
-  /jose@4.14.6:
-    resolution: {integrity: sha512-EqJPEUlZD0/CSUMubKtMaYUOtWe91tZXTWMJZoKSbLk+KtdhNdcvppH8lA9XwVu2V4Ailvsj0GBZJ2ZwDjfesQ==}
+  /jose@4.15.1:
+    resolution: {integrity: sha512-CinpaEMmwb/59YG0N6SC3DY1imdTU5iNl08HPWR7NdyxACPeFuQbqjaocEjCDGq04KbnxSqQu702vL3ZTvKe5w==}
     dev: false
 
   /js-sha3@0.8.0:
@@ -7754,7 +7675,7 @@ packages:
       '@babel/runtime': 7.23.1
       '@panva/hkdf': 1.1.1
       cookie: 0.5.0
-      jose: 4.14.6
+      jose: 4.15.1
       next: 13.5.3(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
       oauth: 0.9.15
       openid-client: 5.5.0
@@ -7805,7 +7726,7 @@ packages:
       '@next/env': 13.5.3
       '@swc/helpers': 0.5.2
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001541
+      caniuse-lite: 1.0.30001542
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -7974,7 +7895,7 @@ packages:
   /openid-client@5.5.0:
     resolution: {integrity: sha512-Y7Xl8BgsrkzWLHkVDYuroM67hi96xITyEDSkmWaGUiNX6CkcXC3XyQGdv5aWZ6dukVKBFVQCADi9gCavOmU14w==}
     dependencies:
-      jose: 4.14.6
+      jose: 4.15.1
       lru-cache: 6.0.0
       object-hash: 2.2.0
       oidc-token-hash: 5.0.3
@@ -8462,8 +8383,8 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
-  /react-hook-form@7.46.2(react@18.2.0):
-    resolution: {integrity: sha512-x1DWmHQchV7x2Rq9l99M/cQHC8JGchAnw9Z0uTz5KrPa0bTl/Inm1NR7ceOARfIrkNuQNAhuSuZPYa6k7QYn3Q==}
+  /react-hook-form@7.47.0(react@18.2.0):
+    resolution: {integrity: sha512-F/TroLjTICipmHeFlMrLtNLceO2xr1jU3CyiNla5zdwsGUGu2UOxxR4UyJgLlhMwLW/Wzp4cpJ7CPfgJIeKdSg==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
@@ -10276,8 +10197,8 @@ packages:
     resolution: {integrity: sha512-wvWkphh5WQsJbVk1tbx1l1Ly4yg+XecD+Mq280uBGt9wa5BKSWf4Mhp6GmrkPixhMxmabYY7RbzlwVP32pbGCg==}
     dev: false
 
-  /zustand@4.4.1(@types/react@18.2.24)(react@18.2.0):
-    resolution: {integrity: sha512-QCPfstAS4EBiTQzlaGP1gmorkh/UL1Leaj2tdj+zZCZ/9bm0WS7sI2wnfD5lpOszFqWJ1DcPnGoY8RDL61uokw==}
+  /zustand@4.4.2(@types/react@18.2.24)(react@18.2.0):
+    resolution: {integrity: sha512-qF3/vZHCrjPUX5DvPE3DPDZlh+FiAWRKlP9PI7SlW1MCk8q4vUCDqyWsbF8K41ne0Yx8eeeb0m1cypn1LqUMYQ==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
       '@types/react': '>=16.8'

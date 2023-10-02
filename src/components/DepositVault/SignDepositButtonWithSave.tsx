@@ -8,6 +8,7 @@ import type { Transaction } from "@prisma/client";
 import Button from "../Button";
 import { api } from "~/utils/api";
 import useTokenPrices from "~/hooks/useTokenPrices";
+import { env } from "~/env.mjs";
 // import { ECDSAProvider } from "@zerodev/sdk";
 // import { env } from "~/env.mjs";
 // import { getPasskeyOwner } from "@zerodev/sdk/passkey";
@@ -29,6 +30,7 @@ export const SignDepositButton = ({
 }) => {
   const { chain } = useNetwork();
   const chainId = chain?.id;
+  const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
   const depositVaultAddress =
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
@@ -68,7 +70,7 @@ export const SignDepositButton = ({
     amount:
       transaction.token === "ETH"
         ? parseEther(transaction.amount.toString())
-        : parseUnits(transaction.amount.toString(), 6),
+        : parseUnits(transaction.amount.toString(), tokenDecimals),
     depositIndex: BigInt(transaction.depositIndex || 0),
   };
 

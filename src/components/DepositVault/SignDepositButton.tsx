@@ -2,7 +2,7 @@ import { useAccount, useNetwork, useSignTypedData } from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import type { Dispatch, SetStateAction } from "react";
-import { parseEther } from "viem";
+import { parseEther, parseUnits } from "viem";
 import type { Transaction } from "~/models/transactions";
 import Button from "../Button";
 import { ZeroDevEthersProvider } from "@zerodev/sdk";
@@ -26,6 +26,7 @@ export const SignDepositButton = ({
   const { chain } = useNetwork();
   const { address } = useAccount();
   const chainId = chain?.id;
+  const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
   const depositVaultAddress =
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
@@ -45,7 +46,10 @@ export const SignDepositButton = ({
   };
 
   const message = {
-    amount: parseEther(transaction.amount.toString()),
+    amount:
+      transaction.token === "ETH"
+        ? parseEther(transaction.amount.toString())
+        : parseUnits(transaction.amount.toString(), tokenDecimals),
     depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
 

@@ -20,7 +20,7 @@ import Button from "~/components/Button";
 import WithdrawIcon from "public/images/icons/WithdrawIcon";
 import TokensList from "~/components/Balance/TokensList";
 
-export default function Home({ coinsData }: { coinsData: TokenPrices }) {
+export default function Home({ tokensData }: { tokensData: TokenPrices }) {
   const { setTokenPrices } = useContext(TokenPricesContext);
   const { setUserBalances } = useContext(UserBalancesContext);
 
@@ -38,12 +38,11 @@ export default function Home({ coinsData }: { coinsData: TokenPrices }) {
   });
 
   useEffect(() => {
-    setTokenPrices(coinsData);
-  }, [coinsData, setTokenPrices]);
+    setTokenPrices(tokensData);
+  }, [tokensData, setTokenPrices]);
 
   useEffect(() => {
     if (address && !isLoading) {
-      //The issue is that this is set before we have ethBalance & usdcBalance
       setUserBalances([
         {
           token: "ETH",
@@ -60,18 +59,6 @@ export default function Home({ coinsData }: { coinsData: TokenPrices }) {
       console.log("Address: ", address);
     }
   }, [setUserBalances, usdcBalance, ethBalance, address, isLoading]);
-
-  // useEffect(() => {
-  //   if (!isConnected && session) {
-  //     console.log("There is a session, but no wallet connected. Signing Out");
-  //     // void signOut({ redirect: false });
-  //     // console.log("Signed Out");
-  //   } else if (isConnected && !session) {
-  //     console.log("Wallet Connected. No session.");
-  //   } else if (isConnected && session) {
-  //     console.log("Wallet Connected. Session exists. Signed In");
-  //   }
-  // }, [isConnected, session]);
 
   return (
     <main>
@@ -96,7 +83,7 @@ export default function Home({ coinsData }: { coinsData: TokenPrices }) {
               <TokensList />
             </div>
           </div>
-          <div className="grid h-full max-h-screen w-full grid-cols-1 grid-rows-2 gap-20 overflow-hidden rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
+          <div className=" h-full max-h-screen w-full  gap-20 overflow-hidden rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
             <PreviousSends />
           </div>
         </div>
@@ -108,16 +95,16 @@ export default function Home({ coinsData }: { coinsData: TokenPrices }) {
 }
 
 export const getServerSideProps: GetServerSideProps<{
-  coinsData: TokenPrices;
+  tokensData: TokenPrices;
 }> = async () => {
   const res = await fetch(
     "https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cusd-coin&vs_currencies=mxn%2Cusd"
   );
-  const coinsData = (await res.json()) as TokenPrices;
+  const tokensData = (await res.json()) as TokenPrices;
 
   return {
     props: {
-      coinsData,
+      tokensData,
     },
   };
 };

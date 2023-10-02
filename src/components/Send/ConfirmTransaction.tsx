@@ -35,6 +35,7 @@ export const ConfirmTransaction = ({
             </div>
           }
         />
+
         <TransactionInfo
           label="Amount"
           content={

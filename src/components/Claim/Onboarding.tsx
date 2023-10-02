@@ -47,6 +47,7 @@ export const Onboarding = ({
     onSuccess: () => {
       if (shouldDeployAccount) {
         toast.success("Account created and connected");
+        toast.success("Deploying account");
         console.log("Deploying account");
         deployAccount?.();
       } else {

@@ -1,10 +1,12 @@
 import { Combobox } from "@headlessui/react";
+import Image from "next/image";
 import ChevronDownIcon from "public/images/icons/chevron-down";
 import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 export interface Data {
   id: string | number;
   displayValue: string;
+  image: string;
   additionalProperties?: unknown;
 }
 
@@ -14,6 +16,7 @@ export interface ComboboxProps {
   setSelectedItem: Dispatch<SetStateAction<Data>>;
   inputOnChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   clickFunction?: () => void;
+  useImage?: boolean;
 }
 
 const ComboboxSelect = ({
@@ -22,6 +25,7 @@ const ComboboxSelect = ({
   setSelectedItem,
   inputOnChange,
   clickFunction,
+  useImage,
 }: ComboboxProps) => {
   return (
     <Combobox value={selectedItem} onChange={setSelectedItem}>
@@ -30,11 +34,21 @@ const ComboboxSelect = ({
           as="div"
           className="relative flex  h-full items-center"
         >
-          <Combobox.Input
-            displayValue={(item: Data) => item.displayValue}
-            onChange={inputOnChange}
-            className="h-full w-full bg-transparent px-4 focus:outline-none"
-          />
+          <div className="flex items-center px-4">
+            {useImage && (
+              <Image
+                src={selectedItem.image}
+                alt={selectedItem.displayValue}
+                height={24}
+                width={24}
+              />
+            )}
+            <Combobox.Input
+              displayValue={(item: Data) => item.displayValue}
+              onChange={inputOnChange}
+              className="h-full w-full bg-transparent px-2 focus:outline-none"
+            />
+          </div>
           <div className="absolute right-1 -mt-1 flex h-6 w-6 items-center justify-center">
             <ChevronDownIcon />
           </div>
@@ -51,7 +65,17 @@ const ComboboxSelect = ({
               }
               onClick={clickFunction}
             >
-              {item.displayValue}
+              <div className="flex items-center gap-2">
+                {useImage && (
+                  <Image
+                    src={item.image}
+                    alt={item.displayValue}
+                    height={24}
+                    width={24}
+                  />
+                )}
+                {item.displayValue}
+              </div>
             </Combobox.Option>
           ))}
         </Combobox.Options>

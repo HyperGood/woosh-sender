@@ -97,13 +97,10 @@ export const Send = () => {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content
-            className="fixed bottom-0 left-1/2 min-h-[700px] w-full -translate-x-1/2  rounded-t-xl bg-brand-white shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl"
-            style={{ height: step === 3 ? "95%" : "80%" }}
-          >
+          <Dialog.Content className="fixed bottom-0 left-1/2 h-[98vh] w-full  -translate-x-1/2 rounded-t-xl bg-brand-white lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
             <Dialog.Close
               onClick={() => {
-                if (step === 3) {
+                if (step === 2) {
                   reset();
                   setDepositSigned(false);
                   setFundsSent(false);
@@ -172,7 +169,6 @@ export const Send = () => {
                     register={register}
                     validateField={validateField}
                     amountErrorMessage={errors.amount?.message}
-                    recipient={getValues("recipient")}
                     setSelectedToken={setSelectedToken}
                     selectedToken={selectedToken}
                     setValue={setValue}

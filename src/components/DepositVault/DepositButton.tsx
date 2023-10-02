@@ -8,7 +8,6 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { api } from "~/utils/api";
 import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
@@ -30,7 +29,8 @@ export const DepositButton = ({
   setFormValue: UseFormSetValue<TransactionForm>;
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
-  const ctx = api.useContext();
+  console.log(debouncedAmount);
+  console.log(transaction.token);
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const [depositIndexSet, setDepositIndexSet] = useState(false);
@@ -42,6 +42,7 @@ export const DepositButton = ({
 
   const tokenAddress =
     env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress;
+  const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
 
   //Approve ERC-20 Tokens
   const { config: approveTokenConfig } = usePrepareContractWrite({
@@ -59,8 +60,14 @@ export const DepositButton = ({
       },
     ],
     functionName: "approve",
-    args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 6)],
+    args: [
+      depositVaultAddress,
+      parseUnits(debouncedAmount.toString(), tokenDecimals),
+    ],
     enabled: Boolean(transaction.token !== "ETH"),
+    onSuccess(data) {
+      console.log(data);
+    },
   });
 
   const {
@@ -108,7 +115,7 @@ export const DepositButton = ({
     args:
       transaction.token === "ETH"
         ? [parseUnits("0", 18), zeroAddress]
-        : [parseUnits(debouncedAmount.toString(), 6), tokenAddress],
+        : [parseUnits(debouncedAmount.toString(), tokenDecimals), tokenAddress],
     enabled:
       transaction.token === "ETH"
         ? Boolean(debouncedAmount)
