@@ -1,4 +1,4 @@
-import { contractAddress, abi } from "~/lib/DepositVaultABI";
+import { contractAddress, abi, Addresses } from "~/lib/DepositVaultABI";
 import { isHex } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
@@ -30,9 +30,15 @@ export const Claim = ({
   const debouncedSecret = useDebounce(secret, 500);
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
+  const chainId = chain?.id;
   const { signMessageAsync } = useSignMessage();
+  const depositVaultAddress =
+    chainId && chainId in contractAddress
+      ? contractAddress[chainId as keyof Addresses][0]
+      : "0x12";
+
   const { config, isLoading: isPreparingWithdraw } = usePrepareContractWrite({
-    address: contractAddress[420][0],
+    address: depositVaultAddress,
     abi,
     functionName: "withdraw",
     args: [
