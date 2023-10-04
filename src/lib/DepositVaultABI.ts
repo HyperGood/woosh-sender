@@ -4,13 +4,16 @@ export const contractAddress = {
   31337: ["0x5FbDB2315678afecb367f032d93F642f64180aa3"],
 } as const;
 
+//OP Goerli 1271 Test
+//0x2087418C36ecb97A0e7CFbC44b2DC0f2A8709C51
+
 //Optimism
 //0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81
 
 //Base
 //0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81
 
-//audit 2 contract
+//OP Goerli Auditted Contract
 //0xBb6FC4030D202627592C75A5C4C98Db083bcC4f7
 
 //contract using call
