@@ -13,7 +13,7 @@ export const TOKENS = [
   {
     id: 1,
     displayValue: "ETH",
-    image: "/images/tokens/eth.svg",
+    image: "/images/tokens/ETH.svg",
     additionalProperties: {
       address: "0x0000000000000000000000000000000000000000",
       tokenName: "ethereum",
@@ -22,7 +22,7 @@ export const TOKENS = [
   {
     id: 2,
     displayValue: "USDc",
-    image: "/images/tokens/usdc.svg",
+    image: "/images/tokens/USDc.svg",
     additionalProperties: {
       address: env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress,
       tokenName: "usd-coin",
