@@ -41,6 +41,7 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
     setTokenPrices(tokensData);
   }, [tokensData, setTokenPrices]);
 
+
   useEffect(() => {
     if (address && !isLoading) {
       setUserBalances([
