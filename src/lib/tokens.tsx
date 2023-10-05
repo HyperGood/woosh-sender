@@ -1,4 +1,7 @@
 import type { Data } from "~/components/ComboboxSelect";
+import { env } from "~/env.mjs";
+import { outAddress } from "./erc-20/opg-out";
+import { usdcAddress } from "./erc-20/op-usdc";
 export interface Token extends Data {
   additionalProperties: {
     address: `0x${string}`;
@@ -10,6 +13,7 @@ export const TOKENS = [
   {
     id: 1,
     displayValue: "ETH",
+    image: "/images/tokens/ETH.svg",
     additionalProperties: {
       address: "0x0000000000000000000000000000000000000000",
       tokenName: "ethereum",
@@ -17,9 +21,10 @@ export const TOKENS = [
   },
   {
     id: 2,
-    displayValue: "USDc/OUT",
+    displayValue: "USDc",
+    image: "/images/tokens/USDc.svg",
     additionalProperties: {
-      address: "0x32307adfFE088e383AFAa721b06436aDaBA47DBE",
+      address: env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress,
       tokenName: "usd-coin",
     },
   },

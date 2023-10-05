@@ -1,36 +1,32 @@
 import { useEffect, useState } from "react";
 import { TOKENS } from "~/lib/tokens";
 import * as Dialog from "@radix-ui/react-dialog";
-import Button from "../../Button";
-import StepIndicator from "../../Form/StepIndicator";
-import DepositButton from "../../DepositVault/DepositButton";
-import EnterPhone from "./EnterPhone";
+import Button from "../Button";
+import StepIndicator from "../Form/StepIndicator";
+import DepositButton from "../DepositVault/DepositButton";
 import EnterAmount from "./EnterAmount";
-import ConfirmTransaction from "../ConfirmTransaction";
-import ShareTransaction from "../ShareTransaction";
-import SignDepositButton from "../../DepositVault/SignDepositButtonWithSave";
+import ConfirmTransaction from "./ConfirmTransaction";
+import ShareTransaction from "./ShareTransaction";
+import SignDepositButton from "~/components/DepositVault/SignDepositButtonWithSave";
 import CloseIcon from "public/images/icons/CloseIcon";
-import type { CheckedState } from "@radix-ui/react-checkbox";
 import type { Transaction } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Data } from "../../ComboboxSelect";
-import { COUNTRIES, type Country } from "~/lib/countries";
+import type { Data } from "../ComboboxSelect";
 import {
-  PhoneTransactionFormSchema,
-  type PhoneTransactionForm,
+  TransactionFormSchema,
+  type TransactionForm,
 } from "~/models/transactions";
+import SendIcon from "public/images/icons/SendIcon";
 
-export interface TransactionForm {
-  amount: number;
-  token: string;
-  phone?: string;
-  recipient?: string;
-  countryCode?: string;
-  address?: string;
-}
+// export interface TransactionForm {
+//   amount: number;
+//   token: string;
+//   recipient?: string;
+//   address?: string;
+// }
 
-export const SendToPhone = () => {
+export const Send = () => {
   const [step, setStep] = useState<number>(0);
 
   const {
@@ -39,17 +35,13 @@ export const SendToPhone = () => {
     getValues,
     reset,
     trigger,
-    control,
-    resetField,
     setValue,
-  } = useForm<PhoneTransactionForm>({
-    resolver: zodResolver(PhoneTransactionFormSchema),
+  } = useForm<TransactionForm>({
+    resolver: zodResolver(TransactionFormSchema),
     mode: "all",
     defaultValues: {
       amount: 0,
       token: "ETH",
-      phone: "",
-      type: "phone",
       depositIndex: 0,
     },
   });
@@ -57,36 +49,32 @@ export const SendToPhone = () => {
   const [fundsSent, setFundsSent] = useState<boolean>(false);
   const [depositSigned, setDepositSigned] = useState<boolean>(false);
   const [secret, setSecret] = useState<string>("");
-  const [saveContact, setSaveContact] = useState<CheckedState>(false);
   const [savedTransaction, setSavedTransaction] = useState<Transaction>();
   const [isValid, setIsValid] = useState<boolean>(false);
   const [selectedToken, setSelectedToken] = useState<Data>(TOKENS[0] as Data);
-  const [selectedCountry, setSelectedCountry] = useState<Data>(
-    COUNTRIES[0] as Data
-  );
 
-  const validateField = async (input: "phone" | "contact" | "amount") => {
+  const validateField = async (input: "recipient" | "amount") => {
     setIsValid(await trigger(input));
   };
 
   const handleStepIndicator = async (
-    input: "phone" | "contact" | "amount",
+    input: "recipient" | "amount",
     nextStep: number
   ) => {
-    if (step === 3) return;
+    if (step === 2) return;
     let validPrev = await trigger(input);
-    if (saveContact && step === 0) {
-      void validateField("contact");
-      if (getValues("contact") === "") return;
-      validPrev = isValid;
-      if (validPrev === false) return;
-    }
+
+    void validateField("recipient");
+    if (getValues("recipient") === "") return;
+    validPrev = isValid;
+    if (validPrev === false) return;
+
     if (validPrev) setStep(nextStep);
   };
 
   useEffect(() => {
     if (depositSigned) {
-      setStep(3);
+      setStep(2);
     }
   }, [depositSigned]);
 
@@ -99,22 +87,23 @@ export const SendToPhone = () => {
   return (
     <>
       <Dialog.Root>
-        <Dialog.Trigger className="flex items-center justify-center rounded-full bg-brand-black px-8 py-5 text-brand-white transition-colors hover:bg-brand-accent hover:text-brand-black focus:outline-none">
-          Send To A Phone
+        <Dialog.Trigger>
+          <Button>
+            <div className="flex items-center gap-2">
+              <SendIcon />
+              <span>Send</span>
+            </div>
+          </Button>
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content
-            className="fixed bottom-0 left-1/2 min-h-[700px] w-full -translate-x-1/2  rounded-t-xl bg-brand-white shadow lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl"
-            style={{ height: step === 3 ? "95%" : "80%" }}
-          >
+          <Dialog.Content className="fixed bottom-0 left-1/2 h-[98vh] w-full  -translate-x-1/2 rounded-t-xl bg-brand-white lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
             <Dialog.Close
               onClick={() => {
-                if (step === 3) {
+                if (step === 2) {
                   reset();
                   setDepositSigned(false);
                   setFundsSent(false);
-                  setSaveContact(false);
                   setIsValid(false);
                   setStep(0);
                 }
@@ -125,14 +114,13 @@ export const SendToPhone = () => {
             </Dialog.Close>
             <div className="flex h-full flex-col justify-between p-4 lg:p-8">
               <div>
-                {step === 3 ? (
+                {step === 2 ? (
                   <button
                     className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
                     onClick={() => {
                       reset();
                       setDepositSigned(false);
                       setFundsSent(false);
-                      setSaveContact(false);
                       setIsValid(false);
                       setStep(0);
                     }}
@@ -151,107 +139,69 @@ export const SendToPhone = () => {
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
-                      if (step !== 3) {
+                      if (step !== 2) {
                         setStep(0);
-                        void validateField("phone");
-                        if (saveContact) {
-                          void validateField("contact");
-                        }
                       }
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={0} name="Phone" currentStep={step} />
-                  </button>
-                  <button
-                    onClick={() => void handleStepIndicator("phone", 1)}
-                    className="cursor-pointer"
-                  >
-                    <StepIndicator step={1} name="Amount" currentStep={step} />
+                    <StepIndicator step={0} name="Amount" currentStep={step} />
                   </button>
                   <button
                     onClick={() => void handleStepIndicator("amount", 2)}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={2} name="Confirm" currentStep={step} />
+                    <StepIndicator step={1} name="Confirm" currentStep={step} />
                   </button>
                   <button
                     onClick={() => {
-                      if (depositSigned) setStep(3);
+                      if (depositSigned) setStep(2);
                     }}
                     className="cursor-pointer"
                   >
-                    <StepIndicator step={3} name="Share" currentStep={step} />
+                    <StepIndicator step={2} name="Share" currentStep={step} />
                   </button>
                 </div>
               </div>
               <form>
                 {step === 0 ? (
-                  <EnterPhone
-                    saveContact={saveContact}
-                    setSaveContact={setSaveContact}
-                    control={control}
-                    register={register}
-                    validateField={validateField}
-                    phoneErrorMessage={errors.phone?.message}
-                    contactErrorMessage={errors.contact?.message}
-                    resetContact={() => resetField("contact")}
-                    selectedCountry={selectedCountry}
-                    setSelectedCountry={setSelectedCountry}
-                  />
-                ) : step === 1 ? (
                   <EnterAmount
-                    phone={getValues("phone")}
                     register={register}
                     validateField={validateField}
                     amountErrorMessage={errors.amount?.message}
-                    countryCode={selectedCountry.displayValue}
-                    contact={getValues("contact")}
                     setSelectedToken={setSelectedToken}
                     selectedToken={selectedToken}
                     setValue={setValue}
                   />
-                ) : step === 2 ? (
-                  <ConfirmTransaction
-                    transactionData={getValues()}
-                    countryCode={selectedCountry.displayValue}
-                  />
-                ) : step === 3 && savedTransaction ? (
+                ) : step === 1 ? (
+                  <ConfirmTransaction transactionData={getValues()} />
+                ) : step === 2 && savedTransaction ? (
                   <ShareTransaction
                     transaction={savedTransaction}
                     secret={secret}
-                    countryCode={selectedCountry.displayValue}
                   />
                 ) : null}
               </form>
 
-              {step === 2 ? (
+              {step === 1 ? (
                 fundsSent ? (
                   <SignDepositButton
                     setDepositSigned={setDepositSigned}
                     setSecret={setSecret}
                     transaction={getValues()}
                     setSavedTransaction={setSavedTransaction}
-                    countryCode={selectedCountry as Country}
                   />
                 ) : (
                   <DepositButton
                     transaction={getValues()}
-                    countryCode={selectedCountry as Country}
                     setFundsSent={setFundsSent}
-                    saveContact={saveContact}
                     setFormValue={setValue}
                   />
                 )
-              ) : step === 3 && savedTransaction ? (
-                <Button fullWidth>Share</Button>
-              ) : (
+              ) : step === 2 && savedTransaction ? null : (
                 <Button
-                  fullWidth
-                  disabled={
-                    !isValid ||
-                    (saveContact === true && getValues("contact") === undefined)
-                  }
+                  size="full"
+                  disabled={!isValid}
                   onClick={() => {
                     if (isValid) {
                       setStep(step > 3 ? step : step + 1);
@@ -271,4 +221,4 @@ export const SendToPhone = () => {
   );
 };
 
-export default SendToPhone;
+export default Send;

@@ -45,7 +45,6 @@ model User {
   accounts    Account[]
   sessions    Session[]
   Transactions Transaction[]
-  Contacts     Contact[]
 }
 
 model VerificationToken {
@@ -56,21 +55,14 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-enum TransactionType {
-  phone
-  wallet
-}
 
 model Transaction {
   id          String   @id @default(cuid())
-  phone       String?
-  address     String?
-  type        TransactionType
   userId      String
   amount      Float
   token       String
-  depositIndex       Int?
-  contact   String?
+  depositIndex    Int
+  recipient String?
   amountInUSD Float
   claimed     Boolean  @default(false)
   claimedBy   String?
@@ -78,15 +70,4 @@ model Transaction {
   claimedAt   DateTime?
   txId        String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-
-model Contact {
-  id      String  @id @default(cuid())
-  phone   String?
-  name    String
-  address String?
-  image   String?
-  userId  String
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

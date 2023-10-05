@@ -1,10 +1,10 @@
 import type { AppProps } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
-import { optimismGoerli } from "wagmi/chains";
+import { optimism, optimismGoerli } from "wagmi/chains";
 import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { CryptoPricesProvider } from "~/context/TokenPricesContext";
+import { TokenPricesProvider } from "~/context/TokenPricesContext";
 import { Toaster } from "react-hot-toast";
 import {
   getDefaultWallets,
@@ -20,9 +20,10 @@ import {
   type GetSiweMessageOptions,
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
 import "@rainbow-me/rainbowkit/styles.css";
+import { UserBalancesProvider } from "~/context/UserBalanceContext";
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [optimismGoerli],
+  [env.NEXT_PUBLIC_TESTNET === "true" ? optimismGoerli : optimism],
   [alchemyProvider({ apiKey: env.NEXT_PUBLIC_ALCHEMY_ID }), publicProvider()]
 );
 
@@ -57,10 +58,12 @@ const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
               accentColorForeground: "#C8FD6A",
             })}
           >
-            <CryptoPricesProvider>
-              <Component {...pageProps} />
-              <Toaster position="bottom-right" />
-            </CryptoPricesProvider>
+            <TokenPricesProvider>
+              <UserBalancesProvider>
+                <Component {...pageProps} />
+                <Toaster position="bottom-right" />
+              </UserBalancesProvider>
+            </TokenPricesProvider>
           </RainbowKitProvider>
         </RainbowKitSiweNextAuthProvider>
       </WagmiConfig>

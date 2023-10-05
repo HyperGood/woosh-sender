@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 export const buttonStyles = cva(
-  "flex items-center justify-center px-12 py-4 rounded-full focus:outline-none transition-all duration-400",
+  "flex items-center justify-center rounded-full focus:outline-none transition-all duration-400",
   {
     variants: {
       intent: {
@@ -11,15 +11,17 @@ export const buttonStyles = cva(
           "bg-brand-gray-light text-brand-black focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
         accent:
-          "bg-brand-accent text-brand-black hover:bg-brand-black hover:text-brand-accent",
+          "bg-brand-gray-light text-brand-accent hover:bg-brand-accent hover:text-brand-white",
         none: "px-0 py-0 hover:bg-brand-gray-light",
       },
-      fullWidth: {
-        true: "w-full",
+      size: {
+        small: "px-4 py-2",
+        full: "w-full py-4",
+        medium: "px-12 py-4",
       },
 
       disabled: {
-        true: "cursor-not-allowed bg-brand-gray-dark text-brand-gray-light",
+        true: "cursor-not-allowed opacity-60 disabled",
       },
       hover: {
         true: "hover:scale-105 transition-transform duration-400",
@@ -31,6 +33,7 @@ export const buttonStyles = cva(
     },
     defaultVariants: {
       intent: "primary",
+      size: "medium",
     },
   }
 );
@@ -40,16 +43,16 @@ interface Props extends VariantProps<typeof buttonStyles> {
   onClick?: () => void;
   disabled?: boolean;
   hover?: boolean;
-  disabledMessage?: string;
+  errorMessage?: string;
 }
 
 const Button = ({
   intent,
-  fullWidth,
+  size,
   children,
   disabled = false,
   onClick,
-  disabledMessage,
+  errorMessage,
   hover = true,
   loading = false,
 }: Props) => {
@@ -59,10 +62,10 @@ const Button = ({
       <button
         className={buttonStyles({
           intent,
-          fullWidth,
           disabled,
           hover,
           loading,
+          size,
         })}
         onClick={onClick}
         disabled={disabled}
@@ -73,9 +76,9 @@ const Button = ({
       >
         {children}
       </button>
-      {disabled ? (
+      {errorMessage ? (
         <span className="mt-2 block text-center text-sm text-error ">
-          {disabledMessage}
+          {errorMessage}
         </span>
       ) : null}
     </>

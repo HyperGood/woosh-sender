@@ -1,6 +1,4 @@
 import { z } from "zod";
-import validator from "validator";
-import { formatPhone } from "~/lib/formatPhone";
 
 export const TransactionSchema = z.object({
   amount: z
@@ -10,17 +8,15 @@ export const TransactionSchema = z.object({
   token: z.string().min(1).max(20),
   amountInUSD: z.number().min(0),
   txId: z.string(),
-  contact: z
+  recipient: z
     .string()
     .trim()
-    .min(2, { message: "Contact name must be 2 or more characters" })
+    .min(2, { message: "Recipient name must be 2 or more characters" })
     .max(100)
-    .optional(),
-  type: z.enum(["wallet", "phone"]),
+    .nullish(),
 });
 
 export const WalletTransactionSchema = TransactionSchema.extend({
-  type: z.literal("wallet"),
   address: z.string().trim().min(4, {
     message: "This is not long enough to be an ENS name or Ethereum Address",
   }),
@@ -28,25 +24,15 @@ export const WalletTransactionSchema = TransactionSchema.extend({
 
 export type WalletTransaction = z.infer<typeof WalletTransactionSchema>;
 
-export const PhoneTransactionFormSchema = TransactionSchema.extend({
-  type: z.literal("phone"),
-  phone: z.string().refine(
-    (phone) => {
-      const formattedPhone = formatPhone(phone);
-      return validator.isMobilePhone(formattedPhone, "any");
-    },
-    { message: "Please enter a phone number that is 10 digits long" }
-  ),
+export const TransactionFormSchema = TransactionSchema.extend({
   depositIndex: z.number().min(0),
 });
 
-//Phone Transaction Schema for saving to database
-export const PhoneTransactionSchema = TransactionSchema.extend({
-  type: z.literal("phone"),
-  phone: z.string(),
+//Transaction Schema for saving to database
+export const VaultTransactionSchema = TransactionSchema.extend({
   depositIndex: z.number().min(0),
   id: z.string(),
 });
 
-export type PhoneTransactionForm = z.infer<typeof PhoneTransactionFormSchema>;
-export type PhoneTransaction = z.infer<typeof PhoneTransactionSchema>;
+export type TransactionForm = z.infer<typeof TransactionFormSchema>;
+export type Transaction = z.infer<typeof VaultTransactionSchema>;

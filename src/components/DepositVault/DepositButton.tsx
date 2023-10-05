@@ -8,33 +8,29 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { api } from "~/utils/api";
 import { contractAddress, type Addresses } from "../../lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../Loading";
 import { useEffect, type Dispatch, type SetStateAction, useState } from "react";
-import type { CheckedState } from "@radix-ui/react-checkbox";
-import type { PhoneTransactionForm } from "~/models/transactions";
-import { type Country } from "~/lib/countries";
+import type { TransactionForm } from "~/models/transactions";
 import { type UseFormSetValue } from "react-hook-form";
 import Button from "../Button";
-import { tokenAbi, outAddress } from "../../lib/OUT-ABI";
+import { env } from "~/env.mjs";
+import { outAddress } from "../../lib/erc-20/opg-out";
+import { usdcAddress } from "~/lib/erc-20/op-usdc";
 
 export const DepositButton = ({
   transaction,
   setFundsSent,
-  saveContact,
-  countryCode,
   setFormValue,
 }: {
-  transaction: PhoneTransactionForm;
+  transaction: TransactionForm;
   setFundsSent: Dispatch<SetStateAction<boolean>>;
-  setFormValue: UseFormSetValue<PhoneTransactionForm>;
-  saveContact: CheckedState;
-  countryCode: Country;
+  setFormValue: UseFormSetValue<TransactionForm>;
 }) => {
   const debouncedAmount = useDebounce(transaction.amount, 500);
-  const ctx = api.useContext();
+  console.log(debouncedAmount);
+  console.log(transaction.token);
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const [depositIndexSet, setDepositIndexSet] = useState(false);
@@ -44,27 +40,41 @@ export const DepositButton = ({
       ? contractAddress[chainId as keyof Addresses][0]
       : "0x12";
 
-  const { mutate: mutateContact } = api.contact.add.useMutation({
-    onSuccess: () => {
-      console.log("Successfully added contact");
-      void ctx.contact.getContacts.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`There was an error saving the contact ${error.message}`);
-    },
-  });
+  const tokenAddress =
+    env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress;
+  const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
 
   //Approve ERC-20 Tokens
-
   const { config: approveTokenConfig } = usePrepareContractWrite({
-    address: "0x32307adfFE088e383AFAa721b06436aDaBA47DBE",
+    address: tokenAddress,
+    abi: [
+      {
+        name: "approve",
+        type: "function",
+        stateMutability: "nonpayable",
+        inputs: [
+          { internalType: "address", name: "spender", type: "address" },
+          { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        outputs: [{ internalType: "bool", name: "", type: "bool" }],
+      },
+    ],
     functionName: "approve",
-    args: [depositVaultAddress, parseUnits(debouncedAmount.toString(), 18)],
-    abi: tokenAbi,
+    args: [
+      depositVaultAddress,
+      parseUnits(debouncedAmount.toString(), tokenDecimals),
+    ],
     enabled: Boolean(transaction.token !== "ETH"),
+    onSuccess(data) {
+      console.log(data);
+    },
   });
 
-  const { data: approvalData, write: approveTokens } = useContractWrite({
+  const {
+    data: approvalData,
+    write: approveTokens,
+    isLoading: waitingForApproval,
+  } = useContractWrite({
     ...approveTokenConfig,
     onError(error) {
       if (error.message.includes("User rejected the request")) {
@@ -87,8 +97,6 @@ export const DepositButton = ({
       hash: approvalData?.hash,
       onSuccess(txData) {
         console.log("Approved! Approval Data: ", txData);
-        console.log("Depositing funds...");
-        deposit?.();
       },
       onError(error) {
         console.log("Transaction error: ", error);
@@ -107,7 +115,7 @@ export const DepositButton = ({
     args:
       transaction.token === "ETH"
         ? [parseUnits("0", 18), zeroAddress]
-        : [parseUnits(debouncedAmount.toString(), 18), outAddress],
+        : [parseUnits(debouncedAmount.toString(), tokenDecimals), tokenAddress],
     enabled:
       transaction.token === "ETH"
         ? Boolean(debouncedAmount)
@@ -124,7 +132,7 @@ export const DepositButton = ({
   const {
     data: depositData,
     write: deposit,
-    isLoading: isDepositLoading,
+    isLoading: waitingForDeposit,
   } = useContractWrite({
     ...contractWriteConfig,
     onError(error) {
@@ -143,9 +151,6 @@ export const DepositButton = ({
   const { isLoading: isDepositing } = useWaitForTransaction({
     hash: depositData?.hash,
     onSuccess(txData) {
-      if (saveContact) {
-        saveContactFunction();
-      }
       setFormValue("txId", txData.transactionHash);
       setTxHashSet(true);
       toast.success(`Funds sent!`);
@@ -167,22 +172,8 @@ export const DepositButton = ({
     },
   });
 
-  function saveContactFunction() {
-    if (transaction.contact && transaction.phone) {
-      console.log("Saving contact...");
-      mutateContact({
-        name: transaction.contact,
-        phone: countryCode.additionalProperties.code + transaction.phone,
-      });
-    } else {
-      toast.error("There was an error saving the contact.");
-    }
-  }
-
   const sendFunction = () => {
-    if (transaction.phone === "") {
-      alert("Please enter a phone number");
-    } else if (transaction.amount === 0) {
+    if (transaction.amount === 0) {
       alert("Please enter an amount greater than 0");
     } else {
       if (transaction.token === "ETH") {
@@ -203,27 +194,65 @@ export const DepositButton = ({
   const status = {
     isDepositting: "Sending funds",
     isApproving: "Allowing your account to send tokens",
-    isDepositLoading: "Confirm the transaction",
+    waitingForDeposit: "Confirm the transaction",
   };
 
   //Add a disclaimer saying that you can always cancel a transaction before someone claims the funds
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <Button
-        onClick={() => void sendFunction()}
-        disabled={isDepositLoading}
-        loading={isDepositing || isApproving}
-        fullWidth
-      >
-        <div className="flex items-center gap-4">
-          {isDepositLoading
-            ? status.isDepositLoading
-            : isDepositing || isApproving
-            ? null
-            : "Send funds"}
-          {isDepositing || isApproving ? <LoadingSpinner /> : null}
-        </div>
-      </Button>
+      {tokenApprovalData ? (
+        <Button
+          onClick={() => void deposit?.()}
+          disabled={waitingForDeposit}
+          loading={
+            isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit
+          }
+          size="full"
+        >
+          <div className="flex items-center gap-4">
+            {waitingForDeposit
+              ? status.waitingForDeposit
+              : isDepositing || isApproving || waitingForApproval
+              ? null
+              : "Send funds"}
+            {isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit ? (
+              <LoadingSpinner />
+            ) : null}
+          </div>
+        </Button>
+      ) : (
+        <Button
+          onClick={() => void sendFunction()}
+          disabled={waitingForDeposit}
+          loading={
+            isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit
+          }
+          size="full"
+        >
+          <div className="flex items-center gap-4">
+            {waitingForDeposit
+              ? status.waitingForDeposit
+              : isDepositing || isApproving || waitingForApproval
+              ? null
+              : "Send funds"}
+            {isDepositing ||
+            isApproving ||
+            waitingForApproval ||
+            waitingForDeposit ? (
+              <LoadingSpinner />
+            ) : null}
+          </div>
+        </Button>
+      )}
       <span>
         {isDepositing
           ? status.isDepositting

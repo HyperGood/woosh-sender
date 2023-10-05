@@ -6,9 +6,12 @@ import { ZeroDevConnector } from "@zerodev/wagmi";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { env } from "~/env.mjs";
 import { chains } from "~/pages/_app";
+import { useState } from "react";
+import { LoadingSpinner } from "./Loading";
 
 export const PasskeySignIn = () => {
-  const { address } = useAccount();
+  const [signingIn, setSigningIn] = useState(false);
+  const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { signMessageAsync } = useSignMessage();
   const { connect } = useConnect({
@@ -18,20 +21,27 @@ export const PasskeySignIn = () => {
   });
 
   const handleLogin = async () => {
-    try {
-      connect({
-        connector: new ZeroDevConnector({
-          chains,
-          options: {
-            projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-            owner: await getPasskeyOwner({
+    setSigningIn(true);
+    if (isConnected) {
+      console.log("siwe");
+      void siweSignIn();
+    } else {
+      try {
+        connect({
+          connector: new ZeroDevConnector({
+            chains,
+            options: {
               projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-            }),
-          },
-        }),
-      });
-    } catch (error) {
-      console.log("error: ", error);
+              owner: await getPasskeyOwner({
+                projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+              }),
+            },
+          }),
+        });
+      } catch (error) {
+        setSigningIn(false);
+        console.log("error: ", error);
+      }
     }
   };
 
@@ -44,7 +54,6 @@ export const PasskeySignIn = () => {
         uri: window.location.origin,
         version: "1",
         chainId: chain?.id,
-        // nonce is used from CSRF token
         nonce: await getCsrfToken(),
       });
       const signature = await signMessageAsync({
@@ -55,15 +64,26 @@ export const PasskeySignIn = () => {
         redirect: false,
         signature,
       });
+      setSigningIn(false);
       console.log("Signed In");
     } catch (error) {
       console.error("Sign in error: ", error);
+      setSigningIn(false);
     }
   }
 
   return (
     <>
-      <Button onClick={() => void handleLogin()}>Sign In</Button>
+      <Button onClick={() => void handleLogin()}>
+        {signingIn ? (
+          <div className="flex items-center gap-2">
+            <span>Signing In</span>
+            <LoadingSpinner />
+          </div>
+        ) : (
+          "Sign In"
+        )}
+      </Button>
     </>
   );
 };

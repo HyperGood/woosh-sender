@@ -37,11 +37,11 @@ export const CustomConnectButton = () => {
               if (!connected) {
                 return (
                   <Button
-                    fullWidth
+                    size="full"
                     intent="secondary"
                     onClick={openConnectModal}
                   >
-                    Connect Wallet
+                    Sign In With Wallet
                   </Button>
                 );
               }

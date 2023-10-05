@@ -19,6 +19,7 @@ const ComboInput = ({
   queryChange,
   input,
   clickFunction,
+  useImage,
 }: ComboInputProps) => {
   return (
     <div className="flex w-full flex-col">
@@ -35,6 +36,7 @@ const ComboInput = ({
             setSelectedItem={setSelectedItem}
             inputOnChange={(e) => queryChange(e.target.value)}
             clickFunction={clickFunction}
+            useImage={useImage}
           />
           <div className="ml-1 h-[60%] w-[1px] bg-brand-black/20" />
         </div>

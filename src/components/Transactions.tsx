@@ -1,5 +1,4 @@
 import SignDepositButton from "~/components/DepositVault/SignDepositButton";
-import { makePhoneReadable } from "~/lib/formatPhone";
 import * as Dialog from "@radix-ui/react-dialog";
 import TransactionInfo from "~/components/Send/TransactionInfo";
 import { toast } from "react-hot-toast";
@@ -10,7 +9,6 @@ import { api } from "~/utils/api";
 import type { Transaction } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { type PhoneTransaction } from "~/models/transactions";
 import { env } from "~/env.mjs";
 
 export const TransactionCard = ({
@@ -20,7 +18,7 @@ export const TransactionCard = ({
 }) => {
   const [clicked, setClicked] = useState(false);
   const [secret, setSecret] = useState("");
-  const phone = makePhoneReadable(transaction.phone || "");
+
   const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
   const [open, setOpen] = useState(false);
   const SecretDialog = () => (
@@ -66,7 +64,7 @@ export const TransactionCard = ({
 
           <Dialog.Close asChild>
             <div className="mt-4">
-              <Button fullWidth intent="secondary">
+              <Button size="full" intent="secondary">
                 Close
               </Button>
             </div>
@@ -87,24 +85,10 @@ export const TransactionCard = ({
       <div className="flex w-full justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            {transaction.contact ? (
-              <>
-                <span className="font-polysans">{transaction.contact}</span>
-                <span className="break-all opacity-60">
-                  {!transaction.address ? phone : transaction.address}
-                </span>
-              </>
-            ) : (
-              <span className="break-all font-polysans">
-                {!transaction.address ? phone : transaction.address}
-              </span>
-            )}
+            <>
+              <span className="font-polysans">{transaction.recipient}</span>
+            </>
           </div>
-          {transaction.type === "phone" ? (
-            <span className="opacity-60">
-              {transaction.claimed ? "Claimed" : "Unclaimed"}
-            </span>
-          ) : null}
         </div>
         <div className="flex flex-col items-end gap-2">
           <div className="font-polysans">
@@ -118,37 +102,34 @@ export const TransactionCard = ({
           </span>
         </div>
       </div>
-      {transaction.type === "phone" ? (
-        <div className="mt-6 flex w-full items-center justify-between">
-          {transaction.claimed ? null : (
-            <div
-              onClick={() => {
-                setClicked(!clicked);
-              }}
-            >
-              <CancelDepositButton
-                transaction={transaction as PhoneTransaction}
-                clicked={clicked}
-              />
-            </div>
-          )}
-          {!transaction.claimed ? (
-            <div
-              onClick={() => {
-                if (secret && !open) setOpen(true);
-              }}
-              className="opacity-80 hover:opacity-100"
-            >
-              <SignDepositButton
-                transaction={transaction as PhoneTransaction}
-                setSecret={setSecret}
-                secret={secret}
-                card
-              />
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+
+      <div className="mt-6 flex w-full items-center justify-between">
+        {transaction.claimed ? null : (
+          <div
+            onClick={() => {
+              setClicked(!clicked);
+            }}
+          >
+            <CancelDepositButton transaction={transaction} clicked={clicked} />
+          </div>
+        )}
+        {!transaction.claimed ? (
+          <div
+            onClick={() => {
+              if (secret && !open) setOpen(true);
+            }}
+            className="opacity-80 hover:opacity-100"
+          >
+            <SignDepositButton
+              transaction={transaction}
+              setSecret={setSecret}
+              secret={secret}
+              card
+            />
+          </div>
+        ) : null}
+      </div>
+
       <SecretDialog />
     </div>
   );
@@ -166,7 +147,7 @@ export const PreviousSends = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  if (!data) return <div>Oh no, something went horribly wrong!😟</div>;
+  if (!data) return <div>Oh no, something went wrong!😟</div>;
 
   return (
     <>
@@ -175,7 +156,7 @@ export const PreviousSends = () => {
           previous sends ({data.length})
         </p>
         {data.length !== 0 ? (
-          <div className=" flex h-full w-full flex-col gap-5 overflow-auto pb-20">
+          <div className=" flex h-full w-full flex-col gap-5 overflow-y-scroll pb-20">
             {data.map((transaction: Transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />
