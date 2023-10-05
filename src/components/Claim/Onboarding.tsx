@@ -21,6 +21,13 @@ import { toast } from "react-hot-toast";
  * 5 needs to get reduced to 1
  */
 
+/**
+ * SESSION KEYS
+ * 1. Generate a key - This one will have the permissiones
+ * 2. Sign the key & its scope with master key - Passkey signs master key
+ * 3. Use the session key
+ */
+
 export const Onboarding = ({
   register,
   setOnboardingComplete,
