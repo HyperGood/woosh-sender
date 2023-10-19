@@ -9,11 +9,10 @@ import Button from "../Button";
 import { api } from "~/utils/api";
 import useTokenPrices from "~/hooks/useTokenPrices";
 import { env } from "~/env.mjs";
-// import { ECDSAProvider } from "@zerodev/sdk";
-// import { env } from "~/env.mjs";
-// import { getPasskeyOwner } from "@zerodev/sdk/passkey";
-// import { verifyMessage } from "@ambire/signature-validator";
-// import { ethers } from "ethers";
+import { ECDSAProvider } from "@zerodev/sdk";
+import { getPasskeyOwner } from "@zerodev/sdk/passkey";
+import { verifyMessage } from "@ambire/signature-validator";
+import { ethers } from "ethers";
 
 export const SignDepositButton = ({
   transaction,
@@ -74,47 +73,47 @@ export const SignDepositButton = ({
     depositIndex: BigInt(transaction.depositIndex || 0),
   };
 
-  // const signWithAA = async () => {
-  //   const provider = await ECDSAProvider.init({
-  //     projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     owner: await getPasskeyOwner({
-  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     }),
-  //     opts: {
-  //       paymasterConfig: {
-  //         policy: "VERIFYING_PAYMASTER",
-  //       },
-  //     },
-  //   });
+  const signWithAA = async () => {
+    const provider = await ECDSAProvider.init({
+      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      owner: await getPasskeyOwner({
+        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      }),
+      opts: {
+        paymasterConfig: {
+          policy: "VERIFYING_PAYMASTER",
+        },
+      },
+    });
 
-  //   const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-  //     `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
-  //   );
-  //   const signingAddress = await provider.getAddress();
+    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
+      `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
+    );
+    const signingAddress = await provider.getAddress();
 
-  //   const typedData = {
-  //     types,
-  //     message,
-  //     primaryType: "Withdrawal",
-  //     domain,
-  //   };
+    const typedData = {
+      types,
+      message,
+      primaryType: "Withdrawal",
+      domain,
+    };
 
-  //   console.log(typedData);
+    console.log(typedData);
 
-  //   const signature = await provider.signTypedData(typedData);
+    const signature = await provider.signTypedDataWith6492(typedData);
 
-  //   console.log("Signing address: ", signingAddress);
-  //   console.log(signature);
+    console.log("Signing address: ", signingAddress);
+    console.log(signature);
 
-  //   console.log(
-  //     await verifyMessage({
-  //       signer: signingAddress,
-  //       typedData,
-  //       signature,
-  //       provider: jsonRpcProvider,
-  //     })
-  //   );
-  // };
+    console.log(
+      await verifyMessage({
+        signer: signingAddress,
+        typedData,
+        signature,
+        provider: jsonRpcProvider,
+      })
+    );
+  };
 
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
@@ -153,8 +152,8 @@ export const SignDepositButton = ({
       <Button
         onClick={() => {
           if (!secret) {
-            //void signWithAA();
-            signTypedData();
+            void signWithAA();
+            //signTypedData();
             saveTransaction();
           }
         }}
