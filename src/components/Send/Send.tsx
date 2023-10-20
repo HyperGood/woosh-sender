@@ -88,7 +88,7 @@ export const Send = () => {
     <>
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button>
+          <Button intent="brand">
             <div className="flex items-center gap-2">
               <SendIcon />
               <span>Send</span>

@@ -26,6 +26,7 @@ export default {
           },
           black: "#19181D",
           accent: "#C8FD6A",
+          main: "#1FAE47",
         },
         warning: "#FA7C28",
         error: "#E73232",

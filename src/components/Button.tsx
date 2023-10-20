@@ -7,6 +7,7 @@ export const buttonStyles = cva(
     variants: {
       intent: {
         primary: "bg-brand-black text-brand-white",
+        brand: "bg-brand-main text-brand-white",
         secondary:
           "bg-brand-gray-light text-brand-black focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
