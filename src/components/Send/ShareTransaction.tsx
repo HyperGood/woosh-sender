@@ -122,7 +122,7 @@ Claim here ${url}
 
 You'll have to enter this secret ${secret ? secret : "secret"}`
           );
-          toast.success("Claim link copied!");
+          toast.success("Claim info copied!");
         }}
       >
         <div className="flex items-center gap-2">
