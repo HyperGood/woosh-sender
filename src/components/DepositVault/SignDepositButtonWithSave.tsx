@@ -102,7 +102,9 @@ export const SignDepositButton = ({
     });
 
     const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-      `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
+      env.NEXT_PUBLIC_TESTNET
+        ? `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
+        : `https://opt-mainnet.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
     );
     const signingAddress = await provider.getAddress();
 
@@ -112,8 +114,6 @@ export const SignDepositButton = ({
       primaryType: "Withdrawal",
       domain,
     };
-
-    console.log(typedData);
 
     const signature = await provider.signTypedDataWith6492(typedData);
 

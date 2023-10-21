@@ -109,7 +109,7 @@ export const Send = () => {
               <div>
                 {step === 2 ? (
                   <button
-                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    className="absolute left-4 top-4 mb-4 cursor-pointer self-start underline transition-opacity hover:opacity-100"
                     onClick={() => {
                       reset();
                       setDepositSigned(false);
@@ -128,7 +128,7 @@ export const Send = () => {
                     Back
                   </button>
                 )}
-
+                {/* 
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
@@ -155,6 +155,7 @@ export const Send = () => {
                     <StepIndicator step={2} name="Share" currentStep={step} />
                   </button>
                 </div>
+                */}
               </div>
               <form>
                 {step === 0 ? (

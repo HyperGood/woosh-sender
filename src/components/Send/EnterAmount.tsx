@@ -73,14 +73,14 @@ export const EnterAmount = ({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* <div className="mb-6 mt-10 flex flex-col gap-2">
-        <h2 className="text-2xl">How much do you want to send?</h2>
-      </div> */}
+      <div className="mb-6 mt-10 flex flex-col gap-2">
+        <h2 className="text-2xl">Send</h2>
+      </div>
 
       <div>
         <div className="relative mb-3">
           <ComboInput
-            label="Send"
+            label="Sending"
             queryChange={setTokenQuery}
             filteredData={filteredTokens}
             selectedItem={selectedToken}

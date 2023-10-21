@@ -8,13 +8,7 @@ export const TransactionSchema = z.object({
   token: z.string().min(1).max(20),
   amountInUSD: z.number().min(0),
   txId: z.string(),
-  recipient: z
-    .string()
-    .trim()
-    .min(2, { message: "Recipient name must be 2 or more characters" })
-    .max(100)
-    .optional()
-    .nullable(),
+  recipient: z.string().trim().nullish(),
 });
 
 export const WalletTransactionSchema = TransactionSchema.extend({

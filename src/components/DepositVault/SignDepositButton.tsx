@@ -78,16 +78,17 @@ export const SignDepositButton = ({
 
     const signature = await signer.signTypedDataWith6492(typedData);
 
-    console.log(signature);
+    await verifyMessage({
+      signer: address,
+      typedData,
+      signature: signature,
+      provider,
+    });
 
-    console.log(
-      await verifyMessage({
-        signer: address,
-        typedData,
-        signature: signature,
-        provider,
-      })
-    );
+    setSecret(signature);
+    if (setDepositSigned) {
+      setDepositSigned(true);
+    }
   };
 
   const { isLoading, signTypedData } = useSignTypedData({

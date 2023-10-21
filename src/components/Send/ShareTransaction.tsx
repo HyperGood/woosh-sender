@@ -23,14 +23,12 @@ export const ShareTransaction = ({
   const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
+    <div className="flex h-full flex-col  gap-20">
+      <div className="flex flex-col gap-6">
         <h2 className="text-2xl">
           Share the claim info{" "}
           {transaction.recipient ? `with ${transaction.recipient}` : null}!
         </h2>
-      </div>
-      <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <span className="opacity-60">Sent</span>
           <div className="rounded-2xl bg-brand-accent p-4">

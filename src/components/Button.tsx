@@ -7,7 +7,7 @@ export const buttonStyles = cva(
     variants: {
       intent: {
         primary: "bg-brand-black text-brand-white",
-        brand: "bg-brand-main text-brand-white",
+        brand: "bg-brand-main text-brand-white shadow-brand-main/60 shadow-md ",
         secondary:
           "bg-brand-gray-light text-brand-black focus:ring-brand-accent   transition-colors",
         danger: "bg-red-500 text-white focus:ring-red-500",
@@ -22,7 +22,7 @@ export const buttonStyles = cva(
       },
 
       disabled: {
-        true: "cursor-not-allowed opacity-60 disabled",
+        true: "cursor-not-allowed opacity-60 disabled shadow-none",
       },
       hover: {
         true: "hover:scale-105 transition-transform duration-400",
