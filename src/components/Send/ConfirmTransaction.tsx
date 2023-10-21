@@ -1,5 +1,4 @@
 import Image from "next/image";
-import TransactionInfo from "./TransactionInfo";
 import useTokenPrices from "~/hooks/useTokenPrices";
 import type { TransactionForm, WalletTransaction } from "~/models/transactions";
 
@@ -16,30 +15,27 @@ export const ConfirmTransaction = ({
   const amountInUSD = transactionData.amount * (tokenPrice || 0);
 
   return (
-    <div className="flex flex-col">
-      <div className="mb-6 flex flex-col gap-2">
-        <h2 className="text-2xl">Confirm</h2>
-        <p>
-          Confirm the transaction and sign the message to generate the secret
-          that the recipient will use to claim
-        </p>
-      </div>
-      <div className="flex flex-col gap-5">
-        <TransactionInfo
-          label="Sending To"
-          content={
-            <div className="flex items-center gap-4">
-              <span className="font-polysans text-lg">
-                {transactionData.recipient}
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-2">
+        <span className="opacity-60">Sending</span>
+        <div className="rounded-2xl bg-brand-accent p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[1.5rem]">
+                {" "}
+                {amountInUSD.toLocaleString("en-us", {
+                  style: "currency",
+                  currency: "USD",
+                  maximumFractionDigits: 2,
+                })}{" "}
+                USD
+              </p>{" "}
+              <span className="opacity-60">
+                {transactionData.amount} {transactionData.token}
               </span>
             </div>
-          }
-        />
 
-        <TransactionInfo
-          label="Amount"
-          content={
-            <div className="flex items-center gap-4">
+            <div className="flex gap-2 rounded-full bg-brand-white py-2 pl-2 pr-4">
               <Image
                 src={`/images/tokens/${transactionData.token}.svg`}
                 alt={transactionData.token}
@@ -47,20 +43,24 @@ export const ConfirmTransaction = ({
                 height={24}
                 className="h-6 w-6 object-contain"
               />
-              <p className="text-lg">
-                {transactionData.amount} {transactionData.token}
-              </p>{" "}
-              <span className="opacity-60">
-                {amountInUSD.toLocaleString("en-us", {
-                  style: "currency",
-                  currency: "USD",
-                  maximumFractionDigits: 2,
-                })}{" "}
-                USD
-              </span>
+              {transactionData.token}
             </div>
-          }
-        />
+          </div>
+        </div>
+      </div>
+
+      {transactionData.recipient ? (
+        <div className="flex flex-col gap-2">
+          <span className="opacity-60">To</span>
+          <div className="rounded-2xl bg-brand-gray-light px-4 py-6 ">
+            <p className="text-[1.25rem]">{transactionData.recipient}</p>{" "}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="flex w-full items-center justify-between">
+        <span>Fee</span>
+        <span className="font-polysans font-bold">FREE</span>
       </div>
     </div>
   );

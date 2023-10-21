@@ -1,7 +1,7 @@
 import { useNetwork, useSignTypedData } from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Hex, parseEther, parseUnits } from "viem";
 import type { TransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
@@ -13,6 +13,17 @@ import { ECDSAProvider } from "@zerodev/sdk";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
 import { verifyMessage } from "@ambire/signature-validator";
 import { ethers } from "ethers";
+import { LoadingSpinner } from "../Loading";
+import KeyIcon from "public/images/icons/KeyIcon";
+
+{
+  /*
+  TO-DO
+  1. Allow both EOAs and SCWs to sign
+  2. Properly fix ts error
+3. Remove the need to getPasskeys owner and sign message. Too much faceID approval here
+  */
+}
 
 export const SignDepositButton = ({
   transaction,
@@ -27,6 +38,7 @@ export const SignDepositButton = ({
   secret?: string;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
 }) => {
+  const [isSigning, setIsSigning] = useState(false);
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
@@ -74,8 +86,11 @@ export const SignDepositButton = ({
   };
 
   const signWithAA = async () => {
+    setIsSigning(true);
     const provider = await ECDSAProvider.init({
       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       owner: await getPasskeyOwner({
         projectId: env.NEXT_PUBLIC_ZERODEV_ID,
       }),
@@ -102,17 +117,18 @@ export const SignDepositButton = ({
 
     const signature = await provider.signTypedDataWith6492(typedData);
 
-    console.log("Signing address: ", signingAddress);
-    console.log(signature);
+    await verifyMessage({
+      signer: signingAddress,
+      typedData,
+      signature,
+      provider: jsonRpcProvider,
+    });
 
-    console.log(
-      await verifyMessage({
-        signer: signingAddress,
-        typedData,
-        signature,
-        provider: jsonRpcProvider,
-      })
-    );
+    setSecret(signature);
+    setIsSigning(false);
+    if (setDepositSigned) {
+      setDepositSigned(true);
+    }
   };
 
   const { isLoading, signTypedData } = useSignTypedData({
@@ -148,7 +164,7 @@ export const SignDepositButton = ({
   };
 
   return (
-    <>
+    <div>
       <Button
         onClick={() => {
           if (!secret) {
@@ -157,11 +173,20 @@ export const SignDepositButton = ({
             saveTransaction();
           }
         }}
-        disabled={isLoading}
+        disabled={isLoading || isSigning}
+        size="full"
       >
-        {isLoading ? "Waiting for Signature" : "Generate Secret"}
+        <div className="flex items-center gap-2">
+          {isLoading || isSigning ? <LoadingSpinner /> : <KeyIcon />}
+          {isLoading || isSigning
+            ? "Waiting for Signature"
+            : "Generate Secret"}{" "}
+        </div>
       </Button>
-    </>
+      <p className="mt-2  text-center opacity-60">
+        Generate the secret so the recipient can get access to the funds
+      </p>
+    </div>
   );
 };
 

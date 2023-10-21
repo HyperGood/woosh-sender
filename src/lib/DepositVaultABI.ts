@@ -1,5 +1,5 @@
 export const contractAddress = {
-  10: ["0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81"],
+  10: ["0x64deabF40A0b360f3930F8b0cBA1727d3a362CaF"],
   420: ["0x835d70aa12353f3866b118F8c9b70685Db44ad4D"],
   31337: ["0x5FbDB2315678afecb367f032d93F642f64180aa3"],
 } as const;

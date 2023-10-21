@@ -56,6 +56,8 @@ export const SignDepositButton = ({
   const signWithAA = async () => {
     const provider = await ZeroDevEthersProvider.init("ECDSA", {
       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       owner: await getPasskeyOwner({
         projectId: env.NEXT_PUBLIC_ZERODEV_ID,
       }),

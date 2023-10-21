@@ -28,8 +28,9 @@ const ComboInput = ({
           {required ? label + "*" : label}
         </label>
       )}
-      <div className="relative">
-        <div className="absolute flex h-full w-[8rem] items-center p-[1px]">
+      <div className="relative flex items-center justify-between rounded-2xl bg-brand-accent px-4">
+        {input}
+        <div>
           <ComboboxSelect
             filteredData={filteredData}
             selectedItem={selectedItem}
@@ -38,10 +39,7 @@ const ComboInput = ({
             clickFunction={clickFunction}
             useImage={useImage}
           />
-          <div className="ml-1 h-[60%] w-[1px] bg-brand-black/20" />
         </div>
-
-        {input}
       </div>
     </div>
   );

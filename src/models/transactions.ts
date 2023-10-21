@@ -13,7 +13,8 @@ export const TransactionSchema = z.object({
     .trim()
     .min(2, { message: "Recipient name must be 2 or more characters" })
     .max(100)
-    .nullish(),
+    .optional()
+    .nullable(),
 });
 
 export const WalletTransactionSchema = TransactionSchema.extend({

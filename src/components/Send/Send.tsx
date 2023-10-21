@@ -19,13 +19,6 @@ import {
 } from "~/models/transactions";
 import SendIcon from "public/images/icons/SendIcon";
 
-// export interface TransactionForm {
-//   amount: number;
-//   token: string;
-//   recipient?: string;
-//   address?: string;
-// }
-
 export const Send = () => {
   const [step, setStep] = useState<number>(0);
 

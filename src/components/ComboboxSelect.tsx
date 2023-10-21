@@ -32,9 +32,9 @@ const ComboboxSelect = ({
       <div className="relative h-full w-full">
         <Combobox.Button
           as="div"
-          className="relative flex  h-full items-center"
+          className="relative flex  h-full items-center rounded-full bg-brand-white p-2"
         >
-          <div className="flex items-center px-4">
+          <div className="flex items-center pr-1">
             {useImage && (
               <Image
                 src={selectedItem.image}
@@ -46,7 +46,7 @@ const ComboboxSelect = ({
             <Combobox.Input
               displayValue={(item: Data) => item.displayValue}
               onChange={inputOnChange}
-              className="h-full w-full bg-transparent px-2 focus:outline-none"
+              className="h-full w-full bg-transparent pl-2 focus:outline-none"
             />
           </div>
           <div className="absolute right-1 -mt-1 flex h-6 w-6 items-center justify-center">
