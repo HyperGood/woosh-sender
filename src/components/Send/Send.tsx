@@ -90,7 +90,7 @@ export const Send = () => {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content className="fixed bottom-0 left-1/2 h-[98vh] w-full  -translate-x-1/2 rounded-t-xl bg-brand-white lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
+          <Dialog.Content className="fixed bottom-0 left-1/2 h-[96dvh] w-full -translate-x-1/2  rounded-t-xl bg-brand-white lg:top-1/2 lg:h-auto lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
             <Dialog.Close
               onClick={() => {
                 if (step === 2) {
