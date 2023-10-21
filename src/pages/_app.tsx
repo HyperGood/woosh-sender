@@ -21,6 +21,7 @@ import {
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
 import "@rainbow-me/rainbowkit/styles.css";
 import { UserBalancesProvider } from "~/context/UserBalanceContext";
+import { Analytics } from "@vercel/analytics/react";
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [env.NEXT_PUBLIC_TESTNET === "true" ? optimismGoerli : optimism],
@@ -61,6 +62,7 @@ const MyApp = ({ Component, pageProps }: AppProps<{ session: Session }>) => {
             <TokenPricesProvider>
               <UserBalancesProvider>
                 <Component {...pageProps} />
+                <Analytics />
                 <Toaster position="bottom-right" />
               </UserBalancesProvider>
             </TokenPricesProvider>
