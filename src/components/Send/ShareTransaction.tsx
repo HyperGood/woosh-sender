@@ -23,7 +23,7 @@ export const ShareTransaction = ({
   const url = `https://${env.NEXT_PUBLIC_APP_URL}/claim/${transaction.id}`;
 
   return (
-    <div className="flex h-full flex-col  gap-20">
+    <div className="flex h-full flex-col  gap-10 lg:gap-20">
       <div className="flex flex-col gap-6">
         <h2 className="text-2xl">
           Share the claim info{" "}
