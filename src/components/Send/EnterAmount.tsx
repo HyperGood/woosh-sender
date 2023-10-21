@@ -90,6 +90,7 @@ export const EnterAmount = ({
               <input
                 className="without-ring ring:border-brand-black w-full rounded-[0.5rem] border-none bg-transparent pb-10 pt-4 text-[1.5rem] focus:border-2 focus:border-brand-black focus:outline-none"
                 type="number"
+                inputMode="decimal"
                 min={0}
                 step={0.01}
                 max={Number(userTokenBalance?.formatted) || 100}
