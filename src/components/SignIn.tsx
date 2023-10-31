@@ -2,12 +2,8 @@ import Logo from "public/images/Logo";
 
 //import CustomConnectButton from "./CustomConnectButton";
 import PasskeySignIn from "./PasskeySignIn";
-import Button from "./Button";
 
 export const SignIn = () => {
-  function throwing() {
-    throw new Error("Sentry Frontend Error");
-  }
   return (
     <div className="flex h-screen w-full flex-col justify-between px-2 py-8 lg:px-0">
       <Logo />
@@ -17,8 +13,6 @@ export const SignIn = () => {
         </h1>
         <div className="flex w-full flex-col gap-4 lg:w-1/2">
           <PasskeySignIn />
-          {/* <CustomConnectButton /> */}
-          <Button onClick={() => throwing()}>⚾️ Throw An Error</Button>
         </div>
       </div>
       <div />
