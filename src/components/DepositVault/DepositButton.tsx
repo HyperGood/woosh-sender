@@ -18,6 +18,14 @@ import Button from "../Button";
 import { env } from "~/env.mjs";
 import { outAddress } from "../../lib/erc-20/opg-out";
 import { usdcAddress } from "~/lib/erc-20/op-usdc";
+import SendIcon from "public/images/icons/SendIcon";
+
+/*
+
+To-do
+- 
+
+*/
 
 export const DepositButton = ({
   transaction,
@@ -237,19 +245,22 @@ export const DepositButton = ({
             waitingForDeposit
           }
           size="full"
+          intent="brand"
         >
           <div className="flex items-center gap-4">
-            {waitingForDeposit
-              ? status.waitingForDeposit
-              : isDepositing || isApproving || waitingForApproval
-              ? null
-              : "Send funds"}
             {isDepositing ||
             isApproving ||
             waitingForApproval ||
             waitingForDeposit ? (
               <LoadingSpinner />
-            ) : null}
+            ) : (
+              <SendIcon />
+            )}
+            {waitingForDeposit
+              ? status.waitingForDeposit
+              : isDepositing || isApproving || waitingForApproval
+              ? null
+              : "Send"}
           </div>
         </Button>
       )}

@@ -12,15 +12,6 @@ export interface Token extends Data {
 export const TOKENS = [
   {
     id: 1,
-    displayValue: "ETH",
-    image: "/images/tokens/ETH.svg",
-    additionalProperties: {
-      address: "0x0000000000000000000000000000000000000000",
-      tokenName: "ethereum",
-    },
-  },
-  {
-    id: 2,
     displayValue: "USDc",
     image: "/images/tokens/USDc.svg",
     additionalProperties: {
@@ -28,6 +19,16 @@ export const TOKENS = [
       tokenName: "usd-coin",
     },
   },
+  {
+    id: 2,
+    displayValue: "ETH",
+    image: "/images/tokens/ETH.svg",
+    additionalProperties: {
+      address: "0x0000000000000000000000000000000000000000",
+      tokenName: "ethereum",
+    },
+  },
+
   // {
   //   id: 3,
   //   displayValue: "DAI",

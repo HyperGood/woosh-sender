@@ -8,7 +8,7 @@ import Button from "../Button";
 import { ZeroDevEthersProvider } from "@zerodev/sdk";
 import { env } from "~/env.mjs";
 import { getPasskeyOwner } from "@zerodev/sdk/passkey";
-// import { verifyMessage } from "@ambire/signature-validator";
+import { verifyMessage } from "@ambire/signature-validator";
 
 export const SignDepositButton = ({
   transaction,
@@ -53,40 +53,43 @@ export const SignDepositButton = ({
     depositIndex: BigInt(transaction.depositIndex || 0),
   } as const;
 
-  // const signWithAA = async () => {
-  //   const provider = await ZeroDevEthersProvider.init("ECDSA", {
-  //     projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     owner: await getPasskeyOwner({
-  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     }),
-  //   });
-  //   const signer = provider.getAccountSigner();
+  const signWithAA = async () => {
+    const provider = await ZeroDevEthersProvider.init("ECDSA", {
+      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      owner: await getPasskeyOwner({
+        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      }),
+    });
+    const signer = provider.getAccountSigner();
 
-  //   const typedData = {
-  //     domain,
-  //     types,
-  //     message,
-  //     primaryType: "Withdrawal",
-  //   };
+    const typedData = {
+      domain,
+      types,
+      message,
+      primaryType: "Withdrawal",
+    };
 
-  //   // const digest = TypedDataUtils.eip712Hash(
-  //   //   { domain, types, message },
-  //   //   SignTypedDataVersion.V4
-  //   // );
+    // const digest = TypedDataUtils.eip712Hash(
+    //   { domain, types, message },
+    //   SignTypedDataVersion.V4
+    // );
 
-  //   const signature = await signer.signTypedData(typedData);
+    const signature = await signer.signTypedDataWith6492(typedData);
 
-  //   console.log(signature);
+    await verifyMessage({
+      signer: address,
+      typedData,
+      signature: signature,
+      provider,
+    });
 
-  //   console.log(
-  //     await verifyMessage({
-  //       signer: address,
-  //       typedData,
-  //       signature: signature,
-  //       provider,
-  //     })
-  //   );
-  // };
+    setSecret(signature);
+    if (setDepositSigned) {
+      setDepositSigned(true);
+    }
+  };
 
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
@@ -108,7 +111,7 @@ export const SignDepositButton = ({
     <>
       <Button
         onClick={() => {
-          if (!secret) signTypedData();
+          if (!secret) void signWithAA();
         }}
         disabled={isLoading}
         intent={card ? "none" : "primary"}

@@ -4,11 +4,11 @@ export const TransactionInfo = ({
   label,
   content,
 }: {
-  label: string;
+  label?: string;
   content: ReactNode;
 }) => {
   return (
-    <div className="flex flex-col gap-1 rounded-md bg-brand-gray-light px-5 py-2">
+    <div className="flex flex-col gap-1 rounded-2xl bg-brand-gray-light px-4 py-6">
       <span>{label}</span>
       {content}
     </div>

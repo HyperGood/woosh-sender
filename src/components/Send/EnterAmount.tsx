@@ -7,6 +7,16 @@ import { type Data } from "~/components/ComboboxSelect";
 import { useAccount, useBalance } from "wagmi";
 import useTokenPrices from "~/hooks/useTokenPrices";
 
+/*
+
+To-do
+
+  - Switch between token amount and entering amount in dollars
+  - Change comboinput to select
+  - When clicking back the previous inputted amount should show
+
+*/
+
 export const EnterAmount = ({
   register,
   validateField,
@@ -22,6 +32,10 @@ export const EnterAmount = ({
   selectedToken: Data;
   setValue: UseFormSetValue<TransactionForm>;
 }) => {
+  //selected token
+  //token balance
+  //send amount (usd or token val)
+  //display send amount
   const [touched, setTouched] = useState<boolean>(false);
   const [tokenQuery, setTokenQuery] = useState("");
   const [amountValue, setAmountValue] = useState(0);
@@ -59,21 +73,14 @@ export const EnterAmount = ({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* <div className="mb-6 mt-10 flex flex-col gap-2">
-        <h2 className="text-2xl">How much do you want to send?</h2>
-      </div> */}
+      <div className="mb-6 mt-10 flex flex-col gap-2">
+        <h2 className="text-2xl">Send</h2>
+      </div>
 
       <div>
-        <div className="mb-6 mt-10 flex flex-col gap-2">
-          <h2 className="text-2xl">Send funds using a link</h2>
-          <p>
-            The recipient doesn&apos;t need to have a wallet or be a Woosh user
-            to recieve the funds!
-          </p>
-        </div>
-        <div className="relative">
+        <div className="relative mb-3">
           <ComboInput
-            label="Send"
+            label="Sending"
             queryChange={setTokenQuery}
             filteredData={filteredTokens}
             selectedItem={selectedToken}
@@ -81,12 +88,12 @@ export const EnterAmount = ({
             useImage={true}
             input={
               <input
-                className="without-ring border-brand-dark ring:border-brand-black w-full rounded-[0.5rem] border-[1px] bg-transparent pb-7 pl-[8.5rem] pr-4 pt-2 text-right text-[1.125rem] focus:border-2 focus:border-brand-black focus:outline-none"
+                className="without-ring ring:border-brand-black w-full rounded-[0.5rem] border-none bg-transparent pb-10 pt-4 text-[1.5rem] focus:border-2 focus:border-brand-black focus:outline-none"
                 type="number"
+                inputMode="decimal"
                 min={0}
                 step={0.01}
                 max={Number(userTokenBalance?.formatted) || 100}
-                // value={amountValue}
                 placeholder="0"
                 onChange={(e) => {
                   setValue("amount", Number(e.target.value));
@@ -97,7 +104,7 @@ export const EnterAmount = ({
               />
             }
           />
-          <span className="absolute bottom-2 right-4 text-sm">
+          <span className="absolute bottom-4 left-4 ">
             ${(amountValue * (tokenPrice || 0)).toFixed(2)}
           </span>
         </div>
@@ -107,7 +114,6 @@ export const EnterAmount = ({
               {amountErrorMessage}
             </span>
           ) : null}
-          <div className="my-4 h-[1px] w-full bg-brand-black/10" />
           {userTokenBalanceLoading ? (
             <span
               className="inline-block h-5 w-full animate-pulse rounded-sm bg-brand-gray-medium "
@@ -118,27 +124,28 @@ export const EnterAmount = ({
               Error getting your balance, please reload the page
             </span>
           ) : (
-            <div className="flex flex-col">
-              <span className="text-right text-[1.125rem] font-bold">
-                Remaining balance: $
+            <div className="flex items-center gap-4">
+              <span>
+                Balance: $
                 {(
-                  (Number(userTokenBalance?.formatted) - amountValue) *
-                  (tokenPrice || 1)
+                  Number(userTokenBalance?.formatted) * (tokenPrice || 1)
                 ).toFixed(2)}
               </span>
-              <span className="text-right">
-                {Number(userTokenBalance?.formatted) - amountValue}
-                {selectedToken.displayValue}
+              <div className="h-[1.5rem] w-[1px] bg-brand-black opacity-20" />
+              <span>
+                {`${Number(userTokenBalance?.formatted)} ${
+                  selectedToken.displayValue
+                }`}
               </span>
             </div>
           )}
         </div>
       </div>
       <div>
-        <label className="mb-2 text-sm opacity-80">Sending to</label>
+        <label className="mb-2 text-sm opacity-80">To</label>
         <input
-          className="without-ring border-brand-dark ring:border-brand-black w-full rounded-[0.5rem] border-[1px] bg-transparent p-4 text-[1.125rem] focus:border-2 focus:border-brand-black focus:outline-none"
-          // value={amountValue}
+          className="without-ring ring:border-brand-black w-full rounded-2xl border-none bg-brand-gray-light px-4 py-6 text-[1.125rem] focus:border-2 focus:border-brand-black focus:outline-none"
+          {...register("recipient")}
           placeholder="Enter recipient name"
         />
       </div>

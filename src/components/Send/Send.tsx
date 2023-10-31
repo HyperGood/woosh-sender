@@ -19,13 +19,6 @@ import {
 } from "~/models/transactions";
 import SendIcon from "public/images/icons/SendIcon";
 
-// export interface TransactionForm {
-//   amount: number;
-//   token: string;
-//   recipient?: string;
-//   address?: string;
-// }
-
 export const Send = () => {
   const [step, setStep] = useState<number>(0);
 
@@ -88,7 +81,7 @@ export const Send = () => {
     <>
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button>
+          <Button intent="brand">
             <div className="flex items-center gap-2">
               <SendIcon />
               <span>Send</span>
@@ -97,7 +90,7 @@ export const Send = () => {
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-20" />
-          <Dialog.Content className="fixed bottom-0 left-1/2 h-[98vh] w-full  -translate-x-1/2 rounded-t-xl bg-brand-white lg:top-1/2 lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
+          <Dialog.Content className="fixed bottom-0 left-1/2 h-[96dvh] w-full -translate-x-1/2  rounded-t-xl bg-brand-white lg:top-1/2 lg:h-auto lg:w-[640px] lg:-translate-y-1/2 lg:rounded-2xl">
             <Dialog.Close
               onClick={() => {
                 if (step === 2) {
@@ -116,7 +109,7 @@ export const Send = () => {
               <div>
                 {step === 2 ? (
                   <button
-                    className="absolute left-8 top-4 mb-4 cursor-pointer self-start opacity-60 transition-opacity hover:opacity-100"
+                    className="absolute left-4 top-4 mb-4 cursor-pointer self-start underline transition-opacity hover:opacity-100"
                     onClick={() => {
                       reset();
                       setDepositSigned(false);
@@ -135,7 +128,7 @@ export const Send = () => {
                     Back
                   </button>
                 )}
-
+                {/* 
                 <div className="mt-10 flex justify-between">
                   <button
                     onClick={() => {
@@ -162,6 +155,7 @@ export const Send = () => {
                     <StepIndicator step={2} name="Share" currentStep={step} />
                   </button>
                 </div>
+                */}
               </div>
               <form>
                 {step === 0 ? (

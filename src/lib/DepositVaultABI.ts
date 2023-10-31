@@ -1,6 +1,6 @@
 export const contractAddress = {
-  10: ["0xEDBaB88D819ad75556AD493Fb13366FF9fe3dB81"],
-  420: ["0xBb6FC4030D202627592C75A5C4C98Db083bcC4f7"],
+  10: ["0x64deabF40A0b360f3930F8b0cBA1727d3a362CaF"],
+  420: ["0x835d70aa12353f3866b118F8c9b70685Db44ad4D"],
   31337: ["0x5FbDB2315678afecb367f032d93F642f64180aa3"],
 } as const;
 
@@ -135,6 +135,19 @@ export const abi = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "WITHDRAWAL_TYPEHASH",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -207,6 +220,35 @@ export const abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_signer",
+        type: "address",
+      },
+      {
+        internalType: "bytes32",
+        name: "_hash",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes",
+        name: "_signature",
+        type: "bytes",
+      },
+    ],
+    name: "isValidUniversalSig",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",

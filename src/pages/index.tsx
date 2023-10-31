@@ -64,7 +64,7 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
   return (
     <main>
       {isConnected && session ? (
-        <div className="relative h-full min-h-screen w-full lg:grid lg:h-screen lg:grid-cols-[1fr_44%] lg:items-center">
+        <div className="relative min-h-screen w-full lg:grid lg:h-screen lg:grid-cols-[1fr_44%] lg:items-center">
           <Header
             username={userData?.name === null ? undefined : userData?.name}
             address={address || "0xnoaddress"}
@@ -84,7 +84,7 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
               <TokensList />
             </div>
           </div>
-          <div className=" h-full max-h-screen w-full  gap-20 overflow-hidden rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
+          <div className=" h-full  w-full  gap-20 overflow-hidden rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
             <PreviousSends />
           </div>
         </div>

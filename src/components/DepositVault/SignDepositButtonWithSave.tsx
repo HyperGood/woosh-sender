@@ -1,7 +1,7 @@
 import { useNetwork, useSignTypedData } from "wagmi";
 import { contractAddress, type Addresses } from "~/lib/DepositVaultABI";
 import { toast } from "react-hot-toast";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { type Hex, parseEther, parseUnits } from "viem";
 import type { TransactionForm } from "~/models/transactions";
 import type { Transaction } from "@prisma/client";
@@ -9,11 +9,21 @@ import Button from "../Button";
 import { api } from "~/utils/api";
 import useTokenPrices from "~/hooks/useTokenPrices";
 import { env } from "~/env.mjs";
-// import { ECDSAProvider } from "@zerodev/sdk";
-// import { env } from "~/env.mjs";
-// import { getPasskeyOwner } from "@zerodev/sdk/passkey";
-// import { verifyMessage } from "@ambire/signature-validator";
-// import { ethers } from "ethers";
+import { ECDSAProvider } from "@zerodev/sdk";
+import { getPasskeyOwner } from "@zerodev/sdk/passkey";
+import { verifyMessage } from "@ambire/signature-validator";
+import { ethers } from "ethers";
+import { LoadingSpinner } from "../Loading";
+import KeyIcon from "public/images/icons/KeyIcon";
+
+{
+  /*
+  TO-DO
+  1. Allow both EOAs and SCWs to sign
+  2. Properly fix ts error
+3. Remove the need to getPasskeys owner and sign message. Too much faceID approval here
+  */
+}
 
 export const SignDepositButton = ({
   transaction,
@@ -28,6 +38,7 @@ export const SignDepositButton = ({
   secret?: string;
   setSavedTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
 }) => {
+  const [isSigning, setIsSigning] = useState(false);
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const tokenDecimals = env.NEXT_PUBLIC_TESTNET === "true" ? 18 : 6;
@@ -74,47 +85,51 @@ export const SignDepositButton = ({
     depositIndex: BigInt(transaction.depositIndex || 0),
   };
 
-  // const signWithAA = async () => {
-  //   const provider = await ECDSAProvider.init({
-  //     projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     owner: await getPasskeyOwner({
-  //       projectId: env.NEXT_PUBLIC_ZERODEV_ID,
-  //     }),
-  //     opts: {
-  //       paymasterConfig: {
-  //         policy: "VERIFYING_PAYMASTER",
-  //       },
-  //     },
-  //   });
+  const signWithAA = async () => {
+    setIsSigning(true);
+    const provider = await ECDSAProvider.init({
+      projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      owner: await getPasskeyOwner({
+        projectId: env.NEXT_PUBLIC_ZERODEV_ID,
+      }),
+      opts: {
+        paymasterConfig: {
+          policy: "VERIFYING_PAYMASTER",
+        },
+      },
+    });
 
-  //   const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-  //     `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
-  //   );
-  //   const signingAddress = await provider.getAddress();
+    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
+      env.NEXT_PUBLIC_TESTNET
+        ? `https://opt-goerli.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
+        : `https://opt-mainnet.g.alchemy.com/v2/${env.NEXT_PUBLIC_ALCHEMY_ID}`
+    );
+    const signingAddress = await provider.getAddress();
 
-  //   const typedData = {
-  //     types,
-  //     message,
-  //     primaryType: "Withdrawal",
-  //     domain,
-  //   };
+    const typedData = {
+      types,
+      message,
+      primaryType: "Withdrawal",
+      domain,
+    };
 
-  //   console.log(typedData);
+    const signature = await provider.signTypedDataWith6492(typedData);
 
-  //   const signature = await provider.signTypedData(typedData);
+    await verifyMessage({
+      signer: signingAddress,
+      typedData,
+      signature,
+      provider: jsonRpcProvider,
+    });
 
-  //   console.log("Signing address: ", signingAddress);
-  //   console.log(signature);
-
-  //   console.log(
-  //     await verifyMessage({
-  //       signer: signingAddress,
-  //       typedData,
-  //       signature,
-  //       provider: jsonRpcProvider,
-  //     })
-  //   );
-  // };
+    setSecret(signature);
+    setIsSigning(false);
+    if (setDepositSigned) {
+      setDepositSigned(true);
+    }
+  };
 
   const { isLoading, signTypedData } = useSignTypedData({
     domain,
@@ -149,20 +164,29 @@ export const SignDepositButton = ({
   };
 
   return (
-    <>
+    <div>
       <Button
         onClick={() => {
           if (!secret) {
-            //void signWithAA();
-            signTypedData();
+            void signWithAA();
+            //signTypedData();
             saveTransaction();
           }
         }}
-        disabled={isLoading}
+        disabled={isLoading || isSigning}
+        size="full"
       >
-        {isLoading ? "Waiting for Signature" : "Generate Secret"}
+        <div className="flex items-center gap-2">
+          {isLoading || isSigning ? <LoadingSpinner /> : <KeyIcon />}
+          {isLoading || isSigning
+            ? "Waiting for Signature"
+            : "Generate Secret"}{" "}
+        </div>
       </Button>
-    </>
+      <p className="mt-2  text-center opacity-60">
+        Generate the secret so the recipient can get access to the funds
+      </p>
+    </div>
   );
 };
 

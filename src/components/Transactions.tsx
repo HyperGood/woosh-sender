@@ -151,12 +151,12 @@ export const PreviousSends = () => {
 
   return (
     <>
-      <div className="h-full w-full">
+      <div className="w-full">
         <p className="mb-5 font-polysans text-lg ">
           previous sends ({data.length})
         </p>
         {data.length !== 0 ? (
-          <div className=" flex h-full w-full flex-col gap-5 overflow-y-scroll pb-20">
+          <div className=" flex w-full flex-col gap-5 overflow-y-scroll pb-20">
             {data.map((transaction: Transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />

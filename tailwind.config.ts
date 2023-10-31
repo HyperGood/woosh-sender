@@ -6,7 +6,7 @@ export default {
     fontSize: {
       "4xl": ["clamp(3.25rem, 2.61rem + 2.5vw, 5rem)", { lineHeight: "1.2" }],
       "3xl": ["3.75rem", { lineHeight: "1.2" }],
-      "2xl": ["clamp(2rem, 1.8rem + 0.73vw, 2.5rem)", { lineHeight: "1.2" }],
+      "2xl": ["clamp(2.75rem, 2rem + 0.5vw, 3.5rem)", { lineHeight: "1.2" }],
       xl: ["2rem", { lineHeight: "1.2" }],
       lg: ["clamp(1rem, 0.9rem + 0.36vw, 1.25rem)", { lineHeight: "1.2" }],
       sm: "0.875rem",
@@ -25,7 +25,8 @@ export default {
             dark: "#383538",
           },
           black: "#19181D",
-          accent: "#C8FD6A",
+          accent: "#F0F9EE",
+          main: "#1FAE47",
         },
         warning: "#FA7C28",
         error: "#E73232",
