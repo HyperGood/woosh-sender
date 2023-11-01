@@ -128,7 +128,7 @@ const getOrCreateOwner = async () => {
   };
 
   return (
-    <div className="flex h-screen flex-col justify-between px-4 py-6">
+    <div className="flex w-[40rem] flex-col justify-between rounded-xl bg-brand-white px-4 py-6">
       <div />
       {isConnected && step === 1 ? (
         <>
@@ -193,7 +193,6 @@ const getOrCreateOwner = async () => {
               {/* <CustomConnectButton /> */}
             </div>
           </div>
-          <button className="font-bold underline">What is Woosh?</button>
         </>
       )}
     </div>

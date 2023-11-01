@@ -80,8 +80,8 @@ export const Send = () => {
   return (
     <>
       <Dialog.Root>
-        <Dialog.Trigger>
-          <Button intent="brand">
+        <Dialog.Trigger className="w-full">
+          <Button intent="brand" size="full">
             <div className="flex items-center gap-2">
               <SendIcon />
               <span>Send</span>

@@ -41,7 +41,6 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
     setTokenPrices(tokensData);
   }, [tokensData, setTokenPrices]);
 
-
   useEffect(() => {
     if (address && !isLoading) {
       setUserBalances([
@@ -72,7 +71,7 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
           <div className="lg:mx-auto">
             <div className="mt-20 flex flex-col items-center  px-4 lg:mt-0 lg:min-w-[500px] lg:max-w-[50vw] lg:px-0">
               <TotalBalance />
-              <div className="mb-12 flex w-full gap-8 lg:mb-0 lg:mt-14">
+              <div className="mb-12 flex w-full justify-between gap-8 lg:mt-14">
                 <Button intent="secondary" size="full">
                   <div className="flex items-center gap-2">
                     <WithdrawIcon />
@@ -84,7 +83,7 @@ export default function Home({ tokensData }: { tokensData: TokenPrices }) {
               <TokensList />
             </div>
           </div>
-          <div className=" h-full  w-full  gap-20 overflow-hidden rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
+          <div className=" h-screen  w-full  gap-20 overflow-y-scroll  rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
             <PreviousSends />
           </div>
         </div>

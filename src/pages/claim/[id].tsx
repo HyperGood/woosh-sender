@@ -30,10 +30,6 @@ export default function ClaimPage({
   const { signMessageAsync } = useSignMessage();
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
-  // const { data: session } = useSession();
-  // const { data: userData } = api.user.getUserData.useQuery(undefined, {
-  //   enabled: !!session,
-  // });
 
   const senderData = JSON.parse(sender) as WooshUser;
 
@@ -121,7 +117,7 @@ export default function ClaimPage({
     return <div>Loading...</div>;
   }
   return (
-    <>
+    <div className="flex h-screen items-center justify-center">
       {!onboardingComplete ? (
         <Onboarding
           register={register}
@@ -135,7 +131,7 @@ export default function ClaimPage({
           sender={senderData.name ? senderData.name : "someone"}
         />
       )}
-    </>
+    </div>
   );
 }
 

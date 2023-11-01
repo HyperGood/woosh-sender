@@ -1,4 +1,4 @@
-import { contractAddress, abi, Addresses } from "~/lib/DepositVaultABI";
+import { contractAddress, abi, type Addresses } from "~/lib/DepositVaultABI";
 import { isHex } from "viem";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
@@ -7,15 +7,20 @@ import {
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
-  useSignMessage,
   useWaitForTransaction,
 } from "wagmi";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 import Button from "../Button";
 import { LoadingSpinner } from "../Loading";
 import { type Transaction } from "@prisma/client";
-import { getCsrfToken, signIn } from "next-auth/react";
-import { SiweMessage } from "siwe";
+import toast from "react-hot-toast";
+
+/*
+To-Do
+
+1. On click of button it should trigger a try/catch
+2. 
+*/
 
 export const Claim = ({
   transaction,
@@ -31,7 +36,6 @@ export const Claim = ({
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const chainId = chain?.id;
-  const { signMessageAsync } = useSignMessage();
   const depositVaultAddress =
     chainId && chainId in contractAddress
       ? contractAddress[chainId as keyof Addresses][0]
@@ -48,7 +52,8 @@ export const Claim = ({
     ],
     enabled: address && debouncedSecret ? true : false,
     onError(error) {
-      console.error(error);
+      toast.error(error.message);
+      throw new Error(error.message);
     },
   });
 
@@ -106,32 +111,6 @@ export const Claim = ({
       console.log("No address or secret");
     }
   }, [address, debouncedSecret]);
-
-  async function siweSignIn() {
-    try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: "Sign in to Woosh",
-        uri: window.location.origin,
-        version: "1",
-        chainId: chain?.id,
-        // nonce is used from CSRF token
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      void signIn("credentials", {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-      });
-      console.log("Signed In");
-    } catch (error) {
-      console.error("Sign in error: ", error);
-    }
-  }
 
   return (
     <div className="flex h-screen flex-col justify-between px-4 py-6">

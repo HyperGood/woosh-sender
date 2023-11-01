@@ -5,15 +5,13 @@ import PasskeySignIn from "./PasskeySignIn";
 
 export const SignIn = () => {
   return (
-    <div className="flex h-screen w-full flex-col justify-between px-2 py-8 lg:px-0">
+    <div className="flex h-screen w-full flex-col justify-between px-2 py-8 lg:items-center lg:px-4">
       <Logo />
-      <div className="w-full md:w-auto">
-        <h1 className="mb-16 mt-4 max-w-[10ch] text-4xl">
-          Send funds to anyone, even if they don&apos;t have a wallet
+      <div className="w-full lg:w-auto">
+        <h1 className="mb-16 mt-4 max-w-[11ch] text-center text-4xl">
+          Pay anyone with just a link
         </h1>
-        <div className="flex w-full flex-col gap-4 lg:w-1/2">
-          <PasskeySignIn />
-        </div>
+        <PasskeySignIn />
       </div>
       <div />
     </div>

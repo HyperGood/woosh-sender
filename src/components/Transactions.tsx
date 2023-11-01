@@ -156,7 +156,7 @@ export const PreviousSends = () => {
           previous sends ({data.length})
         </p>
         {data.length !== 0 ? (
-          <div className=" flex w-full flex-col gap-5 overflow-y-scroll pb-20">
+          <div className=" flex w-full flex-col gap-5 pb-20">
             {data.map((transaction: Transaction) => (
               <div key={transaction.id} className="w-full">
                 <TransactionCard transaction={transaction} />

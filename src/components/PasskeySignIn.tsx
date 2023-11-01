@@ -74,7 +74,7 @@ export const PasskeySignIn = () => {
 
   return (
     <>
-      <Button onClick={() => void handleLogin()}>
+      <Button onClick={() => void handleLogin()} size="full">
         {signingIn ? (
           <div className="flex items-center gap-2">
             <span>Signing In</span>
