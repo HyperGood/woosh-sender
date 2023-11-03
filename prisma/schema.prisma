@@ -71,3 +71,9 @@ model Transaction {
   txId        String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model AccessRequest {
+  id          String        @id @default(cuid())
+  phone      String        @unique
+  registered  Boolean       @default(false)
+}
