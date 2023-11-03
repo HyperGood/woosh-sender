@@ -2,6 +2,7 @@ import Logo from "public/images/Logo";
 
 //import CustomConnectButton from "./CustomConnectButton";
 import PasskeySignIn from "./PasskeySignIn";
+import RequestAccess from "./RequestAccess";
 
 export const SignIn = () => {
   return (
@@ -11,7 +12,10 @@ export const SignIn = () => {
         <h1 className="mb-16 mt-4 max-w-[11ch] text-center text-4xl">
           Pay anyone with just a link
         </h1>
-        <PasskeySignIn />
+        <div className="flex flex-col items-center justify-center gap-4">
+          <PasskeySignIn />
+          <RequestAccess />
+        </div>
       </div>
       <div />
     </div>
