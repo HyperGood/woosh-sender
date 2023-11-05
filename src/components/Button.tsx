@@ -13,6 +13,8 @@ export const buttonStyles = cva(
         danger: "bg-red-500 text-white focus:ring-red-500",
         accent:
           "bg-brand-gray-light text-brand-accent hover:bg-brand-accent hover:text-brand-white",
+        outline:
+          "text-black border border-black bg-transparent hover:bg-black hover:text-white",
         none: "px-0 py-0 hover:bg-brand-gray-light",
       },
       size: {
