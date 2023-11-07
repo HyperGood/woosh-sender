@@ -1,16 +1,5 @@
-import React from "react";
-import Button from "./Button";
+import RequestAccessDrawer from "./RequestAccessDrawer";
 
 export default function RequestAccess() {
-  return (
-    <Button
-      onClick={() => {
-        return;
-      }}
-      size="full"
-      intent="secondary"
-    >
-      Request Access
-    </Button>
-  );
+  return <RequestAccessDrawer />;
 }

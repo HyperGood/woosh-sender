@@ -74,6 +74,9 @@ dependencies:
   class-variance-authority:
     specifier: ^0.6.1
     version: 0.6.1
+  clsx:
+    specifier: ^2.0.0
+    version: 2.0.0
   ethers:
     specifier: 5.7.2
     version: 5.7.2
@@ -101,6 +104,9 @@ dependencies:
   react-hot-toast:
     specifier: ^2.4.1
     version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
+  react-international-phone:
+    specifier: ^4.0.3
+    version: 4.0.3(react@18.2.0)
   react-number-format:
     specifier: ^5.2.2
     version: 5.3.1(react-dom@18.2.0)(react@18.2.0)
@@ -110,6 +116,9 @@ dependencies:
   superjson:
     specifier: 1.12.2
     version: 1.12.2
+  tailwind-merge:
+    specifier: ^2.0.0
+    version: 2.0.0
   twilio:
     specifier: ^4.15.0
     version: 4.18.1
@@ -6216,6 +6225,11 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /clsx@2.0.0:
+    resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
+    engines: {node: '>=6'}
+    dev: false
+
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
     dependencies:
@@ -9518,6 +9532,14 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /react-international-phone@4.0.3(react@18.2.0):
+    resolution: {integrity: sha512-sSbUt3F4+f7xSzGtb5SY78zJTL9kWiU1NpydD9sKtrUDJuBkdl0MSmc4c1RxcMZo9g0TI/e3pqA3VV9eUx/hoQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -10357,6 +10379,12 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /tailwind-merge@2.0.0:
+    resolution: {integrity: sha512-WO8qghn9yhsldLSg80au+3/gY9E4hFxIvQ3qOmlpXnqpDKoMruKfi/56BbbMg6fHTQJ9QD3cc79PoWqlaQE4rw==}
+    dependencies:
+      '@babel/runtime': 7.23.2
+    dev: false
 
   /tailwindcss@3.3.3:
     resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}

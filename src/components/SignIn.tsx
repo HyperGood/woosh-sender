@@ -2,7 +2,7 @@ import Logo from "public/images/Logo";
 
 //import CustomConnectButton from "./CustomConnectButton";
 import PasskeySignIn from "./PasskeySignIn";
-import RequestAccess from "./RequestAccess";
+import RequestAccessDrawer from "./RequestAccessDrawer";
 
 export const SignIn = () => {
   return (
@@ -14,7 +14,7 @@ export const SignIn = () => {
         </h1>
         <div className="flex flex-col items-center justify-center gap-4">
           <PasskeySignIn />
-          <RequestAccess />
+          <RequestAccessDrawer />
         </div>
       </div>
       <div />
