@@ -72,8 +72,11 @@ model Transaction {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model AccessRequest {
-  id          String        @id @default(cuid())
+model ReferralUser {
+  id          String        @id
   phone      String        @unique
-  registered  Boolean       @default(false)
+  username String       @unique
+  referrerId String?      @unique
+  referrer  ReferralUser? @relation("Referrer", fields: [referrerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  referredUsers ReferralUser[] @relation("Referrer")
 }
