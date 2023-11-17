@@ -1,12 +1,13 @@
 import { Listbox } from "@headlessui/react";
 import PixelChevron from "public/images/icons/pixel-chevron";
+import { type ChangeEventHandler, type LegacyRef } from "react";
 import {
   FlagImage,
   defaultCountries,
   parseCountry,
 } from "react-international-phone";
+import { type ParsedCountry } from "react-international-phone/build/types";
 import { cn } from "~/utils/cn";
-import type usePhoneInput from "./usePhoneInput";
 
 export default function PhoneInput({
   country,
@@ -14,9 +15,15 @@ export default function PhoneInput({
   inputValue,
   onCountryChange,
   onPhoneInputChange,
-}: ReturnType<typeof usePhoneInput>) {
+}: {
+  inputValue: string;
+  onPhoneInputChange: ChangeEventHandler<HTMLInputElement>;
+  inputRef?: LegacyRef<HTMLInputElement>;
+  country: ParsedCountry;
+  onCountryChange: (iso2: ParsedCountry["iso2"]) => void;
+}) {
   return (
-    <div className="flex flex-grow items-center justify-between gap-2">
+    <div className="relative flex flex-grow items-center justify-between gap-2">
       <Listbox value={country.iso2} onChange={onCountryChange}>
         <Listbox.Button className="flex h-[4.6875rem] items-center justify-center gap-1 rounded-2xl bg-brand-gray-light px-3">
           {({ open }) => (
@@ -31,7 +38,7 @@ export default function PhoneInput({
             </>
           )}
         </Listbox.Button>
-        <Listbox.Options className="text-base absolute top-10 z-50 max-h-36 w-72 overflow-auto rounded-md bg-white p-2 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+        <Listbox.Options className="text-base absolute top-2 z-50 max-h-36 w-72 overflow-auto rounded-md bg-white p-2 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
           {defaultCountries.map((c) => {
             const country = parseCountry(c);
 

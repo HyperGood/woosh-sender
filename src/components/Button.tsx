@@ -1,5 +1,5 @@
-import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 export const buttonStyles = cva(
   "flex items-center justify-center rounded-full focus:outline-none transition-all duration-400",
@@ -45,6 +45,7 @@ interface Props extends VariantProps<typeof buttonStyles> {
   disabled?: boolean;
   hover?: boolean;
   errorMessage?: string;
+  type?: HTMLButtonElement["type"];
 }
 
 const Button = ({
@@ -56,6 +57,7 @@ const Button = ({
   errorMessage,
   hover = true,
   loading = false,
+  type = "button",
 }: Props) => {
   return (
     <>
@@ -70,7 +72,7 @@ const Button = ({
         })}
         onClick={onClick}
         disabled={disabled}
-        type="button"
+        type={type}
         onKeyDown={(e) => {
           if (e.key === "Enter" && onClick) onClick();
         }}
