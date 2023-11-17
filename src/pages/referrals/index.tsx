@@ -3,7 +3,7 @@ import Logo from "public/images/Logo";
 import Button from "~/components/Button";
 import { LoadingSpinner } from "~/components/Loading";
 import { api } from "~/utils/api";
-import DeleteReferralUser from "./DeleteReferralUser";
+import ReferralUserProfile from "./ReferralUserProfile";
 import SaveReferralUser from "./SaveReferralUser";
 
 export default function ReferralsPage() {
@@ -50,9 +50,6 @@ function ConnectInstagram() {
 function ReferralsPageContent() {
   const { data: session } = useSession();
 
-  // TODO: Remove
-  console.log(session);
-
   const {
     data: userData,
     isLoading: isUserDataLoading,
@@ -67,24 +64,6 @@ function ReferralsPageContent() {
   } = api.referralUser.getReferralUserData.useQuery(undefined, {
     enabled: !!session,
   });
-
-  // TODO: remove
-  // console.log(
-  //   {
-  //     userData,
-  //     isUserDataLoading,
-  //     userDataError,
-  //     userDataStatus,
-  //     userDataFetchStatus,
-  //   },
-  //   {
-  //     referralUserData,
-  //     isReferralUserDataLoading,
-  //     referralUserDataError,
-  //     referralUserDataStatus,
-  //     referralUserDataFetchStatus,
-  //   }
-  // );
 
   // 1. session doesn't exist
   // - show Connect Instagram
@@ -107,14 +86,13 @@ function ReferralsPageContent() {
 
   // 2. session exists
 
-  // 2.1. userData exists
+  // 2.1. userData exists (signed in with SIWE and Passkey)
   // - show Connect Instagram
   if (userData) {
     return <ConnectInstagram />;
   }
 
-  // 2.2. referralUserData doesn't exist
-  // COMMENT: we can connect existing User accounts through the phone number being the same
+  // 2.2. referralUserData doesn't exist (signed in with Insta but ReferralUser hasn't yet been created)
   if (!referralUserData) {
     // - show phone input
     // - onSubmit: create new referralUserData for username and phone, re-render
@@ -123,11 +101,5 @@ function ReferralsPageContent() {
 
   // 2.3. referralUserData exists
   // - show referralUserData - leaderboard and invite link
-
-  // TODO: Add showing Referral User data (profile and invite link and Success message) and Leaderboard
-  return (
-    <div>
-      Referral User Data <DeleteReferralUser />
-    </div>
-  );
+  return <ReferralUserProfile />;
 }
