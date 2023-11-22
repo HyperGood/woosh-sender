@@ -1,110 +1,145 @@
-import { useSession } from "next-auth/react";
-import { useContext, useEffect } from "react";
-import { useAccount, useBalance } from "wagmi";
-import SignIn from "~/components/SignIn";
-import type { GetServerSideProps } from "next";
-import {
-  type TokenPrices,
-  TokenPricesContext,
-} from "~/context/TokenPricesContext";
-import Send from "~/components/Send/Send";
-import { PreviousSends } from "~/components/Transactions";
-import Header from "~/components/header";
-import { api } from "~/utils/api";
-import TotalBalance from "~/components/Balance/TotalBalance";
-import { UserBalancesContext } from "~/context/UserBalanceContext";
-import { outAddress } from "~/lib/erc-20/opg-out";
-import { usdcAddress } from "~/lib/erc-20/op-usdc";
-import { env } from "~/env.mjs";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import Logo from "public/images/Logo";
 import Button from "~/components/Button";
-import WithdrawIcon from "public/images/icons/WithdrawIcon";
-import TokensList from "~/components/Balance/TokensList";
+import { LoadingSpinner } from "~/components/Loading";
+import { api } from "~/utils/api";
+import ReferralUserProfile from "./ReferralUserProfile";
+import SaveReferralUser from "./SaveReferralUser";
 
-export default function Home({ tokensData }: { tokensData: TokenPrices }) {
-  const { setTokenPrices } = useContext(TokenPricesContext);
-  const { setUserBalances } = useContext(UserBalancesContext);
-
-  const { isConnected, address } = useAccount();
-  const { data: session } = useSession();
-  const { data: userData } = api.user.getUserData.useQuery(undefined, {
-    enabled: !!session,
-  });
-  const { data: ethBalance } = useBalance({
-    address: address,
-  });
-  const { data: usdcBalance, isLoading } = useBalance({
-    address: address,
-    token: env.NEXT_PUBLIC_TESTNET === "true" ? outAddress : usdcAddress,
-  });
-
-  useEffect(() => {
-    setTokenPrices(tokensData);
-  }, [tokensData, setTokenPrices]);
-
-  useEffect(() => {
-    if (address && !isLoading) {
-      setUserBalances([
-        {
-          token: "ETH",
-          tokenName: "ethereum",
-          balance: Number(ethBalance?.formatted) || 0,
-        },
-        {
-          token: "USDc",
-          tokenName: "usd-coin",
-          balance: Number(usdcBalance?.formatted) || 0,
-        },
-      ]);
-    } else {
-      console.log("Address: ", address);
-    }
-  }, [setUserBalances, usdcBalance, ethBalance, address, isLoading]);
-
+export default function ReferralsPage() {
   return (
-    <main>
-      {isConnected && session ? (
-        <div className="relative min-h-screen w-full lg:grid lg:h-screen lg:grid-cols-[1fr_44%] lg:items-center">
-          <Header
-            username={userData?.name === null ? undefined : userData?.name}
-            address={address || "0xnoaddress"}
-          />
-          <div className="lg:mx-auto">
-            <div className="mt-20 flex flex-col items-center  px-4 lg:mt-0 lg:min-w-[500px] lg:max-w-[50vw] lg:px-0">
-              <TotalBalance />
-              <div className="mb-12 flex w-full justify-between gap-8 lg:mt-14">
-                <Button intent="secondary" size="full">
-                  <div className="flex items-center gap-2">
-                    <WithdrawIcon />
-                    <span>Withdraw</span>
-                  </div>
-                </Button>
-                <Send />
-              </div>
-              <TokensList />
-            </div>
-          </div>
-          <div className=" h-screen  w-full  gap-20 overflow-y-scroll  rounded-t-xl bg-[#E9EBEA] px-4 pb-20 pt-10 lg:px-8 lg:pb-2 lg:pt-40">
-            <PreviousSends />
-          </div>
-        </div>
-      ) : (
-        <SignIn />
-      )}
+    <main className="container mx-auto flex min-h-screen flex-col px-2 py-8 lg:items-center lg:px-4">
+      <div className="mx-auto flex max-w-lg flex-grow flex-col items-center justify-center">
+        <ReferralsPageContent />
+      </div>
     </main>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<{
-  tokensData: TokenPrices;
-}> = async () => {
-  const res = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cusd-coin&vs_currencies=mxn%2Cusd"
+interface LayoutProps {
+  title: React.ReactNode;
+  content: React.ReactNode;
+}
+function Layout({ title, content }: LayoutProps) {
+  return (
+    <div className="mx-auto flex max-w-lg flex-grow flex-col items-center justify-center">
+      <Logo className="mb-6 text-brand-black dark:text-brand-white" />
+      <div className="mb-8 px-9">{title}</div>
+      <div className="flex w-full items-center justify-center">{content}</div>
+    </div>
   );
-  const tokensData = (await res.json()) as TokenPrices;
+}
 
-  return {
-    props: {
-      tokensData,
-    },
-  };
-};
+function DefaultLayout({ content }: Pick<LayoutProps, "content">) {
+  return (
+    <Layout
+      title={
+        <h1 className="text-center text-2xl">
+          Pay anyone
+          <br />
+          with just a link
+        </h1>
+      }
+      content={content}
+    />
+  );
+}
+
+// TODO:
+// - add image to Schema
+// - load referralId from query params, keep it for redirect and set it in SaveReferralUser
+// - internationalization
+
+function ConnectInstagram() {
+  const router = useRouter();
+  const referrerUsername = router.query.referrer as string | undefined;
+
+  return (
+    <DefaultLayout
+      content={
+        <div className="flex-grow">
+          <Button
+            size="full"
+            intent="primary"
+            onClick={() => {
+              void signIn("instagram", {
+                callbackUrl: `/${
+                  referrerUsername ? `?referrer=${referrerUsername}` : ""
+                }}`,
+              });
+            }}
+          >
+            Join Waitlist with Instagram
+          </Button>
+        </div>
+      }
+    />
+  );
+}
+
+function Loading() {
+  return <DefaultLayout content={<LoadingSpinner size={40} />} />;
+}
+
+function ReferralsPageContent() {
+  const { data: session } = useSession();
+
+  const {
+    data: userData,
+    isLoading: isUserDataLoading,
+    error: userDataError,
+  } = api.user.getUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
+  const {
+    data: referralUserData,
+    isLoading: isReferralUserDataLoading,
+    error: referralUserDataError,
+  } = api.referralUser.getReferralUserData.useQuery(undefined, {
+    enabled: !!session,
+  });
+
+  // 1. session doesn't exist
+  // - show Connect Instagram
+  if (!session) {
+    return <ConnectInstagram />;
+  }
+
+  if (userDataError || referralUserDataError) {
+    return (
+      <div className="flex flex-grow flex-col items-center justify-center">
+        <p>Something went wrong!</p>
+        <p>Error: {userDataError?.message ?? referralUserDataError?.message}</p>
+      </div>
+    );
+  }
+
+  if (isUserDataLoading || isReferralUserDataLoading) {
+    return <Loading />;
+  }
+
+  // 2. session exists
+
+  // 2.1. userData exists (signed in with SIWE and Passkey)
+  // - show Connect Instagram
+  if (userData) {
+    return <ConnectInstagram />;
+  }
+
+  // 2.2. referralUserData doesn't exist (signed in with Insta but ReferralUser hasn't yet been created)
+  if (!referralUserData) {
+    // - show phone input
+    // - onSubmit: create new referralUserData for username and phone, re-render
+    return <DefaultLayout content={<SaveReferralUser />} />;
+  }
+
+  // 2.3. referralUserData exists
+  // - show referralUserData - leaderboard and invite link
+  return (
+    <Layout
+      title={<h1 className="text-center text-2xl">You&apos;re in!</h1>}
+      content={<ReferralUserProfile />}
+    />
+  );
+}

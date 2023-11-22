@@ -31,14 +31,14 @@ export default function PhoneInput({
               <FlagImage iso2={country.iso2} className="h-6" />
               <PixelChevron
                 className={cn(
-                  "h-5 w-5 rotate-90 transform",
+                  "h-5 w-5 rotate-90 transform text-brand-black",
                   open ? "-rotate-90" : ""
                 )}
               />
             </>
           )}
         </Listbox.Button>
-        <Listbox.Options className="text-base absolute top-2 z-50 max-h-36 w-72 overflow-auto rounded-md bg-white p-2 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+        <Listbox.Options className="text-base absolute top-20 z-50 max-h-36 w-72 overflow-auto rounded-md bg-white p-2 text-brand-black shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
           {defaultCountries.map((c) => {
             const country = parseCountry(c);
 
@@ -71,7 +71,7 @@ export default function PhoneInput({
         </Listbox.Options>
       </Listbox>
       <input
-        className="h-[4.6875rem] flex-grow rounded-2xl bg-brand-gray-light px-4 text-[1.3125rem] font-medium leading-5"
+        className="h-[4.6875rem] flex-grow rounded-2xl bg-brand-gray-light px-4 text-[1.3125rem] font-medium leading-5 text-brand-black"
         type="tel"
         value={inputValue}
         onChange={onPhoneInputChange}

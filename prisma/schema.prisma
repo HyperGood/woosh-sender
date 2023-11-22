@@ -77,6 +77,7 @@ model ReferralUser {
   phone      String        @unique
   username String       @unique
   referrerId String?      @unique
+  referredCount Int @default(0)
   referrer  ReferralUser? @relation("Referrer", fields: [referrerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   referredUsers ReferralUser[] @relation("Referrer")
 }

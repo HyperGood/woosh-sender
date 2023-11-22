@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PhoneNumberUtil } from "google-libphonenumber";
+import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -34,6 +35,10 @@ const formSchema = z.object({
 });
 
 export default function SaveReferralUser() {
+  const router = useRouter();
+
+  const referrerUsername = router.query.referrer as string | undefined;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,13 +62,15 @@ export default function SaveReferralUser() {
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = useCallback(
     async ({ phone }: z.infer<typeof formSchema>) => {
       try {
-        await mutateAsync({ phone });
+        await mutateAsync({ phone, referrerUsername });
       } catch (error) {
         toast.error(`Error: ${(error as Error).message}`);
       }
     },
-    [mutateAsync]
+    [mutateAsync, referrerUsername]
   );
+
+  const buttonLoading = isSubmitting || isLoading;
 
   return (
     <Form {...form}>
@@ -91,9 +98,9 @@ export default function SaveReferralUser() {
           type="submit"
           size="full"
           disabled={(submitCount > 0 && !isValid) || isLoading}
-          loading={isSubmitting || isLoading}
+          loading={buttonLoading}
         >
-          Submit
+          {buttonLoading ? "One sec..." : "Submit"}
         </Button>
       </form>
     </Form>

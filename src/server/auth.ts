@@ -28,6 +28,8 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      accessToken: string;
+      userId: number;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -52,14 +54,25 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
   callbacks: {
     // token.sub will refer to the id of the wallet address
     session: ({ session, token }) => {
-      console.log();
       return {
         ...session,
         user: {
           ...session.user,
           id: token.sub,
+          accessToken: token.accessToken,
+          userId: token.userId,
         },
-      } as Session & { user: { id: string } };
+      } as Session & {
+        user: { id: string; accessToken: string; userId: number };
+      };
+    },
+    jwt: ({ token, account }) => {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (account) {
+        token.accessToken = account.access_token;
+        token.userId = account.user_id;
+      }
+      return token;
     },
     // OTHER CALLBACKS to take advantage of but not needed
     // signIn: async (params: { // Used to control if a user is allowed to sign in

@@ -1,3 +1,4 @@
+import { signOut } from "next-auth/react";
 import { useCallback } from "react";
 import Button from "~/components/Button";
 import { api } from "~/utils/api";
@@ -15,5 +16,10 @@ export default function DeleteReferralUser() {
     // TODO: useEffect toast when error
   }, [mutateAsync]);
 
-  return <Button onClick={onSubmit}>DeleteReferralUser</Button>;
+  return (
+    <>
+      <Button onClick={onSubmit}>DeleteReferralUser</Button>
+      <Button onClick={signOut}>Sign Out</Button>
+    </>
+  );
 }

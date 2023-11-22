@@ -1,12 +1,14 @@
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
+import { cn } from "~/utils/cn";
 
 export const buttonStyles = cva(
   "flex items-center justify-center rounded-full focus:outline-none transition-all duration-400",
   {
     variants: {
       intent: {
-        primary: "bg-brand-black text-brand-white",
+        primary:
+          "bg-brand-black text-brand-white dark:bg-brand-white dark:text-brand-black",
         brand: "bg-brand-main text-brand-white shadow-brand-main/60 shadow-md ",
         secondary:
           "bg-brand-gray-light text-brand-black focus:ring-brand-accent   transition-colors",
@@ -29,7 +31,7 @@ export const buttonStyles = cva(
         false: "hover:bg-brand-gray-dark",
       },
       loading: {
-        true: "cursor-not-allowed bg-brand-black text-brand-white w-12 h-12 rounded-full flex items-center justify-center",
+        true: "cursor-not-allowed bg-brand-black text-brand-white rounded-full flex items-center justify-center",
       },
     },
     defaultVariants: {
@@ -46,9 +48,11 @@ interface Props extends VariantProps<typeof buttonStyles> {
   hover?: boolean;
   errorMessage?: string;
   type?: HTMLButtonElement["type"];
+  className?: string;
 }
 
 const Button = ({
+  className,
   intent,
   size,
   children,
@@ -63,13 +67,16 @@ const Button = ({
     <>
       {" "}
       <button
-        className={buttonStyles({
-          intent,
-          disabled,
-          hover,
-          loading,
-          size,
-        })}
+        className={cn(
+          className,
+          buttonStyles({
+            intent,
+            disabled,
+            hover,
+            loading,
+            size,
+          })
+        )}
         onClick={onClick}
         disabled={disabled}
         type={type}
