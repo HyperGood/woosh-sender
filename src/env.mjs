@@ -36,6 +36,7 @@ export const env = createEnv({
     NEXT_PUBLIC_ZERODEV_ID: z.string().min(1),
     NEXT_PUBLIC_APP_URL: z.string().min(1),
     NEXT_PUBLIC_TESTNET: z.string().min(1),
+    NEXT_PUBLIC_VERCEL_URL: z.string().min(1),
   },
 
   /**
@@ -53,6 +54,7 @@ export const env = createEnv({
     NEXT_PUBLIC_ZERODEV_ID: process.env.NEXT_PUBLIC_ZERODEV_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_TESTNET: process.env.NEXT_PUBLIC_TESTNET,
+    NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
     INSTAGRAM_CLIENT_ID: process.env.INSTAGRAM_CLIENT_ID,
     INSTAGRAM_CLIENT_SECRET: process.env.INSTAGRAM_CLIENT_SECRET,
   },

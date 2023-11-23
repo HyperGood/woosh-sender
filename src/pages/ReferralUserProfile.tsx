@@ -36,7 +36,7 @@ export default function ReferralUserProfile() {
   }
   const { phone, username } = data;
   const inviteLink = username
-    ? `https://${env.NEXT_PUBLIC_APP_URL}?referrer=${username}`
+    ? `https://${env.NEXT_PUBLIC_VERCEL_URL}?referrer=${username}`
     : undefined;
 
   const phoneNumber = phone
