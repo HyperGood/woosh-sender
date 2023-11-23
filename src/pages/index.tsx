@@ -64,8 +64,8 @@ function ConnectInstagram() {
             intent="primary"
             onClick={() => {
               void signIn("instagram", {
-                callbackUrl: `/${
-                  referrerUsername ? `?referrer=${referrerUsername}` : ""
+                callbackUrl: `/?${
+                  referrerUsername ? `referrer=${referrerUsername}` : ""
                 }}`,
               });
             }}
