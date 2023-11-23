@@ -29,6 +29,18 @@ const config = {
       },
     ],
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    /**
+     * Had to add this to fix Lint error with react-hook-form's handleSubmit
+     * Source: https://github.com/orgs/react-hook-form/discussions/8622#discussioncomment-4060570
+     */
+    "@typescript-eslint/no-misused-promises": [
+      2,
+      {
+        checksVoidReturn: {
+          attributes: false,
+        },
+      },
+    ],
   },
 };
 

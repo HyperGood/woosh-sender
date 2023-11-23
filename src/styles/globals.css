@@ -19,9 +19,16 @@
   src: local(""), url("/fonts/fhoscar-medium.woff2") format("woff2");
 }
 
-body {
-  background-color: #f9fbfa;
-  color: #19181d;
+@layer base {
+  html {
+    @apply bg-brand-white dark:bg-brand-black;
+    @apply text-brand-black dark:text-brand-white;
+  }
+
+  body {
+    @apply bg-brand-white dark:bg-brand-black;
+    @apply text-brand-black dark:text-brand-white;
+  }
 }
 
 h1,

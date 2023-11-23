@@ -12,7 +12,7 @@ dependencies:
     specifier: ^1.7.15
     version: 1.7.17(react-dom@18.2.0)(react@18.2.0)
   '@hookform/resolvers':
-    specifier: ^3.1.1
+    specifier: ^3.3.2
     version: 3.3.2(react-hook-form@7.47.0)
   '@next-auth/prisma-adapter':
     specifier: ^1.0.5
@@ -29,6 +29,12 @@ dependencies:
   '@radix-ui/react-dropdown-menu':
     specifier: ^2.0.5
     version: 2.0.6(@types/react-dom@18.2.14)(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0)
+  '@radix-ui/react-label':
+    specifier: ^2.0.2
+    version: 2.0.2(@types/react-dom@18.2.14)(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0)
+  '@radix-ui/react-slot':
+    specifier: ^1.0.2
+    version: 1.0.2(@types/react@18.2.29)(react@18.2.0)
   '@rainbow-me/rainbowkit':
     specifier: ^1.0.11
     version: 1.1.2(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0)(viem@1.16.6)(wagmi@1.4.4)
@@ -74,12 +80,18 @@ dependencies:
   class-variance-authority:
     specifier: ^0.6.1
     version: 0.6.1
+  clsx:
+    specifier: ^2.0.0
+    version: 2.0.0
   ethers:
     specifier: 5.7.2
     version: 5.7.2
   framer-motion:
     specifier: ^10.12.18
     version: 10.16.4(react-dom@18.2.0)(react@18.2.0)
+  google-libphonenumber:
+    specifier: ^3.2.33
+    version: 3.2.33
   next:
     specifier: '^13.4.19 '
     version: 13.5.6(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)
@@ -96,11 +108,14 @@ dependencies:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
   react-hook-form:
-    specifier: ^7.45.1
+    specifier: ^7.47.0
     version: 7.47.0(react@18.2.0)
   react-hot-toast:
     specifier: ^2.4.1
     version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
+  react-international-phone:
+    specifier: ^4.0.3
+    version: 4.0.3(react@18.2.0)
   react-number-format:
     specifier: ^5.2.2
     version: 5.3.1(react-dom@18.2.0)(react@18.2.0)
@@ -110,6 +125,9 @@ dependencies:
   superjson:
     specifier: 1.12.2
     version: 1.12.2
+  tailwind-merge:
+    specifier: ^2.0.0
+    version: 2.0.0
   twilio:
     specifier: ^4.15.0
     version: 4.18.1
@@ -126,7 +144,7 @@ dependencies:
     specifier: ^1.3.11
     version: 1.4.4(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.16.6)(zod@3.22.4)
   zod:
-    specifier: ^3.21.4
+    specifier: ^3.22.4
     version: 3.22.4
 
 devDependencies:
@@ -136,6 +154,9 @@ devDependencies:
   '@types/eslint':
     specifier: ^8.37.0
     version: 8.44.6
+  '@types/google-libphonenumber':
+    specifier: ^7.4.30
+    version: 7.4.30
   '@types/next-pwa':
     specifier: ^5.6.4
     version: 5.6.8(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)
@@ -2663,6 +2684,27 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@radix-ui/react-label@2.0.2(@types/react-dom@18.2.14)(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-N5ehvlM7qoTLx7nWPodsPYPgMzA5WM8zZChQg8nyFJKnDO5WHdba1vv5/H6IO5LtJMfD2Q3wh1qHFGNtK0w3bQ==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.14)(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0)
+      '@types/react': 18.2.29
+      '@types/react-dom': 18.2.14
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /@radix-ui/react-menu@2.0.6(@types/react-dom@18.2.14)(@types/react@18.2.29)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-BVkFLS+bUC8HcImkRKPSiVumA1VPOOEC5WBMiT+QAVsPzW1FJzI9KnqgGxVDPBcql5xXrHkD3JOVoXWEXD8SYA==}
     peerDependencies:
@@ -3925,6 +3967,10 @@ packages:
       '@types/minimatch': 5.1.2
       '@types/node': 18.18.6
     dev: false
+
+  /@types/google-libphonenumber@7.4.30:
+    resolution: {integrity: sha512-Td1X1ayRxePEm6/jPHUBs2tT6TzW1lrVB6ZX7ViPGellyzO/0xMNi+wx5nH6jEitjznq276VGIqjK5qAju0XVw==}
+    dev: true
 
   /@types/json-schema@7.0.14:
     resolution: {integrity: sha512-U3PUjAudAdJBeC2pgN8uTIKgxrb4nlDF3SF0++EldXQvQBGkpFZMSnwQiIoDU77tv45VgNkl/L4ouD+rEomujw==}
@@ -6216,6 +6262,11 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /clsx@2.0.0:
+    resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
+    engines: {node: '>=6'}
+    dev: false
+
   /color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
     dependencies:
@@ -7615,6 +7666,11 @@ packages:
       csstype: ^3.0.10
     dependencies:
       csstype: 3.1.2
+    dev: false
+
+  /google-libphonenumber@3.2.33:
+    resolution: {integrity: sha512-1QKCvAlfq8zY1mviORI9lDzM3I/hwm9+h0CwYBTLq59DBbSHMd5zBOLqHZFiBLicRpwIz46Nynvbywj1XApKvA==}
+    engines: {node: '>=0.10'}
     dev: false
 
   /gopd@1.0.1:
@@ -9518,6 +9574,14 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /react-international-phone@4.0.3(react@18.2.0):
+    resolution: {integrity: sha512-sSbUt3F4+f7xSzGtb5SY78zJTL9kWiU1NpydD9sKtrUDJuBkdl0MSmc4c1RxcMZo9g0TI/e3pqA3VV9eUx/hoQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -10357,6 +10421,12 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /tailwind-merge@2.0.0:
+    resolution: {integrity: sha512-WO8qghn9yhsldLSg80au+3/gY9E4hFxIvQ3qOmlpXnqpDKoMruKfi/56BbbMg6fHTQJ9QD3cc79PoWqlaQE4rw==}
+    dependencies:
+      '@babel/runtime': 7.23.2
+    dev: false
 
   /tailwindcss@3.3.3:
     resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}

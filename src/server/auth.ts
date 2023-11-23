@@ -1,19 +1,21 @@
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
-  type NextAuthOptions,
   type DefaultSession,
+  type NextAuthOptions,
   type Session,
 } from "next-auth";
 import { prisma } from "~/server/db";
 // SIWE Integration
-import type { CtxOrReq } from "next-auth/client/_utils";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { SiweMessage, type SiweResponse } from "siwe";
-import { getCsrfToken } from "next-auth/react";
-import { env } from "~/env.mjs";
 import { AlchemyProvider } from "@ethersproject/providers";
+import type { CtxOrReq } from "next-auth/client/_utils";
+import { type Provider } from "next-auth/providers";
+import CredentialsProvider from "next-auth/providers/credentials";
+import InstagramProvider from "next-auth/providers/instagram";
+import { getCsrfToken } from "next-auth/react";
+import { SiweMessage, type SiweResponse } from "siwe";
 import { optimism, optimismGoerli } from "wagmi/chains";
+import { env } from "~/env.mjs";
 // Types
 // ========================================================
 /**
@@ -26,6 +28,8 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      accessToken: string;
+      userId: number;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -49,14 +53,27 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
 }) => ({
   callbacks: {
     // token.sub will refer to the id of the wallet address
-    session: ({ session, token }) =>
-      ({
+    session: ({ session, token }) => {
+      return {
         ...session,
         user: {
           ...session.user,
           id: token.sub,
+          accessToken: token.accessToken,
+          userId: token.userId,
         },
-      } as Session & { user: { id: string } }),
+      } as Session & {
+        user: { id: string; accessToken: string; userId: number };
+      };
+    },
+    jwt: ({ token, account }) => {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (account) {
+        token.accessToken = account.access_token;
+        token.userId = account.user_id;
+      }
+      return token;
+    },
     // OTHER CALLBACKS to take advantage of but not needed
     // signIn: async (params: { // Used to control if a user is allowed to sign in
     //   user: User | AdapterUser
@@ -132,6 +149,10 @@ export const authOptions: (ctxReq: CtxOrReq) => NextAuthOptions = ({
   //   session: async (message: { session: Session; token: JWT }) => {}
   // },
   providers: [
+    InstagramProvider({
+      clientId: process.env.INSTAGRAM_CLIENT_ID,
+      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
+    }) as Provider,
     CredentialsProvider({
       // ! Don't add this
       // - it will assume more than one auth provider
